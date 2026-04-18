@@ -68,7 +68,15 @@ Code lives at `~/Projects/bearstats/` (not in the Obsidian vault).
 ### Historical / national (all 47 prefectures, prefecture-level totals)
 
 **Ministry of the Environment (環境省)** — https://www.env.go.jp/nature/choju/effort/effort12/effort12.html
-PDFs for sightings, captures, and injuries, per prefecture × month. Historical injury PDFs for FY2016 (H28) through FY2025 (R07). Authoritative; consistent methodology; preliminary figures that get revised.
+Three PDF formats, each with different shape:
+
+- **Injury PDFs** (one per fiscal year, 10 total for FY2016 H28 → FY2025 R07): 39 prefectures × 12 months × 3 metrics (incidents, victims, deaths). Deaths ARE broken out per prefecture per month. Prefecture names are abbreviated (`青森`, not `青森県`; Hokkaido keeps full form).
+- **Sightings PDF** (`syutubotu.pdf`, one file): prefecture × 12 months × 5 fiscal years (R03 / 2021 → R07 / 2025) in a single file.
+- **Captures PDF** (`capture-qe.pdf`, one file): prefecture × 18 fiscal years (H20 / 2008 → R07 / 2025), yearly granularity, 3 sub-columns per year (total / culled / non-culled). Also contains a species-breakdown sub-table (ツキノワグマ vs ヒグマ).
+
+Prefectures in env.go.jp tables: 39, not 47. Missing: Kyushu (Fukuoka, Saga, Nagasaki, Kumamoto, Oita, Miyazaki, Kagoshima) + Okinawa, because Asian black bears don't occur there. The pipeline fills missing prefectures with 0 when merging to 47-prefecture schemas for the webapp.
+
+Authoritative; consistent methodology; preliminary figures that get revised.
 
 ### Point-level / current year (6 prefectures)
 
@@ -98,7 +106,7 @@ Full URLs + license terms in `research/data-sources.md`.
 | Script | Reads | Writes |
 |---|---|---|
 | `fetch_env_go_jp.py` | 10 yearly injury PDFs + current sightings/captures PDFs | `raw/env/*.pdf` |
-| `extract_env_go_jp.py` | `raw/env/*.pdf` | `raw/env/injuries.csv`, `sightings.csv`, `captures.csv` |
+| `extract_env_go_jp.py` | `raw/env/*.pdf` (three different shapes — see Section 5) | `raw/env/injuries.csv` (39 pref × 120 months × 3 metrics), `sightings.csv` (39 pref × 60 months, 5 years), `captures.csv` (39 pref × 18 years × 3 cols) |
 | `fetch_arcgis.py` | 4 FeatureServer endpoints, paginated | `raw/arcgis/{pref}.geojson` |
 | `fetch_kumadas.py` | Akita Kumadas open-data endpoint | `raw/kumadas/akita.csv` |
 | `fetch_yamaguchi.py` | Yamaguchi dataset | `raw/yamaguchi/2024.csv` |
@@ -210,6 +218,10 @@ const state = {
 | env.go.jp | Japanese era year codes (R07/H28) | Map to Western year in pipeline |
 | env.go.jp | Preliminary figures get revised | Store fetch timestamp; quarterly re-run |
 | env.go.jp | Includes both species in injury totals | Stays labeled; webapp filters by species |
+| env.go.jp injury PDFs | 39 prefectures (Kyushu + Okinawa absent) | Fill missing prefectures with 0 when projecting to 47-prefecture webapp schema |
+| env.go.jp injury PDFs | 3 metrics per month (incidents / victims / deaths) | Extract all three; webapp uses victim counts for the injuries overlay and death counts for the deaths overlay |
+| env.go.jp sightings PDF | 5 years in one file (R03–R07) | Parse as multi-year; no need to download separate historical sightings PDFs |
+| env.go.jp captures PDF | 18 years in one file (H20–R07), yearly granularity | Parse as multi-year, yearly only (no monthly breakdown available) |
 | ArcGIS | Paginated at 1,000 records | Loop on `exceededTransferLimit` |
 | ArcGIS | Opaque field names (`field_7`, `field_8`) | Explicit mapping in `build_json.py` |
 | ArcGIS | Dashboards can be retired | Log "source unreachable"; webapp shows last-updated badge |
