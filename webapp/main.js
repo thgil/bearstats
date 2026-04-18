@@ -1,6 +1,7 @@
 import { createState } from "./state.js";
 import { loadAllData } from "./data-loader.js";
 import { mountLineChart } from "./chart-line.js";
+import { mountChoropleth } from "./map-choropleth.js";
 
 const state = createState({
   metric: "sightings",
@@ -20,6 +21,15 @@ async function boot() {
       "sightings"
     );
     setTimeout(() => heroChart.play(), 400);
+
+    const choropleth = mountChoropleth(
+      document.getElementById("choropleth"),
+      data.timeline,
+      data.prefectureTotals,
+      data.prefectureGeo,
+      "sightings"
+    );
+    setTimeout(() => choropleth.playAll(), 2000);
   } catch (err) {
     console.error("[bearstats] boot failed:", err);
     document.body.insertAdjacentHTML(
