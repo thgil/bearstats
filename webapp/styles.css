@@ -1,0 +1,96 @@
+:root {
+  --bg: #0f1419;
+  --bg-elev: #1a1f2e;
+  --text: #e8e8ea;
+  --text-dim: #9aa0b4;
+  --accent: #ff3b30;
+  --accent-hot: #ff5e3a;
+  --pale: #fff4a3;
+  --max-width: 960px;
+  --easing-snap: cubic-bezier(0.95, 0.05, 0.8, 0.04);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; margin: 0 0 1rem; line-height: 1.1; }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.75rem; }
+.subtitle { color: var(--text-dim); margin: 0 0 2rem; max-width: 50ch; }
+
+.scroll-section {
+  min-height: 100vh;
+  padding: 4rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.section-content {
+  max-width: var(--max-width);
+  width: 100%;
+}
+
+.viz {
+  width: 100%;
+  height: min(60vh, 560px);
+  background: var(--bg-elev);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.year-label {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: right;
+  margin-top: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.counters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+@media (max-width: 600px) {
+  .counters { grid-template-columns: 1fr; }
+}
+.counter {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--bg-elev);
+  border-radius: 8px;
+}
+.counter .num {
+  display: block;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.counter .label {
+  display: block;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.sources {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-top: 3rem;
+}
+.sources a { color: var(--accent-hot); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
