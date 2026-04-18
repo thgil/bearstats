@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Raw data dumps (too big for git, reproducible from scripts)
+data-pipeline/raw/
+
+# Webapp build artifacts (none yet, but defensive)
+webapp/node_modules/
+
+# macOS / editor
+.DS_Store
+.vscode/
+.idea/
