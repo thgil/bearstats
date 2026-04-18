@@ -13,6 +13,11 @@
       <div class="section-content">
         <h1>2025 is unlike any year before</h1>
         <p class="subtitle">Bear sightings across Japan doubled the previous record. 23 people died — the highest toll since records began.</p>
+        <div class="toggle-bar" role="group" aria-label="Metric">
+          <button class="toggle active" data-metric="sightings">Sightings</button>
+          <button class="toggle"        data-metric="injuries">Injured</button>
+          <button class="toggle"        data-metric="deaths">Killed</button>
+        </div>
         <div id="hero-chart" class="viz"></div>
       </div>
     </section>
@@ -30,6 +35,11 @@
       <div class="section-content">
         <h2>Tohoku, up close</h2>
         <p class="subtitle">Every red dot is a reported sighting, trace, or incident in FY2025.</p>
+        <div class="toggle-bar" role="group" aria-label="Species">
+          <button class="toggle active" data-species="all">All bears</button>
+          <button class="toggle"        data-species="black">Asian black</button>
+          <button class="toggle"        data-species="brown">Brown (Hokkaido)</button>
+        </div>
         <div id="points-map" class="viz"></div>
       </div>
     </section>

@@ -54,6 +54,23 @@ async function boot() {
       });
 
     window.addEventListener("resize", () => scroller.resize());
+
+    document.querySelectorAll('#section-hero .toggle[data-metric]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll('#section-hero .toggle').forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        heroChart.setMetric(btn.dataset.metric);
+      });
+    });
+
+    document.querySelectorAll('#section-points .toggle[data-species]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const container = btn.closest(".scroll-section");
+        container.querySelectorAll('.toggle[data-species]').forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        pointsMap.setFilters({ year: 2025, species: btn.dataset.species });
+      });
+    });
   } catch (err) {
     console.error("[bearstats] boot failed:", err);
     document.body.insertAdjacentHTML(

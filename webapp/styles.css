@@ -91,6 +91,30 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.7
 }
 .sources a { color: var(--accent-hot); }
 
+.toggle-bar {
+  display: inline-flex;
+  gap: 0.25rem;
+  background: var(--bg-elev);
+  padding: 0.25rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+.toggle {
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+.toggle:hover { color: var(--text); }
+.toggle.active {
+  background: var(--accent);
+  color: #fff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
