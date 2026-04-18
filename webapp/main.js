@@ -2,6 +2,7 @@ import { createState } from "./state.js";
 import { loadAllData } from "./data-loader.js";
 import { mountLineChart } from "./chart-line.js";
 import { mountChoropleth } from "./map-choropleth.js";
+import { mountPointsMap } from "./map-points.js";
 
 const state = createState({
   metric: "sightings",
@@ -30,6 +31,14 @@ async function boot() {
       "sightings"
     );
     setTimeout(() => choropleth.playAll(), 2000);
+
+    const pointsMap = mountPointsMap(
+      document.getElementById("points-map"),
+      data.pointsRecent,
+      { year: 2025, species: "black" }
+    );
+    // Expose for later tasks (toggle wiring)
+    window.__bearstats__.pointsMap = pointsMap;
   } catch (err) {
     console.error("[bearstats] boot failed:", err);
     document.body.insertAdjacentHTML(
