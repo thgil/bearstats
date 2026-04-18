@@ -103,6 +103,13 @@ def parse_feature(feature: dict, pref_key: str) -> dict[str, Any]:
 
 
 def fetch_all_features(client: httpx.Client, base_url: str) -> list[dict]:
+    """Fetch all features, handling server-side maxRecordCount.
+
+    ArcGIS Feature Servers have their own maxRecordCount (often 1000) that
+    silently caps responses. We detect this via the `exceededTransferLimit`
+    flag (GeoJSON responses put it at the top level; JSON format puts it
+    under `properties`) and advance offset by the actual chunk size.
+    """
     features: list[dict] = []
     offset = 0
     while True:
@@ -111,9 +118,15 @@ def fetch_all_features(client: httpx.Client, base_url: str) -> list[dict]:
         data = resp.json()
         chunk = data.get("features", [])
         features.extend(chunk)
-        if len(chunk) < PAGE_SIZE:
+
+        exceeded = (
+            data.get("exceededTransferLimit")
+            or data.get("properties", {}).get("exceededTransferLimit")
+            or False
+        )
+        if not exceeded or not chunk:
             break
-        offset += PAGE_SIZE
+        offset += len(chunk)
     return features
 
 
