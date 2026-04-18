@@ -60,6 +60,14 @@ _TYPE_MAP = {
     "捕獲": "capture",         # captured/culled
 }
 
+# Gunma uses integer codes instead of Japanese strings in field_8.
+_TYPE_MAP_INT = {
+    1: "sighting",
+    2: "trace",
+    3: "injury",
+    4: "capture",
+}
+
 
 def _parse_count_ja(raw: str | None) -> int | None:
     """'3頭' → 3, '親1子2' → 3, otherwise None."""
@@ -92,7 +100,11 @@ def parse_feature(feature: dict, pref_key: str) -> dict[str, Any]:
         "lon": coords[0],
         "city": props.get("field_7"),
         "area": props.get("field_17"),
-        "type": _TYPE_MAP.get((props.get("field_8") or "").strip(), "sighting"),
+        "type": (
+            _TYPE_MAP_INT.get(props.get("field_8"), "sighting")
+            if isinstance(props.get("field_8"), int)
+            else _TYPE_MAP.get((props.get("field_8") or "").strip(), "sighting")
+        ),
         "date": _parse_date_ms(props.get("field_20")),
         "time": props.get("field_21"),
         "count": _parse_count_ja(props.get("field_26")),
