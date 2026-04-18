@@ -63,6 +63,17 @@ async function boot() {
       });
     });
 
+    document.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT") return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        heroChart.play();
+      }
+      if (e.key === "1") heroChart.setMetric("sightings");
+      if (e.key === "2") heroChart.setMetric("injuries");
+      if (e.key === "3") heroChart.setMetric("deaths");
+    });
+
     document.querySelectorAll('#section-points .toggle[data-species]').forEach(btn => {
       btn.addEventListener("click", () => {
         const container = btn.closest(".scroll-section");
