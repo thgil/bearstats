@@ -1,10 +1,23 @@
 // Leaflet point overlay for current-year sightings.
 // Assumes Leaflet is loaded globally.
 
+// Japanese fiscal year = April M through March M+1.
+// e.g. fiscal year 2025 includes Apr 2025 - Mar 2026.
+function inFiscalYear(dateStr, fy) {
+  if (!dateStr) return false;
+  const y = Number(dateStr.slice(0, 4));
+  const m = Number(dateStr.slice(5, 7));
+  if (!Number.isFinite(y) || !Number.isFinite(m)) return false;
+  return (m >= 4 && y === fy) || (m <= 3 && y === fy + 1);
+}
+
+export { inFiscalYear };
+
 export function filterPoints(points, filters = {}) {
   return points.filter(p => {
     if (filters.species && filters.species !== "all" && p.species !== filters.species) return false;
     if (filters.pref && p.pref !== filters.pref) return false;
+    if (filters.fiscalYear != null && !inFiscalYear(p.date, filters.fiscalYear)) return false;
     if (filters.year && !(p.date || "").startsWith(String(filters.year))) return false;
     if (filters.type && p.type !== filters.type) return false;
     return true;

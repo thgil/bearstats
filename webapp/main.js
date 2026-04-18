@@ -34,7 +34,7 @@ async function boot() {
     const pointsMap = mountPointsMap(
       document.getElementById("points-map"),
       data.pointsRecent,
-      { year: 2025, species: "black" }
+      { fiscalYear: 2025, species: "black" }
     );
     window.__bearstats__.pointsMap = pointsMap;
     window.__bearstats__.heroChart = heroChart;
@@ -79,7 +79,7 @@ async function boot() {
         const container = btn.closest(".scroll-section");
         container.querySelectorAll('.toggle[data-species]').forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        pointsMap.setFilters({ year: 2025, species: btn.dataset.species });
+        pointsMap.setFilters({ fiscalYear: 2025, species: btn.dataset.species });
       });
     });
   } catch (err) {
