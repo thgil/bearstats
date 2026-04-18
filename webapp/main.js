@@ -1,5 +1,6 @@
 import { createState } from "./state.js";
 import { loadAllData } from "./data-loader.js";
+import { mountLineChart } from "./chart-line.js";
 
 const state = createState({
   metric: "sightings",
@@ -12,17 +13,18 @@ async function boot() {
   try {
     const data = await loadAllData();
     window.__bearstats__ = { state, data };
-    console.log("[bearstats] loaded data:", {
-      timeline_years_sightings: data.timeline.years_sightings,
-      prefecture_totals_metrics: Object.keys(data.prefectureTotals.metrics),
-      points_count: data.pointsRecent.length,
-      geo_features: data.prefectureGeo.features.length,
-    });
+
+    const heroChart = mountLineChart(
+      document.getElementById("hero-chart"),
+      data.timeline,
+      "sightings"
+    );
+    setTimeout(() => heroChart.play(), 400);
   } catch (err) {
-    console.error("[bearstats] data load failed:", err);
+    console.error("[bearstats] boot failed:", err);
     document.body.insertAdjacentHTML(
       "afterbegin",
-      `<div style="background:#b00;color:#fff;padding:1rem;text-align:center">Failed to load data. Refresh to retry.</div>`
+      `<div style="background:#b00;color:#fff;padding:1rem;text-align:center">Failed to load data. Refresh.</div>`
     );
   }
 }
