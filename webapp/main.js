@@ -3,6 +3,7 @@ import { loadAllData } from "./data-loader.js";
 import { mountLineChart } from "./chart-line.js";
 import { mountChoropleth } from "./map-choropleth.js";
 import { mountPointsMap } from "./map-points.js";
+import { animateAllCounters } from "./counters.js";
 
 const state = createState({
   metric: "sightings",
@@ -21,7 +22,6 @@ async function boot() {
       data.timeline,
       "sightings"
     );
-    setTimeout(() => heroChart.play(), 400);
 
     const choropleth = mountChoropleth(
       document.getElementById("choropleth"),
@@ -30,15 +30,30 @@ async function boot() {
       data.prefectureGeo,
       "sightings"
     );
-    setTimeout(() => choropleth.playAll(), 2000);
 
     const pointsMap = mountPointsMap(
       document.getElementById("points-map"),
       data.pointsRecent,
       { year: 2025, species: "black" }
     );
-    // Expose for later tasks (toggle wiring)
     window.__bearstats__.pointsMap = pointsMap;
+    window.__bearstats__.heroChart = heroChart;
+    window.__bearstats__.choropleth = choropleth;
+
+    const scroller = scrollama();
+    scroller
+      .setup({
+        step: ".scroll-section",
+        offset: 0.5,
+        once: true,
+      })
+      .onStepEnter(({ element }) => {
+        if (element.id === "section-hero")  heroChart.play();
+        if (element.id === "section-map")   choropleth.playAll();
+        if (element.id === "section-cost")  animateAllCounters(element);
+      });
+
+    window.addEventListener("resize", () => scroller.resize());
   } catch (err) {
     console.error("[bearstats] boot failed:", err);
     document.body.insertAdjacentHTML(
