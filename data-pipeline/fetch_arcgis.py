@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -78,15 +78,73 @@ def _parse_count_ja(raw: str | None) -> int | None:
     return sum(nums) if nums else None
 
 
+_JST = timezone(timedelta(hours=9))
+
+
 def _parse_date_ms(raw: int | str | None) -> str | None:
-    """ArcGIS Survey123 dates come as epoch-ms integers. → 'YYYY-MM-DD'."""
+    """ArcGIS Survey123 dates come as epoch-ms integers, reported in Japan Standard Time."""
     if raw is None or raw == "":
         return None
     try:
         ms = int(raw)
     except (TypeError, ValueError):
         return None
-    return datetime.fromtimestamp(ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
+    return datetime.fromtimestamp(ms / 1000, tz=_JST).strftime("%Y-%m-%d")
+
+
+# Per-prefecture schema map. Each prefecture's Survey123 template uses different
+# field names; we dispatch by pref_key so every source maps into the canonical schema.
+# Discovered by inspecting raw/arcgis/*.geojson dumps (2026-04-19).
+_FIELD_MAP = {
+    "niigata": {
+        "city": "field_7",
+        "type": "field_8",        # Japanese string: 目撃/痕跡/人身被害/捕獲
+        "type_is_int": False,
+        "date": "field_20",
+        "count": "field_26",      # "3頭" / "親1子2"
+        "description": "field_9",
+        "area": "field_17",
+    },
+    "gunma": {
+        "city": "field_11",
+        "type": "field_8",        # integer 1-4
+        "type_is_int": True,
+        "date": "field_18",
+        "count": None,
+        "description": None,
+        "area": None,
+    },
+    "saitama": {
+        "city": "field_4",
+        "type": "field_10",       # integer
+        "type_is_int": True,
+        "date": "field_1",
+        "count": None,
+        "description": "field_9",
+        "area": "field_6",
+    },
+    "toyama": {
+        "city": "HasseiCity",
+        "type": "HoukokuType",    # Japanese string
+        "type_is_int": False,
+        "date": "HasseiDateTime",
+        "count": None,            # summed from BearAdult/Young/Unknown below
+        "description": "TsuhoInfo",
+        "area": "HasseiArea",
+    },
+}
+
+
+def _toyama_count(props: dict) -> int | None:
+    """Toyama splits count across BearAdult/BearYoung/BearUnknown. Sum them."""
+    total = 0
+    any_set = False
+    for k in ("BearAdult", "BearYoung", "BearUnknown"):
+        v = props.get(k)
+        if isinstance(v, (int, float)) and v > 0:
+            total += int(v)
+            any_set = True
+    return total if any_set else None
 
 
 def parse_feature(feature: dict, pref_key: str) -> dict[str, Any]:
@@ -94,21 +152,34 @@ def parse_feature(feature: dict, pref_key: str) -> dict[str, Any]:
     coords = geom.get("coordinates") or [None, None]
     props = feature.get("properties") or {}
 
+    schema = _FIELD_MAP.get(pref_key, _FIELD_MAP["niigata"])  # default to Niigata for back-compat
+
+    type_raw = props.get(schema["type"]) if schema["type"] else None
+    if schema["type_is_int"] and isinstance(type_raw, int):
+        type_value = _TYPE_MAP_INT.get(type_raw, "sighting")
+    elif isinstance(type_raw, str):
+        type_value = _TYPE_MAP.get(type_raw.strip(), "sighting")
+    else:
+        type_value = "sighting"
+
+    if pref_key == "toyama":
+        count = _toyama_count(props)
+    elif schema["count"]:
+        count = _parse_count_ja(props.get(schema["count"]))
+    else:
+        count = None
+
     return {
         "pref": pref_key,
         "lat": coords[1],
         "lon": coords[0],
-        "city": props.get("field_7"),
-        "area": props.get("field_17"),
-        "type": (
-            _TYPE_MAP_INT.get(props.get("field_8"), "sighting")
-            if isinstance(props.get("field_8"), int)
-            else _TYPE_MAP.get((props.get("field_8") or "").strip(), "sighting")
-        ),
-        "date": _parse_date_ms(props.get("field_20")),
-        "time": props.get("field_21"),
-        "count": _parse_count_ja(props.get("field_26")),
-        "description": props.get("field_9"),
+        "city": props.get(schema["city"]) if schema["city"] else None,
+        "area": props.get(schema["area"]) if schema["area"] else None,
+        "type": type_value,
+        "date": _parse_date_ms(props.get(schema["date"])) if schema["date"] else None,
+        "time": props.get("field_21"),  # Niigata-only; None elsewhere
+        "count": count,
+        "description": props.get(schema["description"]) if schema["description"] else None,
         "species": "black",  # all Honshu prefecture sources are Asian black bear
         "source": f"{pref_key}-arcgis",
     }

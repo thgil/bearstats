@@ -39,8 +39,15 @@ const TYPE_RADIUS = {
 export function mountPointsMap(container, points, initialFilters = { year: 2025, species: "black" }) {
   const map = L.map(container, {
     zoomControl: true,
-    attributionControl: false,
-  }).setView([39.5, 140.5], 6);
+    attributionControl: true,
+  }).setView([37.5, 138.5], 6);
+
+  // Dark basemap so red dots pop against muted terrain.
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> · © <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: "abcd",
+    maxZoom: 18,
+  }).addTo(map);
 
   let layer = null;
 
