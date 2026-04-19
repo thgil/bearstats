@@ -3,11 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bearstats — Japan's 2025 Bear Crisis</title>
+  <title>Bearstats — Japan's FY2025 Bear Crisis</title>
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐻</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="lib/leaflet.css">
 </head>
 <body>
+  <div class="scroll-progress" id="scroll-progress"></div>
   <main>
     <section id="section-hero" class="scroll-section">
       <div class="section-content">
@@ -26,8 +31,11 @@
       <div class="section-content">
         <h2>Where the bears are</h2>
         <p class="subtitle">Each prefecture reddens as sightings accumulate through the year. Watch 2008 to 2025.</p>
-        <div id="choropleth" class="viz"></div>
-        <div class="year-label" id="year-label">—</div>
+        <div id="choropleth-wrap" class="viz-wrap">
+          <div id="choropleth" class="viz"></div>
+          <div class="year-label" id="year-label">—</div>
+          <div id="choropleth-legend" class="legend"></div>
+        </div>
       </div>
     </section>
 

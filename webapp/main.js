@@ -55,6 +55,19 @@ async function boot() {
 
     window.addEventListener("resize", () => scroller.resize());
 
+    // Scroll progress bar
+    const progressEl = document.getElementById("scroll-progress");
+    if (progressEl) {
+      const updateProgress = () => {
+        const scrolled = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = maxScroll > 0 ? Math.min(100, (scrolled / maxScroll) * 100) : 0;
+        progressEl.style.width = pct + "%";
+      };
+      window.addEventListener("scroll", updateProgress, { passive: true });
+      updateProgress();
+    }
+
     document.querySelectorAll('#section-hero .toggle[data-metric]').forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll('#section-hero .toggle').forEach(b => b.classList.remove("active"));

@@ -7,52 +7,116 @@
   --accent-hot: #ff5e3a;
   --pale: #fff4a3;
   --max-width: 960px;
-  --easing-snap: cubic-bezier(0.95, 0.05, 0.8, 0.04);
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
 body {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.55;
   font-size: 16px;
+  font-feature-settings: "ss01", "cv11";
 }
 
-h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; margin: 0 0 1rem; line-height: 1.1; }
-h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.75rem; }
-.subtitle { color: var(--text-dim); margin: 0 0 2rem; max-width: 50ch; }
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.01em;
+}
+.subtitle { color: var(--text-dim); margin: 0 0 1.5rem; max-width: 55ch; }
+
+/* Subtle scroll progress bar at top */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  width: 0%;
+  z-index: 100;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
 
 .scroll-section {
-  min-height: 100vh;
-  padding: 4rem 1.5rem;
+  min-height: 70vh;
+  padding: 3rem 1.5rem;
   display: flex;
   align-items: flex-start;
   justify-content: center;
 }
 .scroll-section .section-content {
-  padding-top: 4vh;
-}
-.section-content {
   max-width: var(--max-width);
   width: 100%;
 }
 
+/* Vizualization container */
 .viz {
   width: 100%;
-  height: min(60vh, 560px);
+  height: min(55vh, 520px);
   background: var(--bg-elev);
   border-radius: 8px;
   overflow: hidden;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-.year-label {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--accent);
-  text-align: right;
+/* Wrapper that lets the year label + legend overlay the map */
+.viz-wrap {
+  position: relative;
   margin-top: 0.5rem;
+}
+.viz-wrap .viz { margin-top: 0; }
+
+/* Year label overlays the map's top-right corner */
+.year-label {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(15, 20, 25, 0.75);
+  backdrop-filter: blur(6px);
+  border-radius: 6px;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 800;
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Choropleth legend: horizontal gradient + range labels */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  max-width: 360px;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+.legend-bar {
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(to right,
+    #2a2f40 0%,
+    #fff4a3 25%,
+    #ffa944 55%,
+    #ff5e3a 80%,
+    #b32d2d 100%);
+}
+.legend-scale {
+  display: flex;
+  justify-content: space-between;
 }
 
 .counters {
@@ -66,25 +130,28 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.7
 }
 .counter {
   text-align: center;
-  padding: 1.5rem;
+  padding: 1.75rem 1.5rem;
   background: var(--bg-elev);
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 .counter .num {
   display: block;
   font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  letter-spacing: -0.03em;
 }
 .counter .label {
   display: block;
   color: var(--text-dim);
   margin-top: 0.5rem;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
 }
 
 .sources {
@@ -94,6 +161,7 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.7
 }
 .sources a { color: var(--accent-hot); }
 
+/* Toggle bar */
 .toggle-bar {
   display: inline-flex;
   gap: 0.25rem;
@@ -101,6 +169,7 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.7
   padding: 0.25rem;
   border-radius: 8px;
   margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 .toggle {
   background: transparent;
@@ -111,6 +180,8 @@ h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 600; margin: 0 0 0.7
   cursor: pointer;
   font-size: 0.9rem;
   font-family: inherit;
+  font-weight: 500;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 .toggle:hover { color: var(--text); }
 .toggle.active {

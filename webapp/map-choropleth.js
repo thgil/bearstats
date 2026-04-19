@@ -44,6 +44,27 @@ export function mountChoropleth(container, timeline, totals, geo, initialMetric 
   let currentYear = yearsForMetric(timeline, initialMetric).at(-1);
   let geoLayer = null;
   const yearLabelEl = document.getElementById("year-label");
+  const legendEl = document.getElementById("choropleth-legend");
+
+  const METRIC_LABELS = {
+    sightings: "sightings",
+    injuries: "people injured",
+    deaths: "people killed",
+    captures_total: "captures",
+  };
+
+  function renderLegend() {
+    if (!legendEl) return;
+    const maxV = maxForMetricAcrossYears(totals, currentMetric);
+    const label = METRIC_LABELS[currentMetric] || currentMetric;
+    legendEl.innerHTML = `
+      <div class="legend-bar" aria-hidden="true"></div>
+      <div class="legend-scale">
+        <span>0 ${label}</span>
+        <span>${maxV.toLocaleString()} / year</span>
+      </div>
+    `;
+  }
 
   function colorForValue(value, maxV) {
     if (value <= 0) return "#2a2f40";
@@ -78,6 +99,7 @@ export function mountChoropleth(container, timeline, totals, geo, initialMetric 
     const years = yearsForMetric(timeline, m);
     currentYear = years.at(-1);
     redraw();
+    renderLegend();
   }
 
   function playAll(durationMs = 8000) {
@@ -92,6 +114,7 @@ export function mountChoropleth(container, timeline, totals, geo, initialMetric 
   }
 
   redraw();
+  renderLegend();
 
   return { playAll, setYear, setMetric };
 }
