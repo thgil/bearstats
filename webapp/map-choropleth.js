@@ -20,10 +20,20 @@ export function valueForPrefYear(totals, metric, year, prefKey) {
   return slot[prefKey] || 0;
 }
 
-function yearsForMetric(timeline, metric) {
-  return metric === "sightings" ? timeline.years_sightings :
-         metric === "captures_total" ? timeline.years_captures :
-         timeline.years_injuries;
+/**
+ * Complete fiscal years for a metric, in order.
+ *
+ * A year still in progress is published as a year-to-date figure; dropping it
+ * keeps the playback a like-for-like comparison and stops the animation
+ * finishing on a near-empty map that reads as a sudden collapse.
+ */
+export function yearsForMetric(timeline, metric) {
+  const years = metric === "sightings" ? timeline.years_sightings :
+                metric === "captures_total" ? timeline.years_captures :
+                timeline.years_injuries;
+  const partial = new Set(timeline.partial_years || []);
+  const complete = (years || []).filter(y => !partial.has(y));
+  return complete.length ? complete : (years || []);
 }
 
 /**
@@ -66,10 +76,26 @@ export function mountChoropleth(container, timeline, totals, geo, initialMetric 
     `;
   }
 
+  const EMPTY_FILL = "#2a2f40";
+
   function colorForValue(value, maxV) {
-    if (value <= 0) return "#2a2f40";
+    if (value <= 0 || maxV <= 0) return EMPTY_FILL;
     const t = Math.min(1, value / maxV);
     return d3.interpolateYlOrRd(0.2 + t * 0.75);
+  }
+
+  /**
+   * Fade the low end toward the empty-prefecture fill.
+   *
+   * The colour ramp starts at an already-saturated yellow, so on its own a
+   * prefecture with a handful of sightings looks much like one with a few
+   * thousand. Carrying opacity alongside hue lets the quiet parts of the
+   * country recede and the hotspots carry the map.
+   */
+  function opacityForValue(value, maxV) {
+    if (value <= 0 || maxV <= 0) return 1;
+    const t = Math.min(1, value / maxV);
+    return 0.3 + Math.sqrt(t) * 0.65;
   }
 
   function redraw() {
@@ -80,7 +106,7 @@ export function mountChoropleth(container, timeline, totals, geo, initialMetric 
         const v = valueForPrefYear(totals, currentMetric, currentYear, feat.properties.code);
         return {
           fillColor: colorForValue(v, maxV),
-          fillOpacity: 0.85,
+          fillOpacity: opacityForValue(v, maxV),
           color: "#0f1419",
           weight: 0.6,
         };

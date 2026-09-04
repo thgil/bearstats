@@ -1,14 +1,20 @@
 """Parse env.go.jp bear PDFs into tidy CSVs.
 
-Three parsers:
-- extract_injury_pdf: one fiscal-year injury PDF → long-form by prefecture × month
-- extract_sightings_pdf: multi-year sightings PDF (R03-R07) → long-form
-- extract_captures_pdf: multi-year captures PDF (H20-R07) → long-form yearly
+Four parsers:
+- extract_injury_pdf: one archived fiscal-year injury PDF → by prefecture × month
+- extract_injury_year_table: the current injury summary PDF → by prefecture × year
+- extract_sightings_pdf: multi-year sightings PDF → long-form by prefecture × month
+- extract_captures_pdf: multi-year captures PDF → long-form yearly
+
+The ministry reshapes and extends these tables between publications, so the
+fiscal years each file covers are read from its column headers at parse time
+rather than hardcoded here.
 """
 from __future__ import annotations
 
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 import pandas as pd
@@ -83,12 +89,43 @@ assert PDF_TO_LONG_NAME["北海道"] == "北海道"
 # Fiscal month order: Apr=1st, ..., Mar=12th (in reading order of PDFs)
 _FISCAL_MONTH_ORDER = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3]
 
-# Sightings PDF covers R03-R07 fiscal years.
-_SIGHTINGS_YEAR_ORDER = [2021, 2022, 2023, 2024, 2025]  # R03-R07
+# Era-year labels in the PDF headers: 'Ｈ２０年度', 'Ｒ０７年度', 'Ｒ04',
+# 'Ｒ０８年度\n(R08年7月末)'. Digits are inconsistently full-width vs half-width
+# (the ministry's own files mix them, e.g. 'Ｈ２1年度'), so normalize before matching.
+_ERA_HEADER_RE = re.compile(r"([HR])\s*(\d{1,2})")
 
-# Captures PDF covers H20-R07 fiscal years.
-_CAPTURES_YEAR_ORDER = list(range(2008, 2026))  # H20..R07
-assert len(_CAPTURES_YEAR_ORDER) == 18
+
+def parse_ytd_month(label: str | None) -> int | None:
+    """Read the cut-off month from a running year's header.
+
+    'Ｒ０８年度\\n(R08年7月末)' → 7, meaning the column covers April through July
+    only. Returns None for a header with no cut-off note, i.e. a closed year.
+    """
+    if not label:
+        return None
+    s = unicodedata.normalize("NFKC", label)
+    m = re.search(r"(\d{1,2})月末", s)
+    return int(m.group(1)) if m else None
+
+
+def parse_fiscal_year_header(label: str | None) -> int | None:
+    """Read a fiscal year out of a PDF column header.
+
+    'Ｈ２０年度' → 2008, 'Ｒ０７年度' → 2025, 'Ｒ04' → 2022,
+    'Ｒ０８年度\\n(R08年7月末)' → 2026. Returns None if no era code is present.
+
+    Year coverage is read from the headers rather than hardcoded so that the
+    ministry appending a new fiscal year each spring does not break the parse.
+    """
+    if not label:
+        return None
+    s = unicodedata.normalize("NFKC", label).strip().upper()
+    m = _ERA_HEADER_RE.search(s)
+    if not m:
+        return None
+    era, n = m.group(1), int(m.group(2))
+    # Heisei 1 = 1989, Reiwa 1 = 2019.
+    return (1988 + n) if era == "H" else (2018 + n)
 
 
 def era_code_to_calendar_year(code: str) -> int:
@@ -197,6 +234,84 @@ def extract_injury_pdf(pdf_path: Path, fiscal_year: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def extract_injury_year_table(pdf_path: Path) -> pd.DataFrame:
+    """Parse the current injury-qe.pdf, which is a by-fiscal-year summary table.
+
+    The ministry changed this file's shape: it used to be a month-by-month
+    snapshot of the current fiscal year, and is now a cumulative table covering
+    every fiscal year since H20 (2008), split across pages (H20-H30 on page 1,
+    R01- on page 2). Rows are prefectures; each fiscal year occupies three
+    columns — 件数 (incidents) / 被害者数 (victims) / 死亡者数 (deaths).
+
+    The trailing fiscal year is a partial year-to-date figure (its header says
+    so, e.g. 'Ｒ０８年度(R08年7月末)'); callers that need only complete years
+    should drop the max year.
+
+    Returns one row per prefecture × fiscal year.
+    """
+    with pdfplumber.open(pdf_path) as pdf:
+        pages = [p.extract_tables() or [] for p in pdf.pages]
+
+    rows: list[dict] = []
+    seen: set[str] = set()
+    years_found: list[int] = []
+
+    for tables in pages:
+        if not tables:
+            continue
+        table = tables[0]
+        if len(table) < 5 or len(table[0]) < 4:
+            continue
+        header = table[0]
+        n_groups = (len(header) - 1) // 3
+        years = [parse_fiscal_year_header(header[1 + 3 * i]) for i in range(n_groups)]
+        # A running year's header names the month it stops at; closed years have none.
+        through = [parse_ytd_month(header[1 + 3 * i]) for i in range(n_groups)]
+        if not any(y is not None for y in years):
+            continue
+        years_found.extend(y for y in years if y is not None)
+
+        for row in table:
+            if not row:
+                continue
+            first = (row[0] or "").strip()
+            if first not in PREFECTURE_NAMES_IN_PDF:
+                continue
+            seen.add(first)
+            long_name = PDF_TO_LONG_NAME[first]
+            key = PREFECTURE_KEYS[PREFECTURE_ORDER_JA.index(long_name)]
+
+            for i, fiscal_year in enumerate(years):
+                if fiscal_year is None:
+                    continue
+                base = 1 + 3 * i
+                if base + 2 >= len(row):
+                    continue
+                rows.append({
+                    "prefecture_ja": long_name,
+                    "prefecture_key": key,
+                    "year": fiscal_year,
+                    # Fiscal month the figure runs through; empty for closed years.
+                    "through_month": through[i],
+                    "incidents": _clean_cell(row[base]),
+                    "victims": _clean_cell(row[base + 1]),
+                    "deaths": _clean_cell(row[base + 2]),
+                })
+
+    if not rows:
+        raise ValueError(f"{pdf_path.name}: no fiscal-year injury columns found")
+
+    missing = set(PREFECTURE_NAMES_IN_PDF) - seen
+    if missing:
+        raise ValueError(f"{pdf_path.name}: missing prefectures: {sorted(missing)}")
+
+    dupes = [y for y in set(years_found) if years_found.count(y) > 1]
+    if dupes:
+        raise ValueError(f"{pdf_path.name}: fiscal year(s) {sorted(dupes)} appear twice")
+
+    return pd.DataFrame(rows)
+
+
 def extract_sightings_pdf(pdf_path: Path) -> pd.DataFrame:
     """Parse the multi-year sightings PDF (syutubotu.pdf).
 
@@ -230,6 +345,27 @@ def extract_sightings_pdf(pdf_path: Path) -> pd.DataFrame:
             f"{len(table)} × {len(table[0])}"
         )
 
+    # The window of fiscal years this PDF covers slides forward each year
+    # (it was R03-R07, it is now R04-R08), so read it from the sub-header row
+    # rather than hardcoding. Each month repeats the same year labels, so the
+    # block length is the distance to the first repeat of the first label.
+    sub = [parse_fiscal_year_header(c) for c in table[1][1:]]
+    if not sub or sub[0] is None:
+        raise ValueError(f"{pdf_path.name}: could not read year sub-headers")
+    year_order = [sub[0]]
+    for label in sub[1:]:
+        if label == sub[0]:
+            break
+        if label is not None:
+            year_order.append(label)
+    n_years = len(year_order)
+    # 12 months + a 合計 block, all n_years wide.
+    if len(table[0]) < 1 + 13 * n_years:
+        raise ValueError(
+            f"{pdf_path.name}: {n_years} years needs ≥{1 + 13 * n_years} cols, "
+            f"got {len(table[0])}"
+        )
+
     rows: list[dict] = []
     seen: set[str] = set()
 
@@ -245,8 +381,8 @@ def extract_sightings_pdf(pdf_path: Path) -> pd.DataFrame:
         key = PREFECTURE_KEYS[PREFECTURE_ORDER_JA.index(long_name)]
 
         for m_idx, month in enumerate(_FISCAL_MONTH_ORDER):
-            for y_idx, fiscal_year in enumerate(_SIGHTINGS_YEAR_ORDER):
-                col = 1 + 5 * m_idx + y_idx
+            for y_idx, fiscal_year in enumerate(year_order):
+                col = 1 + n_years * m_idx + y_idx
                 if col >= len(row):
                     raise ValueError(f"{pdf_path.name}: col {col} out of bounds for {first}")
                 value = _clean_cell(row[col])
@@ -297,6 +433,15 @@ def extract_captures_pdf(pdf_path: Path) -> pd.DataFrame:
             f"{len(table)} × {len(table[0])}"
         )
 
+    # Read the covered fiscal years from the header row; the ministry appends a
+    # new one each year (H20-R07 became H20-R08), and the trailing one is a
+    # partial year-to-date figure.
+    header = table[0]
+    n_groups = (len(header) - 1) // 3
+    year_order = [parse_fiscal_year_header(header[1 + 3 * i]) for i in range(n_groups)]
+    if not any(y is not None for y in year_order):
+        raise ValueError(f"{pdf_path.name}: could not read year headers")
+
     rows: list[dict] = []
     seen: set[str] = set()
 
@@ -310,7 +455,9 @@ def extract_captures_pdf(pdf_path: Path) -> pd.DataFrame:
         long_name = PDF_TO_LONG_NAME[first]
         key = PREFECTURE_KEYS[PREFECTURE_ORDER_JA.index(long_name)]
 
-        for y_idx, cal_year in enumerate(_CAPTURES_YEAR_ORDER):
+        for y_idx, cal_year in enumerate(year_order):
+            if cal_year is None:
+                continue
             base = 1 + 3 * y_idx
             if base + 2 >= len(row):
                 raise ValueError(f"{pdf_path.name}: col {base + 2} out of bounds")
@@ -346,23 +493,52 @@ def main() -> int:
         print(f"[injuries] {pdf_path.name} → FY{fy}")
         injury_frames.append(extract_injury_pdf(pdf_path, fiscal_year=fy))
 
+    # Keep the month-level archive as its own file. The summary PDF below reports
+    # only fiscal-year totals, so this is the sole source able to answer "how did
+    # the same months of an earlier year compare" — the only fair way to read a
+    # year that is still running.
+    if injury_frames:
+        monthly = pd.concat(injury_frames, ignore_index=True)
+        out = ENV_RAW / "injuries_monthly.csv"
+        monthly.to_csv(out, index=False)
+        yrs = sorted(monthly["year"].unique())
+        print(f"[wrote]    {out.name} ({len(monthly):,} rows, FY{yrs[0]}-FY{yrs[-1]})")
+
+    # The per-year monthly PDFs above are the archive. The current summary PDF is
+    # authoritative and now covers every fiscal year since 2008, so where the two
+    # overlap the summary wins and the monthly frames only fill gaps.
     current_injury = ENV_RAW / "injury-qe.pdf"
     if current_injury.exists():
-        print(f"[injuries] {current_injury.name} → FY2025 (current snapshot, supersedes r07)")
-        cur_df = extract_injury_pdf(current_injury, fiscal_year=2025)
-        injury_frames = [f for f in injury_frames if f["year"].iloc[0] != 2025] + [cur_df]
+        year_df = extract_injury_year_table(current_injury)
+        covered = sorted(year_df["year"].unique())
+        print(
+            f"[injuries] {current_injury.name} → FY{covered[0]}-FY{covered[-1]} "
+            f"(by-year summary, supersedes monthly PDFs)"
+        )
+        superseded = set(covered)
+        kept = [f for f in injury_frames if f["year"].iloc[0] not in superseded]
+        # Monthly frames carry month/calendar_year columns the summary lacks;
+        # concat aligns on the union and leaves them null for summary rows.
+        injury_frames = kept + [year_df]
 
     if injury_frames:
         all_injuries = pd.concat(injury_frames, ignore_index=True)
         out = ENV_RAW / "injuries.csv"
         all_injuries.to_csv(out, index=False)
+        by_year = all_injuries.groupby("year")[["victims", "deaths"]].sum()
         print(f"[wrote]    {out.name} ({len(all_injuries):,} rows)")
+        print(
+            f"[injuries] national totals FY{by_year.index.min()}-FY{by_year.index.max()}: "
+            f"latest = {int(by_year['victims'].iloc[-1])} injured, "
+            f"{int(by_year['deaths'].iloc[-1])} killed"
+        )
 
     # --- Sightings (single multi-year PDF) ---
     sightings_pdf = ENV_RAW / "syutubotu.pdf"
     if sightings_pdf.exists():
-        print(f"[sightings] {sightings_pdf.name} → 5 years (R03-R07)")
         df = extract_sightings_pdf(sightings_pdf)
+        yrs = sorted(df["year"].unique())
+        print(f"[sightings] {sightings_pdf.name} → FY{yrs[0]}-FY{yrs[-1]} ({len(yrs)} years)")
         out = ENV_RAW / "sightings.csv"
         df.to_csv(out, index=False)
         print(f"[wrote]    {out.name} ({len(df):,} rows)")
@@ -370,8 +546,9 @@ def main() -> int:
     # --- Captures (single multi-year PDF, yearly) ---
     captures_pdf = ENV_RAW / "capture-qe.pdf"
     if captures_pdf.exists():
-        print(f"[captures] {captures_pdf.name} → 18 years (H20-R07)")
         df = extract_captures_pdf(captures_pdf)
+        yrs = sorted(df["year"].unique())
+        print(f"[captures] {captures_pdf.name} → FY{yrs[0]}-FY{yrs[-1]} ({len(yrs)} years)")
         out = ENV_RAW / "captures.csv"
         df.to_csv(out, index=False)
         print(f"[wrote]    {out.name} ({len(df):,} rows)")

@@ -19,11 +19,14 @@ body {
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  /* Sized for a two-sentence headline: the register wants plain statements
+     rather than one short phrase, so the scale gives them room to sit. */
+  font-size: clamp(1.85rem, 3.6vw, 2.75rem);
   font-weight: 800;
-  margin: 0 0 1rem;
-  line-height: 1.05;
+  margin: 0 0 1.1rem;
+  line-height: 1.12;
   letter-spacing: -0.02em;
+  max-width: 22ch;
 }
 h2 {
   font-size: clamp(1.5rem, 3.5vw, 2.25rem);
@@ -196,4 +199,232 @@ a:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+}
+
+/* ---- Maps -------------------------------------------------------------- */
+/* The basemap is drawn from local GeoJSON, so the container's own background
+   is the sea. Kept darker than the land fill so the coastline reads. */
+#points-map,
+#choropleth {
+  background: #12161f;
+}
+
+/* Leaflet chrome, restyled for the dark palette */
+.leaflet-container {
+  font-family: inherit;
+  outline: none;
+}
+.leaflet-control-attribution {
+  background: rgba(15, 20, 25, 0.8) !important;
+  color: var(--text-dim) !important;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+}
+.leaflet-control-attribution a { color: var(--text-dim); }
+.leaflet-bar a {
+  background: var(--bg-elev);
+  color: var(--text);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.leaflet-bar a:hover { background: #252b3d; color: var(--text); }
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--bg-elev);
+  color: var(--text);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+.leaflet-popup-content-wrapper { border-radius: 8px; }
+.leaflet-popup-content { margin: 0.7rem 0.9rem; font-size: 0.85rem; line-height: 1.45; }
+.leaflet-popup-content strong { color: var(--accent-hot); }
+.leaflet-popup-close-button { color: var(--text-dim) !important; }
+
+/* Points-map key: species colour + incident-type size */
+.map-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  margin-top: 0.75rem;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+.map-key .key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.map-key .dot {
+  display: inline-block;
+  border-radius: 50%;
+  background: currentColor;
+}
+.map-key .dot-black { color: #ff3b30; width: 6px; height: 6px; }
+.map-key .dot-brown { color: #ffa944; width: 8px; height: 8px; }
+.map-key .dot-injury { color: #ff3b30; width: 11px; height: 11px; }
+
+
+
+/* ---- Hero tiles: the chart's read-off date, stated as numbers ---------- */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0 0 1rem;
+  max-width: 620px;
+}
+@media (max-width: 600px) {
+  .tiles { grid-template-columns: 1fr; }
+}
+.tile {
+  background: var(--bg-elev);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.tile.is-current { border-color: rgba(255, 59, 48, 0.32); }
+.tile-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.tile-num {
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.tile-num.is-past { color: #7d87a8; }
+
+/* ---- Same-months comparison rows --------------------------------------- */
+.compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+@media (max-width: 700px) {
+  .compare { grid-template-columns: 1fr; }
+}
+.cmp {
+  background: var(--bg-elev);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  padding: 1.25rem 1.4rem 1.4rem;
+}
+.cmp-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.cmp-head p {
+  margin: 0.15rem 0 1rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+.cmp-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+.cmp-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.cmp-year {
+  width: 3.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.cmp-track { flex-grow: 1; display: flex; }
+.cmp-bar {
+  display: block;
+  height: 16px;
+  border-radius: 0 3px 3px 0;
+  background: #3c4560;
+}
+.cmp-value {
+  width: 2.6rem;
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.cmp-row.is-current .cmp-year,
+.cmp-row.is-current .cmp-value { color: var(--text); }
+.cmp-row.is-current .cmp-bar { background: var(--accent); }
+.cmp-read {
+  margin: 1rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+/* Data-window note under a chart */
+.dateline {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.75rem 0 0;
+  max-width: 68ch;
+}
+
+/* A shorter frame for the deaths columns */
+.viz-short { height: min(34vh, 300px); }
+
+/* Second heading inside "Why now?" */
+.why-second { margin-top: 2.5rem; }
+#section-why p { max-width: 66ch; }
+#section-why em { font-style: normal; color: var(--text); font-weight: 600; }
+
+/* Replay readout over the point map */
+.replay {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.85rem;
+  background: rgba(15, 20, 25, 0.78);
+  backdrop-filter: blur(6px);
+  border-radius: 8px;
+  z-index: 650;
+  pointer-events: none;
+}
+.replay-month {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.replay-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Coverage caveat, kept inside the map frame rather than only in prose */
+.map-caveat {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  max-width: 30ch;
+  padding: 0.4rem 0.7rem;
+  background: rgba(15, 20, 25, 0.78);
+  backdrop-filter: blur(6px);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  z-index: 650;
+  pointer-events: none;
 }

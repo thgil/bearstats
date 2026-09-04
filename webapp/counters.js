@@ -12,8 +12,14 @@ export function animateCounter(el, target, durationMs = 1600) {
   requestAnimationFrame(frame);
 }
 
+/**
+ * Animate only the counters that opt in with `data-count-up`.
+ *
+ * A casualty count spinning up from zero turns people into a scoreboard. Those
+ * numbers are rendered in the markup and left alone; the rest keep the tween.
+ */
 export function animateAllCounters(rootEl) {
-  rootEl.querySelectorAll("[data-target]").forEach(el => {
+  rootEl.querySelectorAll("[data-target][data-count-up]").forEach(el => {
     const target = Number(el.dataset.target);
     if (Number.isFinite(target)) animateCounter(el, target);
   });

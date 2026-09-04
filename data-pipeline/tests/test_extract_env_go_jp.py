@@ -7,7 +7,9 @@ from extract_env_go_jp import (
     era_code_to_calendar_year,
     extract_captures_pdf,
     extract_injury_pdf,
+    extract_injury_year_table,
     extract_sightings_pdf,
+    parse_fiscal_year_header,
     PREFECTURE_ORDER_JA,
     PREFECTURE_KEYS,
 )
@@ -121,3 +123,73 @@ def test_extract_captures_pdf_totals_add_up():
     df = extract_captures_pdf(FIXTURES / "capture-sample.pdf")
     mismatches = (df["total"] - (df["culled"] + df["non_killed"])).abs()
     assert mismatches.max() <= 2, f"max mismatch = {mismatches.max()}"
+
+
+# ---------------------------------------------------------------------------
+# Fiscal-year header parsing
+# ---------------------------------------------------------------------------
+
+def test_parse_fiscal_year_header_full_width():
+    assert parse_fiscal_year_header("Ｈ２０年度") == 2008
+    assert parse_fiscal_year_header("Ｒ０７年度") == 2025
+
+
+def test_parse_fiscal_year_header_half_width_and_mixed():
+    # The ministry's own files mix widths, e.g. 'Ｈ２1年度'.
+    assert parse_fiscal_year_header("Ｈ２1年度") == 2009
+    assert parse_fiscal_year_header("Ｒ04") == 2022
+    assert parse_fiscal_year_header("R05") == 2023
+
+
+def test_parse_fiscal_year_header_partial_year_suffix():
+    """The trailing column carries a year-to-date note; the year still parses."""
+    assert parse_fiscal_year_header("Ｒ０８年度\n(R08年7月末)") == 2026
+
+
+def test_parse_fiscal_year_header_returns_none_for_non_year():
+    assert parse_fiscal_year_header("都道府県") is None
+    assert parse_fiscal_year_header("") is None
+    assert parse_fiscal_year_header(None) is None
+
+
+# ---------------------------------------------------------------------------
+# Injury by-fiscal-year summary table (the current injury-qe.pdf shape)
+# ---------------------------------------------------------------------------
+
+def test_injury_year_table_covers_2008_to_present():
+    df = extract_injury_year_table(FIXTURES / "injury-year-table-sample.pdf")
+    years = sorted(df["year"].unique())
+    assert years[0] == 2008
+    assert years == list(range(years[0], years[-1] + 1)), "fiscal years must be contiguous"
+
+
+def test_injury_year_table_has_all_39_prefectures_each_year():
+    df = extract_injury_year_table(FIXTURES / "injury-year-table-sample.pdf")
+    counts = df.groupby("year")["prefecture_key"].nunique()
+    assert (counts == 39).all(), f"per-year prefecture counts: {counts.to_dict()}"
+
+
+def test_injury_year_table_fy2025_matches_published_totals():
+    """FY2025 (R07) national totals as published: 216 incidents, 238 victims, 13 deaths.
+
+    Regression guard: an earlier parser read this file's fiscal-year columns as
+    if they were months and summed them, reporting 1,087 injured / 23 killed.
+    """
+    df = extract_injury_year_table(FIXTURES / "injury-year-table-sample.pdf")
+    fy25 = df[df["year"] == 2025]
+    assert fy25["incidents"].sum() == 216
+    assert fy25["victims"].sum() == 238
+    assert fy25["deaths"].sum() == 13
+
+
+def test_injury_year_table_fy2025_is_the_record_year():
+    df = extract_injury_year_table(FIXTURES / "injury-year-table-sample.pdf")
+    by_year = df.groupby("year")["deaths"].sum()
+    assert by_year.idxmax() == 2025
+    # Comfortably clear of the prior peak rather than a tie.
+    assert by_year[2025] > by_year.drop(2025).max()
+
+
+def test_injury_year_table_victims_never_below_deaths():
+    df = extract_injury_year_table(FIXTURES / "injury-year-table-sample.pdf")
+    assert (df["victims"] >= df["deaths"]).all()

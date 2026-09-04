@@ -15,3 +15,6 @@ webapp/node_modules/
 .DS_Store
 .vscode/
 .idea/
+
+# wrangler local cache
+.wrangler/

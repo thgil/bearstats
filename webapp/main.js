@@ -1,6 +1,8 @@
 import { createState } from "./state.js";
 import { loadAllData } from "./data-loader.js";
-import { mountLineChart } from "./chart-line.js";
+import { mountPaceChart } from "./chart-pace.js";
+import { mountRows } from "./chart-rows.js";
+import { mountDeathsChart } from "./chart-deaths.js";
 import { mountChoropleth } from "./map-choropleth.js";
 import { mountPointsMap } from "./map-points.js";
 import { animateAllCounters } from "./counters.js";
@@ -17,10 +19,27 @@ async function boot() {
     const data = await loadAllData();
     window.__bearstats__ = { state, data };
 
-    const heroChart = mountLineChart(
+    const heroChart = mountPaceChart(
       document.getElementById("hero-chart"),
-      data.timeline,
-      "sightings"
+      data.timeline
+    );
+
+    // The two tiles are the chart's read-off date, stated as numbers.
+    const ytdSightings = (data.timeline.ytd || {}).sightings;
+    if (ytdSightings) {
+      const n = ytdSightings.values.length;
+      document.getElementById("tile-bench").textContent =
+        ytdSightings.values[n - 2].toLocaleString();
+      document.getElementById("tile-current").textContent =
+        ytdSightings.values[n - 1].toLocaleString();
+    }
+
+    mountRows(document.getElementById("cmp-deaths"), data.timeline, "deaths");
+    mountRows(document.getElementById("cmp-injuries"), data.timeline, "injuries");
+
+    const deathsChart = mountDeathsChart(
+      document.getElementById("deaths-chart"),
+      data.timeline
     );
 
     const choropleth = mountChoropleth(
@@ -34,11 +53,14 @@ async function boot() {
     const pointsMap = mountPointsMap(
       document.getElementById("points-map"),
       data.pointsRecent,
-      { fiscalYear: 2025, species: "black" }
+      data.prefectureGeo,
+      { fiscalYear: 2025 }
     );
     window.__bearstats__.pointsMap = pointsMap;
     window.__bearstats__.heroChart = heroChart;
     window.__bearstats__.choropleth = choropleth;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const scroller = scrollama();
     scroller
@@ -48,9 +70,13 @@ async function boot() {
         once: true,
       })
       .onStepEnter(({ element }) => {
-        if (element.id === "section-hero")  heroChart.play();
-        if (element.id === "section-map")   choropleth.playAll();
-        if (element.id === "section-cost")  animateAllCounters(element);
+        if (element.id === "section-hero")   heroChart.play();
+        if (element.id === "section-map")    choropleth.playAll();
+        if (element.id === "section-points" && !reduceMotion) pointsMap.play();
+        if (element.id === "section-cost") {
+          animateAllCounters(element);
+          deathsChart.play();
+        }
       });
 
     window.addEventListener("resize", () => scroller.resize());
@@ -68,33 +94,15 @@ async function boot() {
       updateProgress();
     }
 
-    document.querySelectorAll('#section-hero .toggle[data-metric]').forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll('#section-hero .toggle').forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        heroChart.setMetric(btn.dataset.metric);
-      });
-    });
-
     document.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT") return;
       if (e.code === "Space") {
         e.preventDefault();
         heroChart.play();
       }
-      if (e.key === "1") heroChart.setMetric("sightings");
-      if (e.key === "2") heroChart.setMetric("injuries");
-      if (e.key === "3") heroChart.setMetric("deaths");
+      if (e.key === "r" && !reduceMotion) pointsMap.play();
     });
 
-    document.querySelectorAll('#section-points .toggle[data-species]').forEach(btn => {
-      btn.addEventListener("click", () => {
-        const container = btn.closest(".scroll-section");
-        container.querySelectorAll('.toggle[data-species]').forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        pointsMap.setFilters({ fiscalYear: 2025, species: btn.dataset.species });
-      });
-    });
   } catch (err) {
     console.error("[bearstats] boot failed:", err);
     document.body.insertAdjacentHTML(
