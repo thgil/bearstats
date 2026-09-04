@@ -167,7 +167,9 @@ const SEA = "#12161f";
 const LAND_BASE = "#1e2433";
 const BORDER = "#38425c";
 const TOHOKU_OUTLINE = "#e8e8ea";
-const MONTH_FADE_OPACITY = 0.18;
+// Canvas opacity for months that have passed: sightings are drawn at .55,
+// so this lands them near .18 — visible as history, not competing.
+const MONTH_FADE = 0.33;
 const JAPAN_CENTER = [37.5, 138.0];
 const JAPAN_ZOOM = 5;
 // The four main islands. The GeoJSON's own bounds run down to Okinawa and
@@ -254,10 +256,18 @@ export function mountStoryMap(container, {
 } = {}) {
   container.style.background = SEA;
 
+  // The map sits inside a pinned panel: a wheel over it must scroll the
+  // page, not zoom the map, and on a touch screen a drag must scroll too.
+  const coarse = typeof window !== "undefined" && window.matchMedia &&
+    window.matchMedia("(pointer: coarse)").matches;
   const map = L.map(container, {
     zoomControl: false,
     attributionControl: true,
     preferCanvas: true,
+    scrollWheelZoom: false,
+    dragging: !coarse,
+    touchZoom: false,
+    tap: false,
     minZoom: 4,
     maxZoom: 12,
     // Fractional zoom so fitBounds can actually fill the panel with Japan
@@ -295,7 +305,6 @@ export function mountStoryMap(container, {
   let geoLayer = null;
   let tohokuOutlines = []; // { layer, tooltip } for akita/iwate
 
-  let pointLayers = [];
 
   // --- choropleth ------------------------------------------------------------
 
@@ -446,19 +455,43 @@ export function mountStoryMap(container, {
 
   // --- points ------------------------------------------------------------------
 
-  function clearPointLayers() {
-    pointLayers.forEach(l => l.remove());
-    pointLayers = [];
+  // One canvas renderer per month. A month's markers are drawn once, and
+  // making earlier months recede is an opacity change on that canvas rather
+  // than restyling thousands of markers — the old approach cleared and
+  // redrew every point on every tick, which is what made phones stutter.
+  // Injuries keep their own pane, above every month, and never fade.
+  map.createPane("points");
+  map.getPane("points").style.zIndex = 640;
+
+  let monthLayers = [];   // month index → { group, renderer }
+  let drawnUpTo = -1;
+  let allPoints = null;
+
+  function makeMarkers(points) {
+    const renderer = L.canvas({ pane: "points" });
+    const markers = points.map(p => {
+      const style = pointStyle(p);
+      if (p.type !== "injury") style.renderer = renderer;
+      return L.circleMarker([p.lat, p.lon], style).bindPopup(
+        `<strong>${p.city || p.pref}</strong><br>` +
+        `${p.type}${p.count ? ` · ${p.count} bears` : ""}<br>${p.date || "date unknown"}`
+      );
+    });
+    return { group: L.layerGroup(markers), renderer };
   }
 
-  function drawPoint(p) {
-    const style = pointStyle(p);
-    const marker = L.circleMarker([p.lat, p.lon], style).bindPopup(
-      `<strong>${p.city || p.pref}</strong><br>` +
-      `${p.type}${p.count ? ` · ${p.count} bears` : ""}<br>${p.date || "date unknown"}`
-    ).addTo(map);
-    pointLayers.push(marker);
-    return marker;
+  function clearPointLayers() {
+    monthLayers.forEach(m => m && m.group.remove());
+    monthLayers = [];
+    drawnUpTo = -1;
+    if (allPoints) { allPoints.group.remove(); allPoints = null; }
+  }
+
+  // Leaflet keeps the renderer's canvas as a private field; there is no
+  // public accessor, and a month with no reports never gets one at all.
+  function setMonthFade(m, faded) {
+    const canvas = m.renderer._container;
+    if (canvas) canvas.style.opacity = faded ? MONTH_FADE : 1;
   }
 
   function showPoints() {
@@ -466,7 +499,8 @@ export function mountStoryMap(container, {
     state.mode = "points";
     applyChoroplethStyles();
     clearPointLayers();
-    sampleFyPoints.forEach(drawPoint);
+    allPoints = makeMarkers(sampleFyPoints);
+    allPoints.group.addTo(map);
   }
 
   function hidePoints() {
@@ -490,17 +524,19 @@ export function mountStoryMap(container, {
    * rendering path shared by the timed replay and the deterministic
    * setMonthProgress, so both can never disagree about what a given month
    * looks like. */
+  /** Months 0..idx on the map, the current one at full strength and the
+   * earlier ones receded. Drawing is incremental when the replay moves
+   * forward (the common case) and rebuilt from scratch otherwise, so the
+   * timed replay and setMonthProgress render identically at any month. */
   function renderMonthsUpTo(idx) {
-    clearPointLayers();
-    for (let i = 0; i <= idx; i++) {
-      const isCurrent = i === idx;
-      buckets[i].points.forEach(p => {
-        const marker = drawPoint(p);
-        if (!isCurrent && p.type !== "injury") {
-          marker.setStyle({ fillOpacity: MONTH_FADE_OPACITY });
-        }
-      });
+    if (allPoints || idx < drawnUpTo) clearPointLayers();
+    for (let i = drawnUpTo + 1; i <= idx; i++) {
+      const m = makeMarkers(buckets[i].points);
+      m.group.addTo(map);
+      monthLayers[i] = m;
     }
+    drawnUpTo = idx;
+    monthLayers.forEach((m, i) => setMonthFade(m, i < idx));
     updateReadout(buckets[idx]);
   }
 

@@ -314,7 +314,11 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
      active sits in the readable band rather than under the graphic. */
   .step { min-height: 54vh; padding: 1.5rem 0 5rem; align-items: flex-start; }
   .step:last-child { padding-bottom: 40vh; }
-  .step-card { background: rgba(26, 31, 46, 0.88); backdrop-filter: blur(6px); }
+  /* backdrop-filter re-composites on every scroll frame; on phones that is
+     the difference between a smooth scroll and a stuttering one. */
+  .step-card { background: rgba(26, 31, 46, 0.96); backdrop-filter: none; }
+  .chapter-nav, .map-year, .replay { backdrop-filter: none; }
+  .chapter-nav { background: rgba(15, 20, 25, 0.97); }
 }
 
 /* ---- Choropleth / point-map legend, overlaid on the map -------------------- */

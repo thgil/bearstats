@@ -102,6 +102,14 @@ async function boot() {
 
     window.__bearstats__ = { data, graphics, director };
 
+    // The hero's "updated" stamp comes from the data, so it cannot drift.
+    const fetched = data.timeline && data.timeline._source_fetched_at;
+    const updatedEl = document.getElementById("updated");
+    if (fetched && updatedEl) {
+      const d = new Date(fetched);
+      updatedEl.textContent = "updated " + d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    }
+
     // Hero counters: the hero is the first thing on screen, so animate on load.
     const heroEl = document.getElementById("hero");
     if (heroEl) animateAllCounters(heroEl);
