@@ -35,6 +35,28 @@ export function peakCaption(top, runnerUp) {
   return `level with FY${runnerUp.year}`;
 }
 
+const BAR_GROW_END = 0.9; // all bars are fully grown by t = 0.9; the note fades in over the rest
+
+/**
+ * Bar i's grown fraction at progress t: bars grow one at a time, in order,
+ * each occupying an equal slice of [0, BAR_GROW_END]. Pure so play()'s
+ * staggered transition and setProgress(t)'s instant frame agree.
+ */
+export function barHeightFraction(t, i, n) {
+  if (n <= 0) return 0;
+  const start = (i / n) * BAR_GROW_END;
+  const end = ((i + 1) / n) * BAR_GROW_END;
+  const span = end - start;
+  const local = span <= 0 ? (t >= end ? 1 : 0) : (t - start) / span;
+  return Math.min(1, Math.max(0, local));
+}
+
+/** The peak-year note fades in only after every bar has finished growing. */
+export function noteOpacityForProgress(t) {
+  const span = 1 - BAR_GROW_END;
+  return Math.min(1, Math.max(0, (t - BAR_GROW_END) / span));
+}
+
 const MARGIN = { top: 34, right: 16, bottom: 30, left: 30 };
 const DIM = "#3c4560";
 const HOT = "#ff3b30";
@@ -42,8 +64,9 @@ const INK = "#e8e8ea";
 const MUTED = "#9aa0b4";
 
 export function mountDeathsChart(container, timeline) {
+  container.innerHTML = "";
   const rows = deathsByYear(timeline);
-  if (!rows.length) return { play: () => {} };
+  if (!rows.length) return { play: () => {}, setProgress: () => {}, stop: () => {} };
 
   const { top, runnerUp } = peak(rows);
   const { width: W, height: H } = container.getBoundingClientRect();
@@ -120,14 +143,31 @@ export function mountDeathsChart(container, timeline) {
   }
 
   function play() {
-    bars.transition()
+    bars.interrupt()
+      .transition()
       .delay((_, i) => i * 45)
       .duration(520)
       .ease(d3.easeCubicOut)
       .attr("y", d => y(d.value))
       .attr("height", d => y(0) - y(d.value));
-    note.transition().delay(rows.length * 45 + 260).duration(360).attr("opacity", 1);
+    note.interrupt().transition().delay(rows.length * 45 + 260).duration(360).attr("opacity", 1);
   }
 
-  return { play };
+  /** Deterministic frame: bars grow in sequence, note fades in at the end — no transitions, no timers. */
+  function setProgress(t) {
+    bars.interrupt()
+      .attr("y", (d, i) => {
+        const f = barHeightFraction(t, i, rows.length);
+        return y(0) - f * (y(0) - y(d.value));
+      })
+      .attr("height", (d, i) => barHeightFraction(t, i, rows.length) * (y(0) - y(d.value)));
+    note.interrupt().attr("opacity", noteOpacityForProgress(t));
+  }
+
+  function stop() {
+    bars.interrupt();
+    note.interrupt();
+  }
+
+  return { play, setProgress, stop };
 }

@@ -1,7 +1,19 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cumulative, paceSeries, compareIndex } from "../chart-pace.js";
+import { readFileSync } from "node:fs";
+import {
+  cumulative,
+  paceSeries,
+  compareIndex,
+  finishedLabel,
+  dashOffsetForProgress,
+  opacityForProgress,
+} from "../chart-pace.js";
 import { ytdRows } from "../chart-rows.js";
+
+const real = JSON.parse(
+  readFileSync(new URL("../data/national-timeline.json", import.meta.url))
+);
 
 const timeline = {
   partial_years: [2026],
@@ -123,4 +135,63 @@ test("matchedFullYear returns null when no closed year has been reached", () => 
 test("matchedFullYear names the most recent year when several tie", () => {
   const closed = [{ year: 2015, value: 4 }, { year: 2019, value: 4 }];
   assert.equal(matchedFullYear(4, closed).year, 2019);
+});
+
+// --- finishedLabel / caution view --------------------------------------
+
+test("finishedLabel reads the year and its final total straight off the series", () => {
+  assert.equal(
+    finishedLabel({ year: 2024, values: [100, 20513] }),
+    "FY2024 finished at 20,513"
+  );
+});
+
+test("finishedLabel against the real timeline matches the spec's caution-view figures", () => {
+  const s = paceSeries(real);
+  const y24 = s.find(x => x.year === 2024);
+  const y25 = s.find(x => x.year === 2025);
+  assert.equal(finishedLabel(y24), "FY2024 finished at 20,513");
+  assert.equal(finishedLabel(y25), "FY2025 finished at 50,801");
+});
+
+test("FY2024 led FY2025 at the June read-off, then finished far behind it", () => {
+  // The point of the "caution" view: a spring lead promises nothing about
+  // autumn. Both numbers come from the real data, matching the spec's facts.
+  const s = paceSeries(real);
+  const i = compareIndex(s); // June, driven by however far FY2026 has reported
+  const y24 = s.find(x => x.year === 2024);
+  const y25 = s.find(x => x.year === 2025);
+  assert.equal(y24.values[i], 7601);
+  assert.equal(y25.values[i], 7555);
+  assert.ok(y24.values[i] > y25.values[i], "FY2024 was ahead in June");
+  assert.ok(y24.values.at(-1) < y25.values.at(-1) * 0.5, "but finished well behind");
+});
+
+// --- progress helpers ----------------------------------------------------
+
+test("dashOffsetForProgress: full length before start, zero at/after end", () => {
+  assert.equal(dashOffsetForProgress(0, 100, 0, 0.8), 100);
+  assert.equal(dashOffsetForProgress(0.8, 100, 0, 0.8), 0);
+  assert.equal(dashOffsetForProgress(1, 100, 0, 0.8), 0);
+});
+
+test("dashOffsetForProgress is monotonically non-increasing across t", () => {
+  const ts = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+  let prev = Infinity;
+  for (const t of ts) {
+    const v = dashOffsetForProgress(t, 200, 0.1, 0.9);
+    assert.ok(v <= prev, `offset should not increase at t=${t}`);
+    prev = v;
+  }
+});
+
+test("opacityForProgress: zero before start, one at/after end", () => {
+  assert.equal(opacityForProgress(0.7, 0.8, 1), 0);
+  assert.equal(opacityForProgress(0.9, 0.8, 1), 0.5);
+  assert.equal(opacityForProgress(1, 0.8, 1), 1);
+});
+
+test("setProgress-style calls are idempotent at t=0 and t=1", () => {
+  assert.equal(dashOffsetForProgress(0, 100, 0, 0.8), dashOffsetForProgress(0, 100, 0, 0.8));
+  assert.equal(opacityForProgress(1, 0.8, 1), opacityForProgress(1, 0.8, 1));
 });
