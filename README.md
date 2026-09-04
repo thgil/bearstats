@@ -7,8 +7,27 @@ See `docs/superpowers/specs/2026-04-18-bearstats-design.md` for the design.
 ## Project layout
 
 - `data-pipeline/` — Python scripts that fetch and normalize sources → `webapp/data/*.json`
-- `webapp/` — static single-page site that consumes those JSON files (built in a later phase)
+- `webapp/` — static scrollytelling site that consumes those JSON files (no build step)
+- `webapp/render.html` + `tools/render-video.mjs` — headless frame renderer for the X videos in `media/`
 - `research/` — written notes and source catalog
+
+## Webapp
+
+Three chapters, each a question with a one-line answer, each driven by a pinned
+graphic that the text steps control (`webapp/director.js` maps `data-step` ids
+to graphic actions). Design: `docs/superpowers/specs/2026-09-05-scrolly-redesign-design.md`.
+
+```bash
+cd webapp && python3 -m http.server 8000   # then open http://localhost:8000/
+webapp/tests/run-tests.sh                   # node --test, pure helpers only
+```
+
+Deploys to GitHub Pages on push to `main` (`.github/workflows/pages.yml`) and,
+by hand, to Cloudflare Pages:
+
+```bash
+npx wrangler pages deploy webapp --project-name bearstats
+```
 
 ## Running the pipeline
 
