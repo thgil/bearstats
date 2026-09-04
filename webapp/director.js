@@ -51,13 +51,15 @@ export const STEPS = {
   },
   upclose: {
     graphic: "map",
-    enter(g) {
+    enter(g, isCurrent) {
       g.map?.stop?.();
       const focused = g.map?.focusSample?.();
-      const runReplay = () => {
-        g.map?.showPoints?.();
-        return g.map?.replayMonths?.();
-      };
+      // replayMonths switches the map into points mode itself; calling
+      // showPoints first would flash the whole year before April. And the
+      // flight takes a second: if the reader has scrolled on by the time it
+      // lands, starting the replay would paint points over whatever step is
+      // now showing.
+      const runReplay = () => (isCurrent() ? g.map?.replayMonths?.() : undefined);
       if (focused && typeof focused.then === "function") {
         return focused.then(runReplay);
       }
@@ -109,9 +111,12 @@ export function createDirector(graphics, panels) {
     });
   }
 
+  let current = null;
+
   function enter(stepId) {
     const step = STEPS[stepId];
     if (!step) return;
+    current = stepId;
 
     const chapter = stepChapter(stepId);
     if (chapter) showGraphic(chapter, step.graphic);
@@ -123,7 +128,7 @@ export function createDirector(graphics, panels) {
     if (mapLayer) mapLayer.classList.toggle("is-points", stepId === "upclose");
 
     try {
-      return step.enter(graphics);
+      return step.enter(graphics, () => current === stepId);
     } catch (err) {
       console.warn(`[director] enter("${stepId}") failed:`, err);
       return undefined;

@@ -264,31 +264,30 @@ export function mountMonthlyChart(container, timeline) {
     // are also clamped clear of the zero baseline (and its axis labels) and
     // the top edge — early months sit low on a chart scaled to October's
     // spike, so an unclamped "beneath" label can land on top of the axis.
+    // Both lines rise steeply through spring, so the clear space around a
+    // point is upper-left and lower-right of it, not directly above or below
+    // — a label centred over the point lands on the line. The bigger value
+    // takes the upper-left slot, the smaller the lower-right, and both stay
+    // clear of the axis and the top edge.
     const clampLabelY = v => Math.min(Math.max(v, MARGIN.top + 10), y(0) - 14);
     if (accent && bench) {
       accent.values.forEach((v, i) => {
         const bv = bench.values[i];
         const py = y(v), pby = y(bv);
-        const accentAbove = py <= pby; // smaller pixel-y = higher up = bigger value
-        const tight = Math.abs(py - pby) < 22;
-        const accentDy = accentAbove ? -10 : (tight ? -24 : 16);
-        const benchDy = accentAbove ? (tight ? 30 : 16) : -10;
-
+        const accentAbove = py <= pby;
+        const place = (val, cy, above, color, size) => {
+          gLabels.append("text")
+            .attr("x", above ? x(i) - 9 : x(i) + 9)
+            .attr("y", clampLabelY(above ? cy - 6 : cy + 15))
+            .attr("text-anchor", above ? "end" : "start")
+            .attr("fill", color).attr("font-size", size).attr("font-weight", 700)
+            .style("font-variant-numeric", "tabular-nums")
+            .text(val.toLocaleString());
+        };
         gLabels.append("circle").attr("cx", x(i)).attr("cy", py).attr("r", 3.5).attr("fill", HOT);
-        gLabels.append("text")
-          .attr("x", x(i)).attr("y", clampLabelY(py + accentDy))
-          .attr("text-anchor", "middle")
-          .attr("fill", HOT).attr("font-size", 12).attr("font-weight", 700)
-          .style("font-variant-numeric", "tabular-nums")
-          .text(v.toLocaleString());
-
         gLabels.append("circle").attr("cx", x(i)).attr("cy", pby).attr("r", 3).attr("fill", BENCH);
-        gLabels.append("text")
-          .attr("x", x(i)).attr("y", clampLabelY(pby + benchDy))
-          .attr("text-anchor", "middle")
-          .attr("fill", BENCH).attr("font-size", 11).attr("font-weight", 600)
-          .style("font-variant-numeric", "tabular-nums")
-          .text(bv.toLocaleString());
+        place(v, py, accentAbove, HOT, 12);
+        place(bv, pby, !accentAbove, BENCH, 11);
       });
     }
 

@@ -199,10 +199,9 @@ export function mountPaceChart(container, timeline) {
     const paths = buildLines(defs);
 
     const gLabels = gMarks.append("g").attr("opacity", 0);
-    // Direct labels name the two years being compared. Their June values are
-    // already the two tiles above the chart, so repeating them here would be
-    // clutter — the only number the chart adds is where the record year
-    // ended up.
+    // Direct labels name the two years being compared and read off their
+    // values at the comparison month — the gap between those two numbers is
+    // the whole point of the view.
     if (bench) {
       const endIdx = bench.values.length - 1;
       gLabels.append("text")
@@ -210,25 +209,34 @@ export function mountPaceChart(container, timeline) {
         .attr("text-anchor", "end")
         .attr("fill", BENCH).attr("font-size", 12).attr("font-weight", 700)
         .text(finishedLabel(bench));
-      // The hollow marker on the read-off line needs no label of its own:
-      // the end label above already names this year, and a second one lands
-      // on the line it belongs to.
+      // Read-off value sits lower-right of the hollow marker, where the
+      // rising line leaves room.
       if (cmpIdx >= 0) {
         gLabels.append("circle")
           .attr("cx", x(cmpIdx)).attr("cy", y(bench.values[cmpIdx]))
           .attr("r", 5).attr("fill", "#1a1f2e")
           .attr("stroke", BENCH).attr("stroke-width", 2);
+        gLabels.append("text")
+          .attr("x", x(cmpIdx) + 11).attr("y", y(bench.values[cmpIdx]) + 17)
+          .attr("fill", BENCH).attr("font-size", 12).attr("font-weight", 700)
+          .style("font-variant-numeric", "tabular-nums")
+          .text(`${bench.values[cmpIdx].toLocaleString()} FY${bench.year}`);
       }
     }
     if (running) {
+      const ry = y(running.values.at(-1));
       gLabels.append("circle")
-        .attr("cx", x(cmpIdx)).attr("cy", y(running.values.at(-1)))
+        .attr("cx", x(cmpIdx)).attr("cy", ry)
         .attr("r", 6).attr("fill", HOT)
         .attr("stroke", "#1a1f2e").attr("stroke-width", 2);
+      // Upper-left of the marker: the record year's line climbs away to the
+      // right of the read-off, so that side is never clear.
       gLabels.append("text")
-        .attr("x", x(cmpIdx) + 12).attr("y", y(running.values.at(-1)) - 8)
+        .attr("x", x(cmpIdx) - 12).attr("y", ry - 10)
+        .attr("text-anchor", "end")
         .attr("fill", HOT).attr("font-size", 13).attr("font-weight", 700)
-        .text(`FY${running.year}`);
+        .style("font-variant-numeric", "tabular-nums")
+        .text(`${running.values.at(-1).toLocaleString()} FY${running.year}`);
     }
 
     return { paths, labels: [{ sel: gLabels, start: LABEL_START, end: LABEL_END }] };

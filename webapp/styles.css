@@ -188,6 +188,10 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   display: flex;
   align-items: center;
 }
+/* The sticky panel lets go when its container ends, so the last step needs
+   enough room beneath it to reach the viewport centre with the panel still
+   fully on screen. */
+.step:last-child { padding-bottom: 60vh; }
 /* Trimming the first step's lead-in is safe — it only affects space before
    scrolling starts. The last step's trailing padding is what keeps the
    sticky `.graphic` panel pinned while its card is the active one; shrinking
@@ -299,12 +303,17 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
     order: -1;
     position: sticky;
     top: var(--nav-h);
-    height: 52vh;
+    height: 46vh;
     z-index: 2;
     margin-bottom: 1rem;
   }
+  .g { inset: 0.5rem; padding: 0.6rem; }
+  .g-caption { display: none; }
   .steps { position: relative; z-index: 1; }
-  .step { min-height: auto; padding: 3rem 0; }
+  /* Each step fills the strip below the pinned panel, so the card that is
+     active sits in the readable band rather than under the graphic. */
+  .step { min-height: 54vh; padding: 1.5rem 0 5rem; align-items: flex-start; }
+  .step:last-child { padding-bottom: 40vh; }
   .step-card { background: rgba(26, 31, 46, 0.88); backdrop-filter: blur(6px); }
 }
 
@@ -356,6 +365,9 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
 }
 
 /* Replay readout, top-left over the map */
+.g[data-g="map"]:not(.is-points) .replay { display: none; }
+.g[data-g="map"].is-points .map-year,
+.g[data-g="map"].is-points .legend { display: none; }
 .replay {
   position: absolute;
   top: 1rem;

@@ -170,6 +170,9 @@ const TOHOKU_OUTLINE = "#e8e8ea";
 const MONTH_FADE_OPACITY = 0.18;
 const JAPAN_CENTER = [37.5, 138.0];
 const JAPAN_ZOOM = 5;
+// The four main islands. The GeoJSON's own bounds run down to Okinawa and
+// out to the far Ogasawara islands, which shrinks Honshu to a sliver.
+const JAPAN_BOUNDS = [[30.8, 128.6], [45.6, 146.0]];
 
 const METRIC_LABELS = { sightings: "sightings" };
 
@@ -257,6 +260,9 @@ export function mountStoryMap(container, {
     preferCanvas: true,
     minZoom: 4,
     maxZoom: 12,
+    // Fractional zoom so fitBounds can actually fill the panel with Japan
+    // rather than snapping down to the next whole level and leaving it small.
+    zoomSnap: 0.25,
     zoomAnimation: animate,
     fadeAnimation: animate,
     markerZoomAnimation: animate,
@@ -412,17 +418,25 @@ export function mountStoryMap(container, {
     return p;
   }
 
-  function focusJapan() {
+  /** Drop the Tohoku highlight without moving the map. Both the national
+   * view and the sample-prefecture flight need this, or Akita's outline and
+   * label would ride along into the point replay. */
+  function unfocusTohoku() {
     state.tohokuFocus = false;
     tohokuOutlines.forEach(({ layer }) => layer.setStyle({ color: BORDER, weight: 0.6 }));
     clearTohokuOutlines();
     applyChoroplethStyles();
+  }
+
+  function focusJapan() {
+    unfocusTohoku();
     const p = waitForMoveEnd();
-    map.flyTo(JAPAN_CENTER, JAPAN_ZOOM, fitOptions());
+    map.flyToBounds(JAPAN_BOUNDS, { padding: [12, 12], ...fitOptions() });
     return p;
   }
 
   function focusSample() {
+    unfocusTohoku();
     if (!sampleFyPoints.length) return Promise.resolve();
     const bounds = L.latLngBounds(sampleFyPoints.map(pt => [pt.lat, pt.lon]));
     const p = waitForMoveEnd();
@@ -513,6 +527,7 @@ export function mountStoryMap(container, {
   buildGeoLayer();
   showChoropleth(state.year);
   renderLegend();
+  map.fitBounds(JAPAN_BOUNDS, { padding: [12, 12], animate: false });
 
   return {
     showChoropleth,

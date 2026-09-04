@@ -120,7 +120,9 @@ async function boot() {
     const scroller = typeof scrollama === "function" ? scrollama() : null;
     if (scroller) {
       scroller
-        .setup({ step: ".step", offset: 0.6 })
+        .setup({ step: ".step", // On phones the panel takes the top of the screen, so the trigger line
+      // sits lower, where the reading band is.
+      offset: window.innerWidth < 800 ? 0.8 : 0.6 })
         .onStepEnter(({ element }) => activateStep(element))
         .onStepExit(({ element, direction }) => {
           if (direction !== "up") return;
