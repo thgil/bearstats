@@ -289,6 +289,19 @@ export function mountMonthlyChart(container, timeline) {
         place(v, py, accentAbove, HOT, 12);
         place(bv, pby, !accentAbove, BENCH, 11);
       });
+
+      // The record year's autumn peak, named quietly so the spring gap is
+      // read against the scale of what followed it last year.
+      const pi = peakMonthIndex(bench.values);
+      gLabels.append("circle")
+        .attr("cx", x(pi)).attr("cy", y(bench.values[pi]))
+        .attr("r", 3).attr("fill", BENCH);
+      gLabels.append("text")
+        .attr("x", x(pi)).attr("y", y(bench.values[pi]) - 12)
+        .attr("text-anchor", pi > 8 ? "end" : "middle")
+        .attr("fill", BENCH).attr("font-size", 12).attr("font-weight", 700)
+        .style("font-variant-numeric", "tabular-nums")
+        .text(peakCallout(bench));
     }
 
     return { paths, labels: [{ sel: gLabels, start: LABEL_START, end: LABEL_END }] };

@@ -103,7 +103,13 @@
   }
 
   .map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .chart-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* Charts size their type in px against their own box, which is tuned for
+     a ~900px panel on the site. Mounting at half size and scaling the SVG up
+     2x gives 1080p-legible text and strokes without touching the charts. */
+  .chart-canvas { position: absolute; inset: 0; width: 50%; height: 50%; }
+  /* Applied after mount: the chart measures itself with getBoundingClientRect,
+     which includes transforms, so scaling first would just re-measure 2x. */
+  .chart-canvas.is-scaled { transform: scale(2); transform-origin: 0 0; }
 
   /* Replay readout (month-replay scene), top-left over the map. */
   .replay-readout {

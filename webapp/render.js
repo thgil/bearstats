@@ -146,6 +146,7 @@ function setupOvertake(data) {
   const root = graphicRoot();
   root.innerHTML = `<div id="scene-chart" class="chart-canvas"></div>`;
   const chart = mountMonthlyChart(document.getElementById("scene-chart"), data.timeline);
+  document.getElementById("scene-chart").classList.add("is-scaled");
   chart.setView("running");
   return {
     map: null,
@@ -159,6 +160,7 @@ function setupDeaths(data) {
   const root = graphicRoot();
   root.innerHTML = `<div id="scene-chart" class="chart-canvas"></div>`;
   const chart = mountDeathsChart(document.getElementById("scene-chart"), data.timeline);
+  document.getElementById("scene-chart").classList.add("is-scaled");
   return {
     map: null,
     renderFrame(frame) {
