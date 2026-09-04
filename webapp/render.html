@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bearstats render frame</title>
+<!-- This page is not linked from the site; it is only ever opened by
+     tools/render-video.mjs to grab one 1920x1080 frame at a time. It has to
+     be self-contained (its own styles, not styles.css) because another
+     workstream owns the live page's CSS and can change it under us. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/leaflet.css">
+<style>
+  :root {
+    --bg: #0f1419;
+    --bg-elev: #1a1f2e;
+    --text: #e8e8ea;
+    --text-dim: #9aa0b4;
+    --accent: #ff3b30;
+    --injury: #ffd166;
+    --field: #333b52;
+    --bench: #7d87a8;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  .stage {
+    position: fixed;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    display: flex;
+    background: var(--bg);
+  }
+
+  /* Title block: eyebrow, rule, title, dek, dateline pinned to the bottom. */
+  .title-block {
+    flex: 0 0 560px;
+    width: 560px;
+    padding: 72px 56px;
+    display: flex;
+    flex-direction: column;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .rule {
+    margin-top: 14px;
+    width: 64px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .title {
+    margin: 28px 0 0;
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .dek {
+    margin: 22px 0 0;
+    font-size: 22px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--text-dim);
+    max-width: 42ch;
+  }
+  .dateline {
+    margin: auto 0 0;
+    font-size: 16px;
+    color: var(--text-dim);
+  }
+
+  /* Graphic: fills the rest of the stage with 48px of padding around
+     whatever the scene mounts. */
+  .graphic {
+    position: relative;
+    flex: 1 1 auto;
+  }
+  .graphic-inner {
+    position: absolute;
+    top: 48px;
+    right: 48px;
+    bottom: 48px;
+    left: 48px;
+  }
+
+  .map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .chart-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Replay readout (month-replay scene), top-left over the map. */
+  .replay-readout {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 650;
+    pointer-events: none;
+  }
+  .replay-month {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .replay-count {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .replay-count .hurt { color: var(--injury); }
+
+  /* Key, bottom-left: red dot for sighting/trace, ringed yellow for injury. */
+  .map-key {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    gap: 32px;
+    color: var(--text-dim);
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    z-index: 650;
+  }
+  .map-key .key-item { display: inline-flex; align-items: center; gap: 10px; }
+  .map-key .dot { display: inline-block; border-radius: 50%; }
+  .map-key .dot-sighting { width: 14px; height: 14px; background: var(--accent); }
+  .map-key .dot-injury {
+    width: 18px;
+    height: 18px;
+    background: var(--injury);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--injury);
+  }
+
+  /* Year scene: big year label top-right, legend bottom-right. */
+  .year-label {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 96px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    z-index: 650;
+  }
+  .legend {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--text-dim);
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    z-index: 650;
+  }
+  .legend-bar {
+    height: 16px;
+    border-radius: 4px;
+    background: linear-gradient(to right,
+      #2a2f40 0%,
+      #fff4a3 25%,
+      #ffa944 55%,
+      #ff5e3a 80%,
+      #b32d2d 100%);
+  }
+  .legend-scale { display: flex; justify-content: space-between; }
+
+  /* Prefecture-name tooltip (unused by these scenes, but map-story.js can
+     create one if focusTohoku is ever added to a scene — keep it legible). */
+  .pref-label {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 8px rgba(0, 0, 0, 0.6);
+    padding: 0;
+  }
+  .pref-label::before { display: none; }
+
+  /* Leaflet chrome: no controls in a rendered frame. */
+  .leaflet-container { font-family: inherit; outline: none; background: #12161f; }
+  .leaflet-control-attribution,
+  .leaflet-control-zoom,
+  .leaflet-popup { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="title-block">
+      <p class="eyebrow" id="eyebrow">BEARSTATS &middot; JAPAN</p>
+      <div class="rule"></div>
+      <h1 class="title" id="title"></h1>
+      <p class="dek" id="dek"></p>
+      <p class="dateline" id="dateline"></p>
+    </div>
+    <div class="graphic">
+      <div class="graphic-inner" id="graphic-inner"></div>
+    </div>
+  </div>
+
+  <!-- Globals the graphics modules assume are already on the page. -->
+  <script src="lib/d3.v7.min.js"></script>
+  <script src="lib/leaflet.js"></script>
+  <script type="module" src="render.js"></script>
+</body>
+</html>

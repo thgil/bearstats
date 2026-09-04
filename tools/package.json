@@ -1,0 +1,13 @@
+{
+  "name": "bearstats-render-tools",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless frame renderer for the bearstats X videos (webapp/render.html -> media/*.mp4).",
+  "scripts": {
+    "render": "node render-video.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.55.0"
+  }
+}
