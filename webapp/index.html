@@ -13,97 +13,199 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="scroll-progress" id="scroll-progress"></div>
+  <header class="chapter-nav">
+    <nav>
+      <a href="#ch-1" data-chapter="1">01 What happened</a>
+      <a href="#ch-2" data-chapter="2">02 Is it over</a>
+      <a href="#ch-3" data-chapter="3">03 Will it get worse</a>
+    </nav>
+  </header>
+
   <main>
-    <section id="section-hero" class="scroll-section">
-      <div class="section-content">
-        <h1>Last year Japan counted 50,801 bear sightings. This year started faster.</h1>
-        <p class="subtitle">Bears killed 13 people in the year to March 2026, the most since the government began keeping count in 2008. By the end of June, the new fiscal year had already logged 12,628 sightings against 7,555 over the same three months a year earlier. Spring is a weak guide to what follows, though. The trouble comes in autumn.</p>
+    <section id="hero" class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Japan &middot; bears &middot; FY2025&ndash;26</p>
+        <h1>Japan just had its worst bear year on record.
+          <span class="answer">This spring is running 67% ahead of it.</span>
+        </h1>
 
-        <div class="tiles">
-          <div class="tile">
-            <span class="tile-label">FY2025 by end of June</span>
-            <span class="tile-num is-past" id="tile-bench">—</span>
+        <div class="hero-numbers">
+          <div class="hero-num">
+            <span class="num" data-target="50801" data-count-up>0</span>
+            <span class="num-label">sightings</span>
           </div>
-          <div class="tile is-current">
-            <span class="tile-label">FY2026 by end of June</span>
-            <span class="tile-num" id="tile-current">—</span>
+          <div class="hero-num">
+            <span class="num">238</span>
+            <span class="num-label">people injured</span>
+          </div>
+          <div class="hero-num">
+            <span class="num">13</span>
+            <span class="num-label">killed</span>
           </div>
         </div>
 
-        <div id="hero-chart" class="viz"></div>
-        <p class="dateline">Sightings run to 30 June 2026, injuries and deaths to 31 July 2026. These are reports made to the Ministry of the Environment. They count encounters, not bears.</p>
+        <p class="dateline">Fiscal year April 2025 &ndash; March 2026. Sightings to 30 June 2026, casualties to 31 July 2026. Ministry of the Environment. Counts are reports, not bears.</p>
+      </div>
+      <div class="scroll-cue" aria-hidden="true">
+        <span>Scroll</span>
+        <span class="scroll-cue-arrow">&darr;</span>
       </div>
     </section>
 
-    <section id="section-map" class="scroll-section">
-      <div class="section-content">
-        <h2>Where the bears are</h2>
-        <p class="subtitle">Sightings reported in each prefecture, FY2022 to FY2025. Akita and Iwate alone account for nearly half of them. The map shows raw counts, so the big northern prefectures run dark partly on size alone.</p>
-        <div id="choropleth-wrap" class="viz-wrap">
-          <div id="choropleth" class="viz"></div>
-          <div class="year-label" id="year-label">—</div>
-          <div id="choropleth-legend" class="legend"></div>
-        </div>
+    <section class="chapter" id="ch-1">
+      <div class="chapter-head">
+        <p class="eyebrow">01</p>
+        <h2>What happened?</h2>
+        <p class="answer">Twice as many sightings as any year before, and thirteen deaths.</p>
       </div>
-    </section>
 
-    <section id="section-points" class="scroll-section">
-      <div class="section-content">
-        <h2>Then came October</h2>
-        <p class="subtitle">Every report from Toyama, Niigata, Gunma, Saitama and Hokkaido across FY2025, played back a month at a time. These five prefectures publish their bear reports as open data. Most prefectures do not, so this is a sample. In April there were 64 reports. In October there were 1,795.</p>
-        <div id="points-wrap" class="viz-wrap">
-          <div id="points-map" class="viz"></div>
-          <div class="replay" id="replay">
-            <span class="replay-month" id="replay-month">April 2025</span>
-            <span class="replay-count" id="replay-count">—</span>
+      <div class="scrolly">
+        <div class="steps">
+          <div class="step" data-step="years">
+            <div class="step-card">
+              <h3>Four years, one map.</h3>
+              <p>Sightings reported in each prefecture, played from FY2022 to FY2025. The country lights up from the north.</p>
+            </div>
           </div>
-          <div class="map-caveat">Five prefectures. Most of Japan is missing.</div>
+
+          <div class="step" data-step="centre">
+            <div class="step-card">
+              <h3>It has a centre.</h3>
+              <p>Akita and Iwate alone reported 23,331 of the 50,801 sightings &mdash; nearly half. The map shows raw counts, so big rural prefectures run dark partly on size, but the gap here is not size.</p>
+            </div>
+          </div>
+
+          <div class="step" data-step="october">
+            <div class="step-card">
+              <h3>It happened in autumn.</h3>
+              <p>For three years the curve peaked in June and fell. In 2025 it kept climbing: 15,998 reports in October alone. The beech and oak crop had failed across Tohoku, and bears that would have fed in the hills came down for apples, persimmons and rubbish &mdash; and found towns. By November the government sent soldiers to Akita.</p>
+            </div>
+          </div>
+
+          <div class="step" data-step="upclose">
+            <div class="step-card">
+              <h3>Up close.</h3>
+              <p>Tohoku's prefectures do not publish individual reports. Four prefectures on the Sea of Japan coast and north of Tokyo do: Toyama, Niigata, Gunma and Saitama. Here is their year, one month at a time. April: 64 reports. October: 1,795. Yellow marks are people hurt.</p>
+            </div>
+          </div>
+
+          <div class="step" data-step="cost">
+            <div class="step-card">
+              <h3>The cost.</h3>
+              <p>Thirteen people killed by bears in a single year. The previous worst since records began in 2008 was six.</p>
+            </div>
+          </div>
         </div>
-        <div class="map-key">
-          <span class="key-item"><i class="dot dot-black"></i>Sighting or trace</span>
-          <span class="key-item"><i class="dot dot-injury"></i>Injury</span>
+
+        <div class="graphic" id="graphic-1">
+          <div class="g" data-g="map">
+            <div class="map-frame">
+              <div id="map" class="map-canvas"></div>
+              <div id="map-year" class="map-year">&mdash;</div>
+              <div class="replay" id="replay">
+                <span class="replay-month" id="replay-month">&mdash;</span>
+                <span class="replay-count" id="replay-count"></span>
+              </div>
+              <div id="map-legend" class="legend"></div>
+            </div>
+            <div class="map-key">
+              <span class="key-item"><i class="dot dot-sighting"></i>Sighting or trace</span>
+              <span class="key-item"><i class="dot dot-injury"></i>Person injured</span>
+            </div>
+            <p class="g-caption">Sightings reported, by prefecture and, up close, by month</p>
+          </div>
+
+          <div class="g" data-g="monthly">
+            <div id="monthly-1" class="chart-canvas"></div>
+            <p class="g-caption">Sightings per month, by fiscal year</p>
+          </div>
+
+          <div class="g" data-g="deaths">
+            <div id="deaths" class="chart-canvas"></div>
+            <p class="g-caption">People killed by bears, by fiscal year</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="section-cost" class="scroll-section">
-      <div class="section-content">
-        <h2>The record year in three numbers</h2>
-        <div class="counters">
-          <div class="counter"><span class="num" data-target="50801" data-count-up>0</span><span class="label">sightings</span></div>
-          <div class="counter"><span class="num" data-target="238">238</span><span class="label">injured</span></div>
-          <div class="counter"><span class="num" data-target="13">13</span><span class="label">killed</span></div>
+    <section class="chapter" id="ch-2">
+      <div class="chapter-head">
+        <p class="eyebrow">02</p>
+        <h2>Is it over?</h2>
+        <p class="answer">No. Every month of the new year is running well above the record year.</p>
+      </div>
+
+      <div class="scrolly">
+        <div class="steps">
+          <div class="step" data-step="months">
+            <div class="step-card">
+              <h3>Same months, new year.</h3>
+              <p>April 1,787 against 800. May 4,581 against 2,528. June 6,260 against 4,227.</p>
+            </div>
+          </div>
+
+          <div class="step" data-step="pace">
+            <div class="step-card">
+              <h3>Sixty-seven percent ahead.</h3>
+              <p>By the end of June FY2026 had logged 12,628 sightings, against 7,555 at the same point of the record year.</p>
+            </div>
+          </div>
+
+          <div class="step" data-step="casualties">
+            <div class="step-card">
+              <h3>More bears seen. Not, so far, more people hurt.</h3>
+              <p>Injuries in April&ndash;July: 53 this year, 55 last. Deaths: 6 against 4 &mdash; a gap too small to read.</p>
+            </div>
+          </div>
         </div>
-        <div id="deaths-chart" class="viz viz-short"></div>
-        <p class="dateline">Deaths by fiscal year. The ministry&rsquo;s series starts in 2008.</p>
+
+        <div class="graphic" id="graphic-2">
+          <div class="g" data-g="monthly">
+            <div id="monthly-2" class="chart-canvas"></div>
+            <p class="g-caption">Sightings per month, FY2025 against FY2026</p>
+          </div>
+
+          <div class="g" data-g="pace">
+            <div id="pace" class="chart-canvas"></div>
+            <p class="g-caption">Cumulative sightings through the fiscal year</p>
+          </div>
+
+          <div class="g" data-g="rows">
+            <div class="cmp" id="rows-injuries"></div>
+            <div class="cmp" id="rows-deaths"></div>
+            <p class="g-caption">Casualties to the same point of each fiscal year</p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="section-fy26" class="scroll-section">
-      <div class="section-content">
-        <h2>This year so far</h2>
-        <p class="subtitle">Sightings are running 67% above the same months last year. The casualty numbers have not moved with them. Injuries are slightly down, 53 against 55. Six deaths against four is too small a gap to read much into.</p>
-        <div class="compare">
-          <div class="cmp" id="cmp-deaths"></div>
-          <div class="cmp" id="cmp-injuries"></div>
-        </div>
+    <section class="chapter" id="ch-3">
+      <div class="chapter-head">
+        <p class="eyebrow">03</p>
+        <h2>Will it get worse?</h2>
+        <p class="answer">That depends on the acorns, and nobody knows yet.</p>
       </div>
-    </section>
 
-    <section id="section-why" class="scroll-section">
-      <div class="section-content">
-        <h2>Why last year was so bad</h2>
-        <p>Two things had been building for years. Japan's bear population roughly tripled between 2012 and 2025, from an estimated 15,000 to 54,000. Over the same stretch the people who hunt them aged out. Fewer than 20,000 active bear hunters were left by 2025, down from more than 70,000 in the 1970s.</p>
-        <p>The third thing happened in a single season. The 2025 acorn and beechnut crop failed across Tohoku. Bears that would have fed in the mountains came down for apples, persimmons and rubbish, and they found towns. By November the government had sent soldiers to Akita to help deal with them.</p>
+      <div class="prose">
+        <p>Spring does not tell you much about what autumn will bring. FY2024 was running <em>ahead</em> of FY2025 at the end of June &mdash; 7,601 sightings against 7,555 &mdash; and still finished the year at 20,513, only 40% of FY2025's eventual total. A fast start can fade; a slow one can explode.</p>
 
-        <h2 class="why-second">What happens next depends on the autumn</h2>
-        <p>None of that reset in April. The bears are still there, the hunters are still gone, and this spring is the highest on record by a wide margin.</p>
-        <p>Spring does not tell you much, though. FY2024 was running <em>ahead</em> of FY2025 at the end of June, 7,601 sightings to 7,555, and FY2025 still finished two and a half times larger. October alone brought 15,998. What settles the year is whether the acorns fail again, and nobody knows that yet.</p>
-        <p class="sources">Counts from the Ministry of the Environment. Population, hunter numbers and the 2025 mast failure from Japan Times and Britannica; the Akita deployment from CNN. Data pipeline and full sources: <a href="https://github.com/thgil/bearstats">repo</a>.</p>
+        <div class="viz" id="pace-caution"></div>
+
+        <p>What has changed is the baseline underneath both years. Japan's bear population roughly tripled between 2012 and 2025, from an estimated 15,000 to around 54,000. Over the same years the people licensed to hunt them aged out of the job: more than 70,000 active bear hunters in the 1970s, fewer than 20,000 by 2025. More bears, fewer hunters &mdash; that does not reset every April.</p>
+
+        <p>What decides whether autumn 2026 repeats autumn 2025 is the mast crop &mdash; the beech and oak nuts bears fatten on before winter. A second failed crop would send hungry bears back into towns; a good one would ease the pressure. Neither is visible yet: the trees fruit from September.</p>
+
+        <p class="close">Check back in November.</p>
       </div>
     </section>
   </main>
+
+  <footer id="methods" class="methods">
+    <h2>Methods</h2>
+    <p>A &ldquo;sighting&rdquo; here is any report made to a prefectural government of a bear seen, tracked, or otherwise encountered &mdash; not a confirmed animal. The same bear can generate several reports, and reporting rates vary with how alarmed people are, so year-on-year swings partly reflect that as well as bear activity.</p>
+    <p>Only four prefectures &mdash; Toyama, Niigata, Gunma and Saitama &mdash; publish individual reports as open data; the other 42, including Akita and Iwate, publish totals only. Hokkaido's point-data feed begins in May 2026 and is excluded from the month-by-month replay above.</p>
+    <p class="sources">Sightings, injuries and deaths from the Ministry of the Environment. Population, hunter numbers and the mast-crop failure from Japan Times and Britannica; the Akita troop deployment from CNN. Prefecture boundaries from <a href="https://github.com/dataofjapan/land">dataofjapan/land</a>. Data pipeline and full sources: <a href="https://github.com/thgil/bearstats">repo</a>.</p>
+  </footer>
 
   <script src="lib/d3.v7.min.js"></script>
   <script src="lib/leaflet.js"></script>

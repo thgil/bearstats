@@ -6,25 +6,29 @@
   --accent: #ff3b30;
   --accent-hot: #ff5e3a;
   --pale: #fff4a3;
+  --injury: #ffd166;
+  --field: #333b52;
+  --bench: #7d87a8;
   --max-width: 960px;
+  --nav-h: 44px;
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+html { scroll-behavior: smooth; }
 body {
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.55;
   font-size: 16px;
   font-feature-settings: "ss01", "cv11";
+  padding-top: var(--nav-h);
 }
 
 h1 {
-  /* Sized for a two-sentence headline: the register wants plain statements
-     rather than one short phrase, so the scale gives them room to sit. */
-  font-size: clamp(1.85rem, 3.6vw, 2.75rem);
+  font-size: clamp(1.9rem, 4vw, 3rem);
   font-weight: 800;
-  margin: 0 0 1.1rem;
-  line-height: 1.12;
+  margin: 0 0 1.25rem;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   max-width: 22ch;
 }
@@ -34,52 +38,278 @@ h2 {
   margin: 0 0 0.75rem;
   letter-spacing: -0.01em;
 }
-.subtitle { color: var(--text-dim); margin: 0 0 1.5rem; max-width: 55ch; }
+h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.005em;
+}
+p { margin: 0 0 1rem; }
 
-/* Subtle scroll progress bar at top */
-.scroll-progress {
+.eyebrow {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+.answer {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  max-width: 44ch;
+  margin-top: 0.4rem;
+}
+h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ---- Chapter nav -------------------------------------------------------- */
+.chapter-nav {
   position: fixed;
   top: 0;
   left: 0;
-  height: 3px;
-  background: var(--accent);
-  width: 0%;
-  z-index: 100;
-  transition: width 0.1s linear;
-  pointer-events: none;
-}
-
-.scroll-section {
-  min-height: 70vh;
-  padding: 3rem 1.5rem;
+  right: 0;
+  height: var(--nav-h);
+  z-index: 200;
+  background: rgba(15, 20, 25, 0.86);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
 }
-.scroll-section .section-content {
+.chapter-nav nav {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+.chapter-nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.chapter-nav a:hover { color: var(--text); }
+.chapter-nav a.is-current {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.chapter-nav a:focus-visible { outline: 2px solid var(--accent-hot); outline-offset: 2px; }
+
+/* ---- Hero ---------------------------------------------------------------- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--nav-h) + 2rem) 1.5rem 4rem;
+  text-align: left;
+}
+.hero-content {
   max-width: var(--max-width);
   width: 100%;
 }
+.hero-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 620px;
+  margin: 2rem 0 1.75rem;
+}
+@media (max-width: 600px) {
+  .hero-numbers { grid-template-columns: 1fr; }
+}
+.hero-num { display: flex; flex-direction: column; gap: 0.3rem; }
+.hero-num .num {
+  font-size: clamp(2.25rem, 5.5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.hero-num .num-label {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+}
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 2rem;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  animation: bob 2.2s ease-in-out infinite;
+}
+.scroll-cue-arrow { font-size: 1rem; }
+.hero { position: relative; }
+@keyframes bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 6px); }
+}
 
-/* Vizualization container */
+/* ---- Chapters + scrolly --------------------------------------------------- */
+.chapter { padding: 5rem 1.5rem 3rem; max-width: 1280px; margin: 0 auto; }
+.chapter-head { max-width: var(--max-width); margin: 0 auto 2.5rem; }
+
+.scrolly {
+  display: grid;
+  grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.steps { display: flex; flex-direction: column; }
+.step {
+  min-height: 80vh;
+  padding: 25vh 0;
+  display: flex;
+  align-items: center;
+}
+/* Trimming the first step's lead-in is safe — it only affects space before
+   scrolling starts. The last step's trailing padding is what keeps the
+   sticky `.graphic` panel pinned while its card is the active one; shrinking
+   it un-sticks the panel early and lets the next chapter's fixed nav clip
+   the still-visible graphic, so it stays at the full step height. */
+.step:first-child { padding-top: 4vh; }
+
+.step-card {
+  background: var(--bg-elev);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+.step.is-active .step-card { opacity: 1; }
+.step-card h3 { color: var(--text); }
+.step-card p { margin: 0; color: var(--text-dim); font-size: 1rem; max-width: 34ch; }
+
+.graphic {
+  position: sticky;
+  top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  overflow: hidden;
+}
+.g {
+  position: absolute;
+  inset: 1.25rem;
+  background: var(--bg-elev);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 250ms ease, visibility 0s linear 250ms;
+}
+.g.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 250ms ease, visibility 0s linear 0s;
+}
+
+.chart-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* The map and its overlays (year label, replay readout, legend) all need to
+   be positioned relative to the map's own box, not `.g`'s — `.g` also holds
+   the caption row below the map, which would otherwise throw off any
+   "bottom: …" offset measured from `.g` itself. */
+.map-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  background: #12161f;
+}
+
+.g-caption {
+  flex: 0 0 auto;
+  margin: 0.6rem 0 0;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+/* ---- Prose chapter (03) --------------------------------------------------- */
+.prose { max-width: 66ch; margin: 0 auto; }
+.prose p { max-width: 66ch; }
+.prose em { font-style: normal; color: var(--text); font-weight: 600; }
+.prose .close { font-weight: 700; color: var(--text); margin-top: 2rem; }
+.prose .viz {
+  height: min(46vh, 420px);
+  margin: 1.75rem 0;
+}
+
+/* ---- Generic chart/map surface -------------------------------------------- */
 .viz {
   width: 100%;
   height: min(55vh, 520px);
   background: var(--bg-elev);
   border-radius: 8px;
   overflow: hidden;
-  margin-top: 0.5rem;
 }
 
-/* Wrapper that lets the year label + legend overlay the map */
-.viz-wrap {
-  position: relative;
-  margin-top: 0.5rem;
+/* ---- Mobile: single column, sticky graphic on top -------------------------- */
+@media (max-width: 800px) {
+  /* .graphic comes after .steps in the markup, but on mobile it needs to sit
+     visually above them so it can stay pinned while the steps scroll past
+     underneath it — flex + order flips that without touching DOM order. */
+  /* The base rule's `align-items: start` is for the desktop grid; left in
+     place it also applies here and, since `.graphic`'s children are all
+     absolutely positioned (no intrinsic width), stretch-less alignment
+     collapses `.graphic` to zero width. */
+  .scrolly { display: flex; flex-direction: column; align-items: stretch; }
+  .graphic {
+    order: -1;
+    position: sticky;
+    top: var(--nav-h);
+    height: 52vh;
+    z-index: 2;
+    margin-bottom: 1rem;
+  }
+  .steps { position: relative; z-index: 1; }
+  .step { min-height: auto; padding: 3rem 0; }
+  .step-card { background: rgba(26, 31, 46, 0.88); backdrop-filter: blur(6px); }
 }
-.viz-wrap .viz { margin-top: 0; }
 
-/* Year label overlays the map's top-right corner */
-.year-label {
+/* ---- Choropleth / point-map legend, overlaid on the map -------------------- */
+.map-year {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -87,25 +317,28 @@ h2 {
   background: rgba(15, 20, 25, 0.75);
   backdrop-filter: blur(6px);
   border-radius: 6px;
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
   font-weight: 800;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  z-index: 5;
+  z-index: 500;
   pointer-events: none;
 }
 
-/* Choropleth legend: horizontal gradient + range labels */
 .legend {
+  position: absolute;
+  bottom: 1.6rem;
+  right: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  margin-top: 0.75rem;
-  max-width: 360px;
+  gap: 0.3rem;
+  width: 190px;
   color: var(--text-dim);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: 0.02em;
+  z-index: 500;
+  pointer-events: none;
 }
 .legend-bar {
   height: 10px;
@@ -122,97 +355,65 @@ h2 {
   justify-content: space-between;
 }
 
-.counters {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  margin-top: 2rem;
-}
-@media (max-width: 600px) {
-  .counters { grid-template-columns: 1fr; }
-}
-.counter {
-  text-align: center;
-  padding: 1.75rem 1.5rem;
-  background: var(--bg-elev);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-.counter .num {
-  display: block;
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 800;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-.counter .label {
-  display: block;
-  color: var(--text-dim);
-  margin-top: 0.5rem;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-}
-
-.sources {
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  margin-top: 3rem;
-}
-.sources a { color: var(--accent-hot); }
-
-/* Toggle bar */
-.toggle-bar {
-  display: inline-flex;
-  gap: 0.25rem;
-  background: var(--bg-elev);
-  padding: 0.25rem;
+/* Replay readout, top-left over the map */
+.replay {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.85rem;
+  background: rgba(15, 20, 25, 0.78);
+  backdrop-filter: blur(6px);
   border-radius: 8px;
-  margin-bottom: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  z-index: 650;
+  pointer-events: none;
 }
-.toggle {
-  background: transparent;
-  border: 0;
+.replay-month {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.replay-count {
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--text-dim);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-family: inherit;
-  font-weight: 500;
-  transition: color 0.15s ease, background 0.15s ease;
+  font-variant-numeric: tabular-nums;
 }
-.toggle:hover { color: var(--text); }
-.toggle.active {
-  background: var(--accent);
-  color: #fff;
+.replay .hurt { color: var(--injury); }
+
+/* Map key: red dot = sighting/trace, ringed yellow dot = injury. Only makes
+   sense once points are on screen. */
+.map-key {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  margin: 0.6rem 0 0;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
 }
-.toggle:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--accent-hot);
-  outline-offset: 2px;
+.g[data-g="map"].is-points .map-key { display: flex; }
+.map-key .key-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.map-key .dot { display: inline-block; border-radius: 50%; }
+.map-key .dot-sighting { width: 8px; height: 8px; background: var(--accent); }
+.map-key .dot-injury {
+  width: 12px;
+  height: 12px;
+  background: var(--injury);
+  border: 2px solid #0f1419;
+  box-shadow: 0 0 0 1px var(--injury);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
-}
-
-/* ---- Maps -------------------------------------------------------------- */
-/* The basemap is drawn from local GeoJSON, so the container's own background
-   is the sea. Kept darker than the land fill so the coastline reads. */
-#points-map,
-#choropleth {
-  background: #12161f;
-}
-
+/* ---- Maps ------------------------------------------------------------- */
 /* Leaflet chrome, restyled for the dark palette */
 .leaflet-container {
   font-family: inherit;
   outline: none;
+  background: #12161f;
 }
 .leaflet-control-attribution {
   background: rgba(15, 20, 25, 0.8) !important;
@@ -238,86 +439,27 @@ a:focus-visible {
 .leaflet-popup-content strong { color: var(--accent-hot); }
 .leaflet-popup-close-button { color: var(--text-dim) !important; }
 
-/* Points-map key: species colour + incident-type size */
-.map-key {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.25rem;
-  margin-top: 0.75rem;
-  color: var(--text-dim);
-  font-size: 0.75rem;
+/* Prefecture-name tooltip used by focusTohoku()'s Akita/Iwate labels: no
+   background box, just legible text laid over the map. */
+.pref-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 8px rgba(0, 0, 0, 0.6);
+  padding: 0;
 }
-.map-key .key-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.map-key .dot {
-  display: inline-block;
-  border-radius: 50%;
-  background: currentColor;
-}
-.map-key .dot-black { color: #ff3b30; width: 6px; height: 6px; }
-.map-key .dot-brown { color: #ffa944; width: 8px; height: 8px; }
-.map-key .dot-injury { color: #ff3b30; width: 11px; height: 11px; }
+.pref-label::before { display: none; }
 
-
-
-/* ---- Hero tiles: the chart's read-off date, stated as numbers ---------- */
-.tiles {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 0 0 1rem;
-  max-width: 620px;
-}
-@media (max-width: 600px) {
-  .tiles { grid-template-columns: 1fr; }
-}
-.tile {
-  background: var(--bg-elev);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.tile.is-current { border-color: rgba(255, 59, 48, 0.32); }
-.tile-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-}
-.tile-num {
-  font-size: clamp(2rem, 4.5vw, 2.75rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-.tile-num.is-past { color: #7d87a8; }
-
-/* ---- Same-months comparison rows --------------------------------------- */
-.compare {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-  margin-top: 2.5rem;
-}
-@media (max-width: 700px) {
-  .compare { grid-template-columns: 1fr; }
-}
+/* ---- Same-months comparison rows (chapter 2 "rows" graphic) --------------- */
 .cmp {
-  background: var(--bg-elev);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
-  padding: 1.25rem 1.4rem 1.4rem;
+  background: transparent;
+  padding: 0 0 1rem;
 }
+.cmp:last-child { padding-bottom: 0; }
 .cmp-head h3 {
   margin: 0;
   font-size: 1rem;
@@ -325,11 +467,11 @@ a:focus-visible {
   letter-spacing: -0.01em;
 }
 .cmp-head p {
-  margin: 0.15rem 0 1rem;
+  margin: 0.15rem 0 0.75rem;
   font-size: 0.75rem;
   color: var(--text-dim);
 }
-.cmp-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+.cmp-rows { display: flex; flex-direction: column; gap: 0.4rem; }
 .cmp-row {
   display: flex;
   align-items: center;
@@ -345,7 +487,7 @@ a:focus-visible {
 .cmp-track { flex-grow: 1; display: flex; }
 .cmp-bar {
   display: block;
-  height: 16px;
+  height: 14px;
   border-radius: 0 3px 3px 0;
   background: #3c4560;
 }
@@ -360,13 +502,13 @@ a:focus-visible {
 .cmp-row.is-current .cmp-value { color: var(--text); }
 .cmp-row.is-current .cmp-bar { background: var(--accent); }
 .cmp-read {
-  margin: 1rem 0 0;
+  margin: 0.75rem 0 0;
   font-size: 0.78rem;
   line-height: 1.45;
   color: var(--text-dim);
 }
 
-/* Data-window note under a chart */
+/* ---- Dateline / footer ----------------------------------------------------- */
 .dateline {
   color: var(--text-dim);
   font-size: 0.75rem;
@@ -375,56 +517,16 @@ a:focus-visible {
   max-width: 68ch;
 }
 
-/* A shorter frame for the deaths columns */
-.viz-short { height: min(34vh, 300px); }
+.methods {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.methods h2 { font-size: 1.15rem; }
+.methods p { max-width: 66ch; color: var(--text-dim); font-size: 0.9rem; }
+.sources { font-size: 0.85rem; }
+.sources a { color: var(--accent-hot); }
 
-/* Second heading inside "Why now?" */
-.why-second { margin-top: 2.5rem; }
-#section-why p { max-width: 66ch; }
-#section-why em { font-style: normal; color: var(--text); font-weight: 600; }
-
-/* Replay readout over the point map */
-.replay {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.5rem 0.85rem;
-  background: rgba(15, 20, 25, 0.78);
-  backdrop-filter: blur(6px);
-  border-radius: 8px;
-  z-index: 650;
-  pointer-events: none;
-}
-.replay-month {
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-.replay-count {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Coverage caveat, kept inside the map frame rather than only in prose */
-.map-caveat {
-  position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  max-width: 30ch;
-  padding: 0.4rem 0.7rem;
-  background: rgba(15, 20, 25, 0.78);
-  backdrop-filter: blur(6px);
-  border-radius: 6px;
-  color: var(--text-dim);
-  font-size: 0.68rem;
-  line-height: 1.4;
-  z-index: 650;
-  pointer-events: none;
-}
+a { color: var(--accent-hot); }
+a:focus-visible { outline: 2px solid var(--accent-hot); outline-offset: 2px; }

@@ -1,106 +1,180 @@
-import { createState } from "./state.js";
 import { loadAllData } from "./data-loader.js";
-import { mountPaceChart } from "./chart-pace.js";
 import { mountRows } from "./chart-rows.js";
-import { mountDeathsChart } from "./chart-deaths.js";
-import { mountChoropleth } from "./map-choropleth.js";
-import { mountPointsMap } from "./map-points.js";
 import { animateAllCounters } from "./counters.js";
+import { createDirector } from "./director.js";
 
-const state = createState({
-  metric: "sightings",
-  year: 2025,
-  species: "all",
-});
-export { state };
+// map-story.js, chart-monthly.js, chart-pace.js and chart-deaths.js are owned
+// by other agents building in parallel and may not exist yet (or may not yet
+// export the scrolly-view methods this page calls). Import them dynamically
+// so a missing/broken module degrades to an empty panel instead of taking the
+// whole page down — a static `import` of a 404 module would abort the entire
+// script.
+async function safeImport(path) {
+  try {
+    return await import(path);
+  } catch (err) {
+    console.warn(`[bearstats] could not load ${path}:`, err);
+    return null;
+  }
+}
+
+/** Mount one graphic, swallowing any error so the shell keeps rendering. */
+function safeMount(label, fn) {
+  try {
+    return fn();
+  } catch (err) {
+    console.warn(`[bearstats] ${label} mount failed:`, err);
+    return null;
+  }
+}
 
 async function boot() {
   try {
     const data = await loadAllData();
-    window.__bearstats__ = { state, data };
 
-    const heroChart = mountPaceChart(
-      document.getElementById("hero-chart"),
-      data.timeline
-    );
+    const [mapMod, monthlyMod, paceMod, deathsMod] = await Promise.all([
+      safeImport("./map-story.js"),
+      safeImport("./chart-monthly.js"),
+      safeImport("./chart-pace.js"),
+      safeImport("./chart-deaths.js"),
+    ]);
 
-    // The two tiles are the chart's read-off date, stated as numbers.
-    const ytdSightings = (data.timeline.ytd || {}).sightings;
-    if (ytdSightings) {
-      const n = ytdSightings.values.length;
-      document.getElementById("tile-bench").textContent =
-        ytdSightings.values[n - 2].toLocaleString();
-      document.getElementById("tile-current").textContent =
-        ytdSightings.values[n - 1].toLocaleString();
-    }
+    const graphics = {};
 
-    mountRows(document.getElementById("cmp-deaths"), data.timeline, "deaths");
-    mountRows(document.getElementById("cmp-injuries"), data.timeline, "injuries");
-
-    const deathsChart = mountDeathsChart(
-      document.getElementById("deaths-chart"),
-      data.timeline
-    );
-
-    const choropleth = mountChoropleth(
-      document.getElementById("choropleth"),
-      data.timeline,
-      data.prefectureTotals,
-      data.prefectureGeo,
-      "sightings"
-    );
-
-    const pointsMap = mountPointsMap(
-      document.getElementById("points-map"),
-      data.pointsRecent,
-      data.prefectureGeo,
-      { fiscalYear: 2025 }
-    );
-    window.__bearstats__.pointsMap = pointsMap;
-    window.__bearstats__.heroChart = heroChart;
-    window.__bearstats__.choropleth = choropleth;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const scroller = scrollama();
-    scroller
-      .setup({
-        step: ".scroll-section",
-        offset: 0.5,
-        once: true,
-      })
-      .onStepEnter(({ element }) => {
-        if (element.id === "section-hero")   heroChart.play();
-        if (element.id === "section-map")    choropleth.playAll();
-        if (element.id === "section-points" && !reduceMotion) pointsMap.play();
-        if (element.id === "section-cost") {
-          animateAllCounters(element);
-          deathsChart.play();
-        }
+    graphics.map = safeMount("map", () => {
+      if (!mapMod?.mountStoryMap) return null;
+      return mapMod.mountStoryMap(document.getElementById("map"), {
+        timeline: data.timeline,
+        totals: data.prefectureTotals,
+        geo: data.prefectureGeo,
+        points: data.pointsRecent,
+        fiscalYear: 2025,
+        yearLabelEl: document.getElementById("map-year"),
+        replayMonthEl: document.getElementById("replay-month"),
+        replayCountEl: document.getElementById("replay-count"),
+        legendEl: document.getElementById("map-legend"),
       });
+    });
 
-    window.addEventListener("resize", () => scroller.resize());
+    graphics.monthly1 = safeMount("monthly-1", () => {
+      if (!monthlyMod?.mountMonthlyChart) return null;
+      const chart = monthlyMod.mountMonthlyChart(document.getElementById("monthly-1"), data.timeline);
+      chart?.setView?.("closed");
+      return chart;
+    });
 
-    // Scroll progress bar
-    const progressEl = document.getElementById("scroll-progress");
-    if (progressEl) {
-      const updateProgress = () => {
-        const scrolled = window.scrollY;
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const pct = maxScroll > 0 ? Math.min(100, (scrolled / maxScroll) * 100) : 0;
-        progressEl.style.width = pct + "%";
-      };
-      window.addEventListener("scroll", updateProgress, { passive: true });
-      updateProgress();
+    graphics.monthly2 = safeMount("monthly-2", () => {
+      if (!monthlyMod?.mountMonthlyChart) return null;
+      const chart = monthlyMod.mountMonthlyChart(document.getElementById("monthly-2"), data.timeline);
+      chart?.setView?.("running");
+      return chart;
+    });
+
+    graphics.deaths = safeMount("deaths", () => {
+      if (!deathsMod?.mountDeathsChart) return null;
+      return deathsMod.mountDeathsChart(document.getElementById("deaths"), data.timeline);
+    });
+
+    graphics.pace = safeMount("pace", () => {
+      if (!paceMod?.mountPaceChart) return null;
+      const chart = paceMod.mountPaceChart(document.getElementById("pace"), data.timeline);
+      chart?.setView?.("running");
+      return chart;
+    });
+
+    safeMount("rows-injuries", () => mountRows(document.getElementById("rows-injuries"), data.timeline, "injuries"));
+    safeMount("rows-deaths", () => mountRows(document.getElementById("rows-deaths"), data.timeline, "deaths"));
+
+    // Chapter 3's inline chart: its own instance, in "caution" view, outside
+    // the director's remit (chapter 3 has no sticky graphic panel).
+    const paceCaution = safeMount("pace-caution", () => {
+      if (!paceMod?.mountPaceChart) return null;
+      const chart = paceMod.mountPaceChart(document.getElementById("pace-caution"), data.timeline);
+      chart?.setView?.("caution");
+      return chart;
+    });
+
+    const panels = {
+      1: document.getElementById("graphic-1"),
+      2: document.getElementById("graphic-2"),
+    };
+    const director = createDirector(graphics, panels);
+
+    window.__bearstats__ = { data, graphics, director };
+
+    // Hero counters: the hero is the first thing on screen, so animate on load.
+    const heroEl = document.getElementById("hero");
+    if (heroEl) animateAllCounters(heroEl);
+
+    // ---- Scrollytelling ----------------------------------------------------
+    const allSteps = Array.from(document.querySelectorAll(".step"));
+    let currentStepEl = null;
+
+    function activateStep(el) {
+      allSteps.forEach(s => s.classList.remove("is-active"));
+      el.classList.add("is-active");
+      currentStepEl = el;
+      director.enter(el.dataset.step);
     }
 
-    document.addEventListener("keydown", (e) => {
-      if (e.target.tagName === "INPUT") return;
-      if (e.code === "Space") {
-        e.preventDefault();
-        heroChart.play();
+    const scroller = typeof scrollama === "function" ? scrollama() : null;
+    if (scroller) {
+      scroller
+        .setup({ step: ".step", offset: 0.6 })
+        .onStepEnter(({ element }) => activateStep(element))
+        .onStepExit(({ element, direction }) => {
+          if (direction !== "up") return;
+          const idx = allSteps.indexOf(element);
+          const prev = allSteps[idx - 1];
+          if (prev) activateStep(prev);
+        });
+
+      window.addEventListener("resize", () => scroller.resize());
+    }
+
+    // ---- Chapter nav highlight ----------------------------------------------
+    const navLinks = Array.from(document.querySelectorAll(".chapter-nav a[data-chapter]"));
+    const chapterEls = [1, 2, 3]
+      .map(n => document.getElementById(`ch-${n}`))
+      .filter(Boolean);
+
+    if ("IntersectionObserver" in window && chapterEls.length) {
+      const chapterObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const chapterNum = chapterEls.indexOf(entry.target) + 1;
+          navLinks.forEach(a => a.classList.toggle("is-current", Number(a.dataset.chapter) === chapterNum));
+        });
+      }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+      chapterEls.forEach(el => chapterObserver.observe(el));
+    }
+
+    // ---- Chapter 3 inline chart: plays once, when its section is reached ---
+    if (paceCaution?.play) {
+      const ch3 = document.getElementById("ch-3");
+      if (ch3 && "IntersectionObserver" in window) {
+        let played = false;
+        const ch3Observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !played) {
+              played = true;
+              paceCaution.play();
+              ch3Observer.disconnect();
+            }
+          });
+        }, { threshold: 0.3 });
+        ch3Observer.observe(ch3);
+      } else {
+        paceCaution.play();
       }
-      if (e.key === "r" && !reduceMotion) pointsMap.play();
+    }
+
+    // ---- Keyboard: replay the current step ----------------------------------
+    document.addEventListener("keydown", e => {
+      if (e.target.tagName === "INPUT") return;
+      if (e.key === "r" && currentStepEl) {
+        director.enter(currentStepEl.dataset.step);
+      }
     });
 
   } catch (err) {
