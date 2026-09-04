@@ -312,8 +312,16 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   .steps { position: relative; z-index: 1; }
   /* Each step fills the strip below the pinned panel, so the card that is
      active sits in the readable band rather than under the graphic. */
-  .step { min-height: 54vh; padding: 1.5rem 0 5rem; align-items: flex-start; }
-  .step:last-child { padding-bottom: 40vh; }
+  /* The reading band is what is left under the pinned panel (46vh + nav).
+     One step fills it, so the active card is the one under the panel and
+     nothing has to slide beneath it before the next step takes over. */
+  .step { min-height: 48vh; padding: 0.75rem 0 2rem; align-items: flex-start; }
+  .step:last-child { padding-bottom: 30vh; }
+  .step-card p { font-size: 0.95rem; }
+  /* Credited in the Methods footer; on the phone-sized map it wraps to two
+     lines and sits on top of the legend. */
+  .leaflet-control-attribution { display: none; }
+  .legend { width: 140px; bottom: 0.75rem; right: 0.75rem; }
   /* backdrop-filter re-composites on every scroll frame; on phones that is
      the difference between a smooth scroll and a stuttering one. */
   .step-card { background: rgba(26, 31, 46, 0.96); backdrop-filter: none; }

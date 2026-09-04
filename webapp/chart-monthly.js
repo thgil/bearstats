@@ -149,7 +149,9 @@ export function mountMonthlyChart(container, timeline) {
 
   // Month axis, Apr through Mar.
   const gAxis = svg.append("g");
+  const labelEvery = plotW / 12 < 34 ? 2 : 1;   // phones: every other month
   MONTH_LABELS.forEach((label, i) => {
+    if (i % labelEvery !== 0) return;
     gAxis.append("text")
       .attr("x", x(i)).attr("y", y(0) + 20)
       .attr("text-anchor", "middle")

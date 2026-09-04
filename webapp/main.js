@@ -118,28 +118,45 @@ async function boot() {
     const allSteps = Array.from(document.querySelectorAll(".step"));
     let currentStepEl = null;
 
-    function activateStep(el) {
+    function activateStep(el, mode = "play") {
       allSteps.forEach(s => s.classList.remove("is-active"));
       el.classList.add("is-active");
       currentStepEl = el;
-      director.enter(el.dataset.step);
+      director.enter(el.dataset.step, mode);
     }
+
+    // Where a step becomes the active one. On phones the panel is pinned
+    // across the top (46vh plus the nav), so the line sits just under it and
+    // the active card is always the one in the reading band below the panel.
+    const stepOffset = () => window.innerWidth < 800
+      ? Math.min(0.6, (0.46 * window.innerHeight + 52) / window.innerHeight)
+      : 0.6;
+
+    // Show each panel's opening graphic before any step triggers, so the
+    // pinned panel is never an empty block between the chapter head and the
+    // first card.
+    director.showGraphic(1, "map");
+    director.showGraphic(2, "monthly");
 
     const scroller = typeof scrollama === "function" ? scrollama() : null;
     if (scroller) {
       scroller
         .setup({ step: ".step", // On phones the panel takes the top of the screen, so the trigger line
       // sits lower, where the reading band is.
-      offset: window.innerWidth < 800 ? 0.8 : 0.6 })
-        .onStepEnter(({ element }) => activateStep(element))
+      offset: stepOffset() })
+        .onStepEnter(({ element, direction }) =>
+          activateStep(element, direction === "up" ? "settle" : "play"))
         .onStepExit(({ element, direction }) => {
           if (direction !== "up") return;
           const idx = allSteps.indexOf(element);
           const prev = allSteps[idx - 1];
-          if (prev) activateStep(prev);
+          if (prev) activateStep(prev, "settle");
         });
 
-      window.addEventListener("resize", () => scroller.resize());
+      window.addEventListener("resize", () => {
+        scroller.setup({ step: ".step", offset: stepOffset() });
+        scroller.resize();
+      });
     }
 
     // ---- Chapter nav highlight ----------------------------------------------

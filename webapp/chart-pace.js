@@ -146,7 +146,11 @@ export function mountPaceChart(container, timeline) {
 
   // Month axis, with the read-off month picked out
   const gAxis = svg.append("g");
+  // On a phone twelve labels collide, so show every other one — keeping
+  // the read-off month, which is the one that matters.
+  const labelEvery = plotW / 12 < 34 ? 2 : 1;
   MONTH_LABELS.forEach((label, i) => {
+    if (i % labelEvery !== 0 && i !== cmpIdx) return;
     gAxis.append("text")
       .attr("x", x(i)).attr("y", y(0) + 20)
       .attr("text-anchor", "middle")
@@ -229,14 +233,18 @@ export function mountPaceChart(container, timeline) {
         .attr("cx", x(cmpIdx)).attr("cy", ry)
         .attr("r", 6).attr("fill", HOT)
         .attr("stroke", "#1a1f2e").attr("stroke-width", 2);
-      // Upper-left of the marker: the record year's line climbs away to the
-      // right of the read-off, so that side is never clear.
+      // Upper-left of the marker, where the record year's line has not yet
+      // climbed — unless the chart is too narrow for the label to fit
+      // between the marker and the axis, in which case it goes above-right.
+      const label = `${running.values.at(-1).toLocaleString()} FY${running.year}`;
+      const fitsLeft = x(cmpIdx) - 12 - label.length * 7.5 >= MARGIN.left;
       gLabels.append("text")
-        .attr("x", x(cmpIdx) - 12).attr("y", ry - 10)
-        .attr("text-anchor", "end")
+        .attr("x", fitsLeft ? x(cmpIdx) - 12 : x(cmpIdx) + 10)
+        .attr("y", fitsLeft ? ry - 10 : ry - 16)
+        .attr("text-anchor", fitsLeft ? "end" : "start")
         .attr("fill", HOT).attr("font-size", 13).attr("font-weight", 700)
         .style("font-variant-numeric", "tabular-nums")
-        .text(`${running.values.at(-1).toLocaleString()} FY${running.year}`);
+        .text(label);
     }
 
     return { paths, labels: [{ sel: gLabels, start: LABEL_START, end: LABEL_END }] };

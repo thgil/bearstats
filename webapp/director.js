@@ -8,6 +8,8 @@
 // into a graphic instance is optional-chained: a missing instance is a no-op,
 // never a thrown error.
 
+const REPLAY_GUARD_MS = 2500;
+
 const CHAPTER_1_STEPS = new Set(["years", "centre", "october", "upclose", "cost"]);
 const CHAPTER_2_STEPS = new Set(["months", "pace", "casualties"]);
 
@@ -31,6 +33,12 @@ export const STEPS = {
       g.map?.showChoropleth?.(2022);
       return g.map?.playYears?.();
     },
+    settle(g) {
+      g.map?.stop?.();
+      g.map?.hidePoints?.();
+      g.map?.focusJapan?.();
+      g.map?.showChoropleth?.(2025);
+    },
   },
   centre: {
     graphic: "map",
@@ -40,6 +48,7 @@ export const STEPS = {
       g.map?.showChoropleth?.(2025);
       return g.map?.focusTohoku?.();
     },
+    settle(g) { return STEPS.centre.enter(g); },
   },
   october: {
     graphic: "monthly",
@@ -47,6 +56,11 @@ export const STEPS = {
       g.monthly1?.stop?.();
       g.monthly1?.setView?.("closed");
       return g.monthly1?.play?.();
+    },
+    settle(g) {
+      g.monthly1?.stop?.();
+      g.monthly1?.setView?.("closed");
+      g.monthly1?.setProgress?.(1);
     },
   },
   upclose: {
@@ -65,12 +79,23 @@ export const STEPS = {
       }
       return runReplay();
     },
+    settle(g, isCurrent) {
+      g.map?.stop?.();
+      const focused = g.map?.focusSample?.();
+      const finish = () => { if (isCurrent()) g.map?.setMonthProgress?.(1); };
+      if (focused && typeof focused.then === "function") return focused.then(finish);
+      finish();
+    },
   },
   cost: {
     graphic: "deaths",
     enter(g) {
       g.deaths?.stop?.();
       return g.deaths?.play?.();
+    },
+    settle(g) {
+      g.deaths?.stop?.();
+      g.deaths?.setProgress?.(1);
     },
   },
   months: {
@@ -80,6 +105,11 @@ export const STEPS = {
       g.monthly2?.setView?.("running");
       return g.monthly2?.play?.();
     },
+    settle(g) {
+      g.monthly2?.stop?.();
+      g.monthly2?.setView?.("running");
+      g.monthly2?.setProgress?.(1);
+    },
   },
   pace: {
     graphic: "pace",
@@ -88,11 +118,17 @@ export const STEPS = {
       g.pace?.setView?.("running");
       return g.pace?.play?.();
     },
+    settle(g) {
+      g.pace?.stop?.();
+      g.pace?.setView?.("running");
+      g.pace?.setProgress?.(1);
+    },
   },
   casualties: {
     // Static: the two comparison-row boxes are already mounted; nothing to do.
     graphic: "rows",
     enter() {},
+    settle() {},
   },
 };
 
@@ -112,11 +148,22 @@ export function createDirector(graphics, panels) {
   }
 
   let current = null;
+  const lastPlayed = new Map();
 
-  function enter(stepId) {
+  /**
+   * `mode` is "play" (the reader arrived scrolling down) or "settle" (they
+   * came back up, or are hovering around a trigger line). An animation plays
+   * once per visit; a settle jumps straight to the finished state. Replaying
+   * within a couple of seconds of the last play is treated as a settle too,
+   * so a thumb wobbling on the trigger line doesn't restart the chart.
+   */
+  function enter(stepId, mode = "play") {
     const step = STEPS[stepId];
     if (!step) return;
     current = stepId;
+    const now = Date.now();
+    const recent = (lastPlayed.get(stepId) || 0) > now - REPLAY_GUARD_MS;
+    const settle = mode === "settle" || recent;
 
     const chapter = stepChapter(stepId);
     if (chapter) showGraphic(chapter, step.graphic);
@@ -128,7 +175,10 @@ export function createDirector(graphics, panels) {
     if (mapLayer) mapLayer.classList.toggle("is-points", stepId === "upclose");
 
     try {
-      return step.enter(graphics, () => current === stepId);
+      const isCurrent = () => current === stepId;
+      if (settle && step.settle) return step.settle(graphics, isCurrent);
+      lastPlayed.set(stepId, now);
+      return step.enter(graphics, isCurrent);
     } catch (err) {
       console.warn(`[director] enter("${stepId}") failed:`, err);
       return undefined;
