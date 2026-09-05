@@ -7,7 +7,7 @@
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐻</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <!-- Leaflet first: styles.css restyles its chrome and must win on equal specificity. -->
   <link rel="stylesheet" href="lib/leaflet.css">
   <link rel="stylesheet" href="styles.css">
@@ -15,37 +15,38 @@
 <body>
   <header class="chapter-nav">
     <nav>
-      <a href="#ch-1" data-chapter="1">01 Record year</a>
-      <a href="#ch-2" data-chapter="2">02 This year</a>
-      <a href="#ch-3" data-chapter="3">03 Autumn ahead</a>
+      <a href="#ch-1" data-chapter="1"><span class="nav-n">01</span> Record year</a>
+      <a href="#ch-2" data-chapter="2"><span class="nav-n">02</span> Outbreaks</a>
+      <a href="#ch-3" data-chapter="3"><span class="nav-n">03</span> This year</a>
+      <a href="#ch-4" data-chapter="4"><span class="nav-n">04</span> Baseline</a>
     </nav>
   </header>
 
   <main>
     <section id="hero" class="hero">
       <div class="hero-content">
-        <p class="eyebrow">Japan &middot; bear sightings and attacks &middot; <span id="updated">updated September 2026</span></p>
-        <h1>Bears killed 13 people in Japan in the year to March 2026. That is the most on record.
-          <span class="answer">In April to June 2026, sightings were 67% above the same months of that record year.</span>
-        </h1>
+        <p class="eyebrow">Japan &middot; bear sightings and attacks &middot; <span id="updated">updated 4 September 2026</span></p>
+        <h1>Spring 2026 had more bear sightings than any spring in 14 years of records. The beech crop that drives autumn attacks is forecast good.</h1>
 
-        <p class="eyebrow num-window">Fiscal 2025, April 2025 to March 2026</p>
-        <div class="hero-numbers">
-          <div class="hero-num">
-            <span class="num" data-target="50801" data-count-up>0</span>
-            <span class="num-label">sightings</span>
+        <div class="hero-figures">
+          <div class="figure figure-sight">
+            <span class="num">12,628</span>
+            <span class="figure-label">sightings, April to June 2026</span>
+            <span class="figure-compare">7,555 in 2025</span>
           </div>
-          <div class="hero-num">
-            <span class="num">238</span>
-            <span class="num-label">people injured</span>
+          <div class="figure figure-mast">
+            <span class="num">3.9</span>
+            <span class="figure-label">beech index, Tohoku forecast, July 2026</span>
+            <span class="figure-compare">0.44 in July 2025</span>
           </div>
-          <div class="hero-num">
+          <div class="figure figure-harm">
             <span class="num">13</span>
-            <span class="num-label">people killed</span>
+            <span class="figure-label">people killed, fiscal 2025</span>
+            <span class="figure-compare">April 2025 to March 2026</span>
           </div>
         </div>
 
-        <p class="dateline">Source: Ministry of the Environment. Fiscal 2026 figures are provisional: sightings to 30 June 2026, injuries and deaths to 31 July 2026. A sighting is a report of a bear made to a prefecture. It is not a count of bears.</p>
+        <p class="dateline">Sources: Ministry of the Environment (sightings to 30 June 2026, injuries and deaths to 31 July 2026); Tohoku Regional Forest Office beech survey (7 July 2026). A sighting is a report made to a prefecture. It is not a count of bears.</p>
       </div>
       <div class="scroll-cue" aria-hidden="true">
         <span>Scroll</span>
@@ -53,159 +54,277 @@
       </div>
     </section>
 
+    <!-- ---- 01 ------------------------------------------------------------ -->
     <section class="chapter" id="ch-1">
-      <div class="chapter-head">
-        <p class="eyebrow">01</p>
-        <h2>What happened in fiscal 2025?</h2>
-        <p class="answer">Sightings were 2.5 times the previous year. 238 people were injured and 13 were killed, the most since the count began in 2008.</p>
-      </div>
-
-      <div class="scrolly">
-        <div class="steps">
-          <div class="step" data-step="years">
-            <div class="step-card">
-              <h3>Sightings by prefecture, fiscal 2022 to 2025.</h3>
-              <p>The map plays four fiscal years. Each runs from April to the following March. National sightings rose from 11,136 in fiscal 2022 to 50,801 in fiscal 2025.</p>
-            </div>
-          </div>
-
-          <div class="step" data-step="centre">
-            <div class="step-card">
-              <h3>Two prefectures had nearly half the sightings.</h3>
-              <p>Akita reported 13,592 sightings in fiscal 2025 and Iwate 9,739. Together that is 46% of the national total. The map shows raw counts, not counts per area.</p>
-            </div>
-          </div>
-
-          <div class="step" data-step="october">
-            <div class="step-card">
-              <h3>Most of the increase came in autumn.</h3>
-              <p>In most years sightings peak in June. In fiscal 2025 they kept rising. October 2025 alone had 15,998 sightings, more than all of fiscal 2022. The cause was a failed acorn and beechnut crop in the Tohoku region. Bears came down to farms and towns for food.</p>
-            </div>
-          </div>
-
-          <div class="step" data-step="upclose">
-            <div class="step-card">
-              <h3>The same autumn, report by report.</h3>
-              <p>Akita and Iwate publish totals only. Toyama, Niigata, Gunma and Saitama publish each report with a location. The map plays their fiscal 2025 month by month. April 2025: 64 reports. October 2025: 1,795. Yellow marks are people injured.</p>
-            </div>
-          </div>
-
-          <div class="step" data-step="cost">
-            <div class="step-card">
-              <h3>13 people killed.</h3>
-              <p>Bears killed 13 people between April 2025 and March 2026. The previous high was 6, in fiscal 2023. The count began in 2008.</p>
-            </div>
+      <div class="chapter-inner">
+        <div class="chapter-head">
+          <span class="stamp" aria-hidden="true">01</span>
+          <div>
+            <h2>What happened in fiscal 2025?</h2>
+            <p class="answer">50,801 sightings, 2.1 times the previous high. 238 people injured and 13 killed. Half of it in October and November, and three quarters of that in Tohoku.</p>
           </div>
         </div>
 
-        <div class="graphic" id="graphic-1">
-          <div class="g" data-g="map">
-            <div class="map-frame">
-              <div id="map" class="map-canvas"></div>
-              <div id="map-year" class="map-year">&mdash;</div>
-              <div class="replay" id="replay">
-                <span class="replay-month" id="replay-month">&mdash;</span>
-                <span class="replay-count" id="replay-count"></span>
+        <div class="scrolly">
+          <div class="steps">
+            <div class="step" data-step="annual">
+              <div class="step-body">
+                <h3>Thirteen years of sightings.</h3>
+                <p>The Ministry's series begins in fiscal 2013 with 9,133 sightings. Fiscal 2023 set a record of 24,348. Fiscal 2025 more than doubled it: 50,801.</p>
               </div>
-              <div id="map-legend" class="legend"></div>
             </div>
-            <div class="map-key">
-              <span class="key-item"><i class="dot dot-sighting"></i>Sighting or trace</span>
-              <span class="key-item"><i class="dot dot-injury"></i>Person injured</span>
+
+            <div class="step" data-step="harm">
+              <div class="step-body">
+                <h3>238 injured, 13 killed.</h3>
+                <p>Both are the highest since the injury count began in 2008. The previous highs were 219 injured and 6 killed, both in fiscal 2023.</p>
+              </div>
             </div>
-            <p class="g-caption">Bear sightings reported to prefectures</p>
+
+            <div class="step" data-step="where">
+              <div class="step-body">
+                <h3>Two prefectures, one autumn.</h3>
+                <p>Akita reported 13,592 sightings in fiscal 2025 and Iwate 9,739, 46% of the national total. In October alone the two reported 8,898 of 15,998.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="heat">
+              <div class="step-body">
+                <h3>The same year, month by month.</h3>
+                <p>Each cell is one prefecture in one month. October and November 2025 were 26,336 sightings, 52% of the year. The same two months of fiscal 2024 were 3,518.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="replay">
+              <div class="step-body">
+                <h3>Report by report.</h3>
+                <p>Akita and Iwate publish totals only. Toyama, Niigata, Gunma and Saitama publish each report with a location. The map plays their fiscal 2025 month by month: 64 reports in April, 1,795 in October. Yellow marks are people injured.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="g" data-g="monthly">
-            <div id="monthly-1" class="chart-canvas"></div>
-            <p class="g-caption">Sightings per month, fiscal 2022 to 2025</p>
-          </div>
+          <div class="graphic" id="graphic-1">
+            <div class="g" data-g="annual">
+              <div id="annual" class="chart-canvas"></div>
+              <p class="g-caption">Bear sightings reported to prefectures, by fiscal year (April to March), fiscal 2013 to 2025, with April to June 2026. Ministry of the Environment.</p>
+            </div>
 
-          <div class="g" data-g="deaths">
-            <div id="deaths" class="chart-canvas"></div>
-            <p class="g-caption">People killed by bears, by fiscal year</p>
+            <div class="g" data-g="harm">
+              <div id="harm" class="chart-canvas"></div>
+              <p class="g-caption">People injured and killed by bears, by fiscal year, 2008 to 2025. Ministry of the Environment.</p>
+            </div>
+
+            <div class="g" data-g="map">
+              <div class="map-frame">
+                <div id="map" class="map-canvas"></div>
+                <div id="map-year" class="map-year">&mdash;</div>
+                <div class="replay" id="replay">
+                  <span class="replay-month" id="replay-month">&mdash;</span>
+                  <span class="replay-count" id="replay-count"></span>
+                </div>
+                <div id="map-legend" class="legend"></div>
+              </div>
+              <div class="map-key">
+                <span class="key-item"><i class="dot dot-sighting"></i>Sighting or trace</span>
+                <span class="key-item"><i class="dot dot-injury"></i>Person injured</span>
+              </div>
+              <p class="g-caption">Sightings by prefecture, fiscal 2025 (April 2025 to March 2026). Raw counts, not counts per area. Prefectures compile reports by different methods, so the ranking partly reflects reporting practice.</p>
+            </div>
+
+            <div class="g" data-g="heat">
+              <div id="heat" class="chart-canvas"></div>
+              <p class="g-caption">Sightings by prefecture and month, fiscal 2025 beside fiscal 2024 on one colour scale. Ministry of the Environment.</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ---- 02 ------------------------------------------------------------ -->
     <section class="chapter" id="ch-2">
-      <div class="chapter-head">
-        <p class="eyebrow">02</p>
-        <h2>Is fiscal 2026 on the same path?</h2>
-        <p class="answer">So far, yes. April, May and June 2026 were each above the same month of fiscal 2025.</p>
-      </div>
-
-      <div class="scrolly">
-        <div class="steps">
-          <div class="step" data-step="months">
-            <div class="step-card">
-              <h3>Sightings by month, fiscal 2026 against fiscal 2025.</h3>
-              <p>April 2026: 1,787 sightings, against 800 in April 2025. May: 4,581 against 2,528. June: 6,260 against 4,227.</p>
-            </div>
-          </div>
-
-          <div class="step" data-step="pace">
-            <div class="step-card">
-              <h3>12,628 sightings by the end of June.</h3>
-              <p>Fiscal 2026 had 12,628 sightings by 30 June. Fiscal 2025 had 7,555 at the same point. That is 67% more.</p>
-            </div>
-          </div>
-
-          <div class="step" data-step="casualties">
-            <div class="step-card">
-              <h3>Injuries and deaths have not risen with sightings.</h3>
-              <p>April to July 2026: 53 people injured, against 55 in the same months of 2025. Six people killed, against four. The difference in deaths is too small to draw a conclusion from.</p>
-            </div>
+      <div class="chapter-inner">
+        <div class="chapter-head">
+          <span class="stamp" aria-hidden="true">02</span>
+          <div>
+            <h2>Why do some autumns explode?</h2>
+            <p class="answer">When the beech crop fails. Every October spike in the record follows a failed crop, and a good crop follows a failure.</p>
           </div>
         </div>
 
-        <div class="graphic" id="graphic-2">
-          <div class="g" data-g="monthly">
-            <div id="monthly-2" class="chart-canvas"></div>
-            <p class="g-caption">Sightings per month, fiscal 2026 against fiscal 2025</p>
+        <div class="scrolly">
+          <div class="steps">
+            <div class="step" data-step="mast">
+              <div class="step-body">
+                <h3>Beech crop and October sightings.</h3>
+                <p>Top row: the Tohoku Regional Forest Office beech index, 0 to 5, from 145 survey points in five prefectures. Bottom row: national October sightings. Dark tiles sit under tall bars. In 2023 the index was 0.06 and October had 5,983 sightings. In 2024, 3.24 and 2,235. In 2025, 0.10 and 15,998.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="alternate">
+              <div class="step-body">
+                <h3>A full crop is followed by a failure.</h3>
+                <p>At Akita's five survey sites, every year with a full crop since 2002 was followed by a failure the next year: six of six. 2024 was full. 2025 failed.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="weather">
+              <div class="step-body">
+                <h3>Weather does not explain it.</h3>
+                <p>Summer temperature and rainfall at Akita in the year before a crop show no relationship with the crop over 16 years. The 2023 and 2025 failures coincided with the two hottest summers, but the July survey had already graded both years 大凶作 before the heat.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="g" data-g="pace">
-            <div id="pace" class="chart-canvas"></div>
-            <p class="g-caption">Sightings, running total through the fiscal year</p>
-          </div>
+          <div class="graphic" id="graphic-2">
+            <div class="g" data-g="mast">
+              <div id="mast" class="chart-canvas"></div>
+              <p class="g-caption">Top: Tohoku Regional Forest Office beech index, 0 to 5, autumn result, 2012 to 2025. Bottom: national October sightings, Ministry of the Environment.</p>
+            </div>
 
-          <div class="g" data-g="rows">
-            <div class="cmp" id="rows-injuries"></div>
-            <div class="cmp" id="rows-deaths"></div>
-            <p class="g-caption">People injured and killed, April to July of each fiscal year</p>
+            <div class="g" data-g="alternate">
+              <div id="alternate" class="chart-canvas"></div>
+              <p class="g-caption">Akita Prefecture beech survey, five fixed sites, 2002 to 2025. A full crop is ○, a failure is ×.</p>
+            </div>
+
+            <div class="g" data-g="weather">
+              <div id="weather" class="chart-canvas"></div>
+              <p class="g-caption">June to August mean temperature and rainfall at Akita (JMA station 47582) in the year before each crop, against the Akita beech score, crops 2010 to 2025.</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ---- 03 ------------------------------------------------------------ -->
     <section class="chapter" id="ch-3">
-      <div class="chapter-head">
-        <p class="eyebrow">03</p>
-        <h2>Will autumn 2026 be as bad?</h2>
-        <p class="answer">Not yet known. The acorn and beechnut crop decides it, and that becomes clear from September.</p>
+      <div class="chapter-inner">
+        <div class="chapter-head">
+          <span class="stamp" aria-hidden="true">03</span>
+          <div>
+            <h2>Will autumn 2026 repeat autumn 2025?</h2>
+            <p class="answer">Probably not. Spring is far ahead, but spring does not set the autumn, and the beech crop is forecast good.</p>
+          </div>
+        </div>
+
+        <div class="scrolly">
+          <div class="steps">
+            <div class="step" data-step="spring">
+              <div class="step-body">
+                <h3>The busiest spring in 14 years.</h3>
+                <p>April to June 2026: 12,628 sightings. The previous high was 7,601 in fiscal 2024. Fiscal 2025 had 7,555 at the same point.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="scatter">
+              <div class="step-body">
+                <h3>Spring does not set the autumn.</h3>
+                <p>Across 13 years, October plus November ranged from a quarter of the spring count to three and a half times it. A high spring sets a floor for the year, not the autumn peak. Applying each past year's shape to 12,628 gives a full year of 28,293 to 84,913. That is arithmetic, not a forecast.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="forecast">
+              <div class="step-body">
+                <h3>The 2026 crop is forecast good.</h3>
+                <p>Tohoku Regional Forest Office, 7 July 2026: 豊作 in Iwate, Miyagi, Akita and Yamagata, 並作 in Aomori; mean index 3.9, against 0.44 on the same date in 2025. Niigata, 189 points: 豊作 in all four regions. Toyama: 豊作. Akita five-site survey: full crop at four sites. In every prefecture-year on file, the July forecast matched the autumn result: 15 of 15.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="casualties">
+              <div class="step-body">
+                <h3>Injuries are ordinary. Deaths are not.</h3>
+                <p>April to July 2026: 53 people injured, within the range of the last ten years (31 to 56). Six killed, the most for that window since the monthly count began in 2016.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="graphic" id="graphic-3">
+            <div class="g" data-g="monthly">
+              <div id="monthly" class="chart-canvas"></div>
+              <p class="g-caption">Sightings per month, fiscal 2013 to 2026. Closed years in grey, fiscal 2025 in black, fiscal 2026 in green to June. Ministry of the Environment.</p>
+            </div>
+
+            <div class="g" data-g="scatter">
+              <div id="scatter" class="chart-canvas"></div>
+              <p class="g-caption">Each point is one fiscal year, 2013 to 2025: April to June sightings against October plus November. The line is April to June 2026.</p>
+            </div>
+
+            <div class="g" data-g="forecast">
+              <div id="forecast" class="chart-canvas"></div>
+              <p class="g-caption">Beech crop forecasts for autumn 2026: Tohoku Regional Forest Office (7 July 2026), Niigata Prefecture (7 August 2026), Akita Prefecture five-site forecast (November 2025).</p>
+            </div>
+
+            <div class="g" data-g="casualties">
+              <div id="casualties" class="chart-canvas"></div>
+              <p class="g-caption">People injured and killed by bears, April to July of each year, 2016 to 2026. Ministry of the Environment, to 31 July 2026.</p>
+            </div>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="prose">
-        <p>A high spring count does not predict a bad autumn. At the end of June 2024, fiscal 2024 had 7,601 sightings. Fiscal 2025 had 7,555 at the same point. Fiscal 2024 finished the year at 20,513. Fiscal 2025 finished at 50,801.</p>
+    <!-- ---- 04 (inline, no pinned panel) ----------------------------------- -->
+    <section class="chapter chapter-inline" id="ch-4">
+      <div class="chapter-inner">
+        <div class="chapter-head">
+          <span class="stamp" aria-hidden="true">04</span>
+          <div>
+            <h2>Why are there more bears than there were?</h2>
+            <p class="answer">Estimates rose in every prefecture with two surveys, and gun licences fell 83% since 1975.</p>
+          </div>
+        </div>
 
-        <div class="viz" id="pace-caution"></div>
+        <div class="inline-figures">
+          <figure class="inline-figure">
+            <h3>Hunting licences, 1975 to 2021.</h3>
+            <p>All licences: 517,800 to 213,400. Gun licences: 493,700 to 84,400. Trap licences rose from 51,600 in 2007 to 119,500. 119,100 of 213,400 holders were 60 or older in 2021. The Ministry does not count hunters by target species.</p>
+            <div id="licences" class="chart-canvas"></div>
+            <figcaption class="g-caption">Hunting licence holders by type, 1975 to 2021, rounded to 100. Every five years to 2005, then annual. Ministry of the Environment.</figcaption>
+          </figure>
 
-        <p>Two long-term changes make a bad autumn more likely than it used to be. Japan&rsquo;s bear population is estimated at about 54,000, up from about 15,000 in 2012. Licensed bear hunters number fewer than 20,000, down from more than 70,000 in the 1970s.</p>
-
-        <p>The short-term factor is the autumn food supply. Bears feed on acorns and beechnuts before winter. When the crop fails, as it did in 2025, bears enter towns. The 2026 crop is forming now. The sighting figures for September and October will show whether it has failed.</p>
-
-        <p class="close">This page is updated when the Ministry of the Environment publishes new figures.</p>
+          <figure class="inline-figure">
+            <h3>Bear estimates by prefecture.</h3>
+            <p>Each line runs from a prefecture's earliest published estimate to its latest, with the survey year at each end. Iwate rose from 1,100 in 2006 to 3,700 in 2020. Akita from 1,052 in 2010 to 2,900 in 2024. Nagano from 2,770 in 2007 to 7,270 in 2020. Methods changed between surveys, so part of the rise is measurement. There is no national series.</p>
+            <div id="population" class="chart-canvas"></div>
+            <figcaption class="g-caption">Prefectural bear population estimates, earliest and latest published survey, with survey years. Ministry of the Environment draft guideline, February 2026.</figcaption>
+          </figure>
+        </div>
       </div>
     </section>
   </main>
 
   <footer id="methods" class="methods">
-    <h2>Methods</h2>
-    <p>A sighting is a report made to a prefectural government of a bear seen, tracked or otherwise encountered. One bear can produce several reports. Reporting rises when people are alarmed, so part of any year-on-year change is reporting, not bears.</p>
-    <p>Four prefectures publish individual reports as open data: Toyama, Niigata, Gunma and Saitama. The other 42, including Akita and Iwate, publish totals only. Hokkaido&rsquo;s feed began in May 2026 and is not in the month-by-month replay.</p>
-    <p class="sources">Sightings, injuries and deaths: Ministry of the Environment. Bear population, hunter numbers and the 2025 crop failure: Japan Times, Britannica. Prefecture boundaries: <a href="https://github.com/dataofjapan/land">dataofjapan/land</a>. Code and data pipeline: <a href="https://github.com/thgil/bearstats">github.com/thgil/bearstats</a>.</p>
+    <div class="methods-inner">
+      <h2>Methods</h2>
+
+      <h3>What a sighting is</h3>
+      <p>A sighting is a report made to a prefectural government of a bear seen, tracked or otherwise encountered. It is not a count of bears: one bear can produce several reports. The Ministry of the Environment compiles the prefectures' counts into one provisional table each month and revises earlier months in later editions. Prefectures compile reports by different methods (police, municipalities, or both), so counts are not comparable between prefectures.</p>
+
+      <h3>Reporting effects</h3>
+      <p>Reporting rises when people are alarmed. After a year with 13 deaths, more people report bears and more prefectures log traces. The data cannot separate that from bears, so part of any year-on-year change is reporting.</p>
+
+      <h3>The beech index</h3>
+      <p id="index-definition">The Tohoku Regional Forest Office surveys beech only, at fixed points in Aomori, Iwate, Miyagi, Akita and Yamagata (145 points in 2025). Each point is graded for fruiting, the grades are averaged into an index from 0 to 5, and the index is reported per prefecture with a category: 大凶作, 凶作, 並作 or 豊作. A July survey of flowering gives the forecast; an autumn survey of fruit gives the result. The Akita Prefecture survey uses five fixed beech sites and grades each ○, △ or ×.</p>
+
+      <h3>Point data</h3>
+      <p>Four prefectures publish individual reports as open data: Toyama, Niigata, Gunma and Saitama. The other 43, including Akita and Iwate, publish totals only. Hokkaido's feed began in May 2026 and is not in the month-by-month replay.</p>
+
+      <h3>Sources</h3>
+      <ul class="sources">
+        <li><span class="src-name">Ministry of the Environment, クマ類の出没情報について［速報値］ (monthly sightings by prefecture).</span> <a href="https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf">syutubotu.pdf</a> <span class="src-date">edition of 6 August 2026, sightings to 30 June 2026</span>. Fiscal 2013 to 2021 from Internet Archive copies of the same file dated 23 December 2016, 18 April 2021 and 30 June 2022.</li>
+        <li><span class="src-name">Ministry of the Environment, クマ類による人身被害について［速報値］ (people injured and killed).</span> <a href="https://www.env.go.jp/nature/choju/effort/effort12/injury-qe.pdf">injury-qe.pdf</a> <span class="src-date">to 31 July 2026</span>; closed years from the yearly files at the same address (h28 to r07). Annual totals from fiscal 2008, monthly from fiscal 2016.</li>
+        <li><span class="src-name">Tohoku Regional Forest Office (東北森林管理局), beech flowering forecast and fruiting result.</span> Forecast: <a href="https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-180.pdf">ブナの開花状況と結実予測 2026</a> <span class="src-date">7 July 2026</span>. Result: <a href="https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf">ブナの結実状況（実績）2025</a> <span class="src-date">6 November 2025</span>. Earlier years from the office's <a href="https://www.rinya.maff.go.jp/tohoku/sidou/buna.html">survey archive</a>, 2012 to 2026.</li>
+        <li><span class="src-name">Niigata Prefecture, 令和8年度堅果類の豊凶状況調査結果（速報）.</span> <a href="https://www.pref.niigata.lg.jp/uploaded/attachment/506777.pdf">506777.pdf</a> <span class="src-date">7 August 2026</span>, 189 survey points.</li>
+        <li><span class="src-name">Toyama Prefecture, 堅果類（ドングリ）の豊凶調査結果について.</span> <a href="https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/houkyou.html">results page</a> <span class="src-date">updated 4 September 2026</span>; <a href="https://www.pref.toyama.jp/documents/21689/r8houkyou1.pdf">2026 result</a>.</li>
+        <li><span class="src-name">Akita Prefecture, ブナ・ミズナラ豊凶結果 2002 to 2025 and ブナ豊凶予報 2026.</span> <a href="https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf">results 2002 to 2025</a>, <a href="https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ豊凶予報2026.pdf">forecast 2026</a> <span class="src-date">November 2025</span>, five fixed sites.</li>
+        <li><span class="src-name">Ministry of the Environment, hunting licence holders.</span> <a href="https://www.env.go.jp/nature/choju/docs/docs4/syubetu.pdf">種別狩猟免許所持者数</a> and <a href="https://www.env.go.jp/nature/choju/docs/docs4/nenreibetu.pdf">年代別狩猟免許所持者数</a> <span class="src-date">1975 to 2021, latest edition fiscal 2021</span>, rounded to 100.</li>
+        <li><span class="src-name">Ministry of the Environment, bear population estimates by prefecture.</span> <a href="https://www.env.go.jp/content/000377671.pdf">特定鳥獣保護・管理計画作成のためのガイドライン（クマ編）令和8年度版（案）</a>, table 表Ⅱ-２ <span class="src-date">February 2026</span>, surveys 2020 to 2024.</li>
+        <li><span class="src-name">Japan Meteorological Agency, 過去の気象データ検索 (monthly station data).</span> <a href="https://www.data.jma.go.jp/stats/etrn/">data.jma.go.jp/stats/etrn</a> <span class="src-date">Akita 47582 and Morioka 47584, 2009 to August 2026</span>.</li>
+        <li><span class="src-name">Point reports:</span> ArcGIS Survey123 open-data services of Toyama, Niigata, Gunma and Saitama prefectures, fetched daily. Prefecture boundaries: <a href="https://github.com/dataofjapan/land">dataofjapan/land</a>. Code and data pipeline: <a href="https://github.com/thgil/bearstats">github.com/thgil/bearstats</a>.</li>
+      </ul>
+
+      <h3>What this page does not claim</h3>
+      <p>It does not say that weather causes the beech crop to fail: at Akita, the previous summer's temperature and rainfall show no relationship with the crop over 16 years. It does not say anything about acorns outside Fukushima and Toyama, because no other prefecture on file publishes an oak series. It does not draw a national bear population line, because there is no national series: the Ministry tabulates prefectural surveys taken in different years by different methods.</p>
+    </div>
   </footer>
 
   <script src="lib/d3.v7.min.js"></script>

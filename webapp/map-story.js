@@ -130,8 +130,21 @@ export function monthIndexForProgress(t, n) {
   return progressIndex(t, n);
 }
 
-const ACCENT = "#ff3b30";
-const INJURY = "#ffd166";
+// Palette: the tokens in styles.css (spec §3), read at load so the map
+// follows the stylesheet. The literals are the same values, for node (tests,
+// the render pipeline) where there is no document.
+function cssVar(name, fallback) {
+  if (typeof document === "undefined" || typeof getComputedStyle !== "function") return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+const ACCENT = cssVar("--map-point", "#ff5e3a");
+const INJURY = cssVar("--map-injury", "#ffd166");
+const SEA = cssVar("--map-sea", "#12161f");
+const LAND_BASE = cssVar("--map-land", "#1e2433");
+const BORDER = cssVar("--map-border", "#38425c");
+// Akita/Iwate outline: paper, so the two read as pencilled on the photograph.
+const TOHOKU_OUTLINE = cssVar("--paper", "#f6f1e7");
 const TYPE_RADIUS = { sighting: 3, trace: 2, capture: 3 };
 const TYPE_FILL_OPACITY = { sighting: 0.55, trace: 0.35, capture: 0.55 };
 
@@ -146,7 +159,7 @@ export function pointStyle(p) {
     return {
       radius: 6,
       fillColor: INJURY,
-      color: "#0f1419",
+      color: SEA,
       weight: 1.5,
       fillOpacity: 1,
       pane: "injuries",
@@ -163,10 +176,6 @@ export function pointStyle(p) {
 
 // --- map ----------------------------------------------------------------------
 
-const SEA = "#12161f";
-const LAND_BASE = "#1e2433";
-const BORDER = "#38425c";
-const TOHOKU_OUTLINE = "#e8e8ea";
 // Canvas opacity for months that have passed: sightings are drawn at .55,
 // so this lands them near .18 — visible as history, not competing.
 const MONTH_FADE = 0.33;
@@ -413,7 +422,10 @@ export function mountStoryMap(container, {
       layer.setStyle({ color: TOHOKU_OUTLINE, weight: 1.5 });
       const feature = layer.feature;
       const name = (feature && feature.properties && (feature.properties.name_en || feature.properties.nam)) || code;
-      const tooltip = L.tooltip({ permanent: true, direction: "center", className: "pref-label" })
+      // Akita's label sits to the left of its centre and Iwate's to the
+      // right: centred, the two collide on a phone-sized map.
+      const direction = code === "akita" ? "left" : "right";
+      const tooltip = L.tooltip({ permanent: true, direction, className: "pref-label" })
         .setLatLng(layer.getBounds().getCenter())
         .setContent(name)
         .addTo(map);

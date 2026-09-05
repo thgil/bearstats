@@ -1,46 +1,61 @@
 // Wires scroll steps to graphic actions.
 //
-// Each chapter has its own sticky `.graphic` panel with one or more `.g`
-// layers stacked inside it (map / monthly / deaths / pace / rows). A step
-// names which layer should be visible and what the underlying graphic
-// instance should do when the reader reaches it. Graphics can land late (the
-// map and chart modules are built by other agents in parallel), so every call
-// into a graphic instance is optional-chained: a missing instance is a no-op,
-// never a thrown error.
+// Chapters 1 to 3 each have a sticky `.graphic` panel with `.g[data-g]`
+// layers stacked inside it. A step names which layer should be visible and
+// what the underlying graphic instance should do when the reader reaches it.
+// Chart modules land from other agents in parallel, so every call into an
+// instance is optional-chained: a missing instance is a no-op, never a throw.
+//
+// Chapter 4 is inline (no panel) and is not in this table; main.js plays its
+// two charts on an IntersectionObserver.
 
-const REPLAY_GUARD_MS = 2500;
+export const REPLAY_GUARD_MS = 2500;
 
-const CHAPTER_1_STEPS = new Set(["years", "centre", "october", "upclose", "cost"]);
-const CHAPTER_2_STEPS = new Set(["months", "pace", "casualties"]);
+// Step ids per chapter, in page order (spec §4).
+const CHAPTER_STEPS = {
+  1: ["annual", "harm", "where", "heat", "replay"],
+  2: ["mast", "alternate", "weather"],
+  3: ["spring", "scatter", "forecast", "casualties"],
+};
 
-/** Which chapter (1 or 2) a step belongs to. */
+/** Which chapter (1, 2 or 3) a step belongs to. */
 export function stepChapter(stepId) {
-  if (CHAPTER_1_STEPS.has(stepId)) return 1;
-  if (CHAPTER_2_STEPS.has(stepId)) return 2;
+  for (const [chapter, ids] of Object.entries(CHAPTER_STEPS)) {
+    if (ids.includes(stepId)) return Number(chapter);
+  }
   return undefined;
 }
 
-// g = { map, monthly1, deaths, monthly2, pace } — two monthly-chart instances
-// because chapters 1 and 2 each have their own panel and their own copy of
-// the chart.
-export const STEPS = {
-  years: {
-    graphic: "map",
+/**
+ * The common case: a chart that plays on the way down and shows its finished
+ * frame otherwise. `key` is the graphics-object slot, `graphic` the `.g`
+ * layer name, `view` an optional setView() argument applied before either.
+ */
+function playable(key, graphic, view) {
+  return {
+    graphic,
     enter(g) {
-      g.map?.stop?.();
-      g.map?.hidePoints?.();
-      g.map?.focusJapan?.();
-      g.map?.showChoropleth?.(2022);
-      return g.map?.playYears?.();
+      const chart = g[key];
+      chart?.stop?.();
+      if (view) chart?.setView?.(view);
+      return chart?.play?.();
     },
     settle(g) {
-      g.map?.stop?.();
-      g.map?.hidePoints?.();
-      g.map?.focusJapan?.();
-      g.map?.showChoropleth?.(2025);
+      const chart = g[key];
+      chart?.stop?.();
+      if (view) chart?.setView?.(view);
+      chart?.setProgress?.(1);
     },
-  },
-  centre: {
+  };
+}
+
+// g = { annual, harm, map, heat, mast, alternate, weather, monthly, scatter,
+//       forecast, casualties }
+export const STEPS = {
+  // ---- 01 Record year -------------------------------------------------------
+  annual: playable("annual", "annual"),
+  harm: playable("harm", "harm"),
+  where: {
     graphic: "map",
     enter(g) {
       g.map?.stop?.();
@@ -48,22 +63,10 @@ export const STEPS = {
       g.map?.showChoropleth?.(2025);
       return g.map?.focusTohoku?.();
     },
-    settle(g) { return STEPS.centre.enter(g); },
+    settle(g) { return STEPS.where.enter(g); },
   },
-  october: {
-    graphic: "monthly",
-    enter(g) {
-      g.monthly1?.stop?.();
-      g.monthly1?.setView?.("closed");
-      return g.monthly1?.play?.();
-    },
-    settle(g) {
-      g.monthly1?.stop?.();
-      g.monthly1?.setView?.("closed");
-      g.monthly1?.setProgress?.(1);
-    },
-  },
-  upclose: {
+  heat: playable("heat", "heat"),
+  replay: {
     graphic: "map",
     enter(g, isCurrent) {
       g.map?.stop?.();
@@ -87,54 +90,22 @@ export const STEPS = {
       finish();
     },
   },
-  cost: {
-    graphic: "deaths",
-    enter(g) {
-      g.deaths?.stop?.();
-      return g.deaths?.play?.();
-    },
-    settle(g) {
-      g.deaths?.stop?.();
-      g.deaths?.setProgress?.(1);
-    },
-  },
-  months: {
-    graphic: "monthly",
-    enter(g) {
-      g.monthly2?.stop?.();
-      g.monthly2?.setView?.("running");
-      return g.monthly2?.play?.();
-    },
-    settle(g) {
-      g.monthly2?.stop?.();
-      g.monthly2?.setView?.("running");
-      g.monthly2?.setProgress?.(1);
-    },
-  },
-  pace: {
-    graphic: "pace",
-    enter(g) {
-      g.pace?.stop?.();
-      g.pace?.setView?.("running");
-      return g.pace?.play?.();
-    },
-    settle(g) {
-      g.pace?.stop?.();
-      g.pace?.setView?.("running");
-      g.pace?.setProgress?.(1);
-    },
-  },
-  casualties: {
-    // Static: the two comparison-row boxes are already mounted; nothing to do.
-    graphic: "rows",
-    enter() {},
-    settle() {},
-  },
+
+  // ---- 02 Outbreaks ---------------------------------------------------------
+  mast: playable("mast", "mast"),
+  alternate: playable("alternate", "alternate"),
+  weather: playable("weather", "weather"),
+
+  // ---- 03 This year ---------------------------------------------------------
+  spring: playable("monthly", "monthly", "spring13"),
+  scatter: playable("scatter", "scatter"),
+  forecast: playable("forecast", "forecast"),
+  casualties: playable("casualties", "casualties"),
 };
 
 /**
  * `graphics` is the `g` object passed to every STEPS[x].enter().
- * `panels` maps chapter number (1, 2) → the chapter's `.graphic` element,
+ * `panels` maps chapter number (1, 2, 3) → the chapter's `.graphic` element,
  * the container that holds that chapter's `.g[data-g]` layers.
  */
 export function createDirector(graphics, panels) {
@@ -172,7 +143,7 @@ export function createDirector(graphics, panels) {
     // points are on screen, so the map layer only carries .is-points on the
     // one step that shows them.
     const mapLayer = panels[1] && panels[1].querySelector('.g[data-g="map"]');
-    if (mapLayer) mapLayer.classList.toggle("is-points", stepId === "upclose");
+    if (mapLayer) mapLayer.classList.toggle("is-points", stepId === "replay");
 
     try {
       const isCurrent = () => current === stepId;

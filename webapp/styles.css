@@ -1,75 +1,83 @@
+/* Bearstats: the Field Notebook system (docs/superpowers/specs/2026-09-05-rebuild-design.md §3).
+   Paper, ink, hairline rules, one rust stamp per chapter, one dark inset (the map). */
+
 :root {
-  --bg: #0f1419;
-  --bg-elev: #1a1f2e;
-  --text: #e8e8ea;
-  --text-dim: #aab0c3;
-  --accent: #ff3b30;
-  --accent-hot: #ff5e3a;
-  --pale: #fff4a3;
-  --injury: #ffd166;
-  --field: #333b52;
-  --bench: #7d87a8;
-  --max-width: 960px;
+  --paper: #f6f1e7;
+  --paper-2: #efe8d8;
+  --ink: #2b2620;
+  --ink-2: #5a5148;
+  --rule: #d8cdb8;
+  --sight: #4a6741;
+  --sight-2: #7f9a6c;
+  --harm: #b5482a;
+  --harm-2: #d98b6f;
+  --mast-0: #2b2620;
+  --mast-1: #4b4237;
+  --mast-2: #6d604f;
+  --mast-3: #958468;
+  --mast-4: #c2b48e;
+  --mast-5: #efe6d2;
+  --map-sea: #12161f;
+  --map-land: #1e2433;
+  --map-border: #38425c;
+  --map-point: #ff5e3a;
+  --map-injury: #ffd166;
+
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-sans: "Public Sans", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --wide: 1280px;
   --nav-h: 44px;
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); }
 html { scroll-behavior: smooth; }
 body {
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 17px;
   line-height: 1.55;
-  font-size: 16px;
-  font-feature-settings: "ss01", "cv11";
+  font-weight: 400;
+  /* Every numeral on the page lines up, in prose as well as in figures. */
+  font-variant-numeric: tabular-nums;
   padding-top: var(--nav-h);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: clamp(1.9rem, 4vw, 3rem);
-  font-weight: 800;
-  margin: 0 0 1.25rem;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  max-width: 22ch;
-}
-h2 {
-  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-  letter-spacing: -0.01em;
-}
-h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-  letter-spacing: -0.005em;
-}
+h1, h2, h3 { font-family: var(--font-serif); margin: 0; }
 p { margin: 0 0 1rem; }
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--harm);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--harm); outline-offset: 2px; }
+
+.num, .mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
 
 .eyebrow {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-dim);
-  font-weight: 600;
-  margin: 0 0 0.5rem;
+  color: var(--ink-2);
+  margin: 0 0 0.75rem;
 }
-.answer {
-  display: block;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--text);
-  max-width: 44ch;
-  margin-top: 0.4rem;
-}
-h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { animation: none !important; transition: none !important; }
 }
 
-/* ---- Chapter nav -------------------------------------------------------- */
+/* ---- Chapter nav (fixed 44px) --------------------------------------------- */
 .chapter-nav {
   position: fixed;
   top: 0;
@@ -77,19 +85,19 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   right: 0;
   height: var(--nav-h);
   z-index: 200;
-  background: rgba(15, 20, 25, 0.86);
+  background: rgba(246, 241, 231, 0.92);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--rule);
   display: flex;
   align-items: center;
 }
 .chapter-nav nav {
   width: 100%;
-  max-width: var(--max-width);
+  max-width: var(--wide);
   margin: 0 auto;
   padding: 0 1.5rem;
   display: flex;
-  gap: 1.5rem;
+  gap: 1.75rem;
   /* The bar is a fixed 44px that the sticky panels are offset by, so the
      labels must never wrap onto a second line. */
   white-space: nowrap;
@@ -98,98 +106,155 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
 }
 .chapter-nav nav::-webkit-scrollbar { display: none; }
 .chapter-nav a {
-  color: var(--text-dim);
+  color: var(--ink-2);
   text-decoration: none;
   font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  padding: 0.25rem 0;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0;
   border-bottom: 2px solid transparent;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-.chapter-nav a:hover { color: var(--text); }
-.chapter-nav a.is-current {
-  color: var(--text);
-  border-color: var(--accent);
-}
-.chapter-nav a:focus-visible { outline: 2px solid var(--accent-hot); outline-offset: 2px; }
+/* Numerals stay in ink-2: rust on paper is 4.75:1, too light for text this small. */
+.chapter-nav .nav-n { font-family: var(--font-mono); font-weight: 500; margin-right: 0.15em; }
+.chapter-nav a:hover { color: var(--ink); }
+.chapter-nav a.is-current { color: var(--ink); border-color: var(--harm); }
+.chapter-nav a:focus-visible { outline: 2px solid var(--harm); outline-offset: 2px; }
 
-/* ---- Hero ---------------------------------------------------------------- */
+/* ---- Hero ----------------------------------------------------------------- */
 .hero {
-  min-height: 100vh;
+  position: relative;
+  min-height: calc(100vh - var(--nav-h));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: calc(var(--nav-h) + 2rem) 1.5rem 2rem;
-  text-align: left;
+  padding: 3rem 1.5rem 1.5rem;
 }
-.hero-content { margin: auto 0; }
 .hero-content {
-  max-width: var(--max-width);
+  max-width: var(--wide);
   width: 100%;
+  margin: auto 0;
 }
-.num-window { margin: 0 0 0.6rem; }
-.hero-numbers {
+h1 {
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+  max-width: 24ch;
+  margin: 0 0 2.25rem;
+}
+.hero-figures {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
-  max-width: 620px;
-  margin: 2rem 0 1.75rem;
+  gap: 1.5rem 2.5rem;
+  max-width: 820px;
+  padding: 1.35rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
-@media (max-width: 600px) {
-  .hero-numbers { grid-template-columns: 1fr; }
-}
-.hero-num { display: flex; flex-direction: column; gap: 0.3rem; }
-.hero-num .num {
-  font-size: clamp(2.25rem, 5.5vw, 3.5rem);
-  font-weight: 800;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
+.figure { display: flex; flex-direction: column; gap: 0.35rem; }
+/* A short colour tick names the series each figure belongs to: green for
+   sightings, rust for harm, ink for the crop index. The numerals themselves
+   stay in ink, the only colour that clears 7:1 on paper at this size. */
+.figure::before { content: ""; display: block; width: 28px; height: 3px; background: var(--ink); margin-bottom: 0.45rem; }
+.figure-sight::before { background: var(--sight); }
+.figure-harm::before { background: var(--harm); }
+.figure .num {
+  font-size: clamp(2.1rem, 4.2vw, 3rem);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
-.hero-num .num-label {
-  color: var(--text-dim);
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  letter-spacing: 0.07em;
-  font-weight: 600;
+.figure-label { font-size: 0.86rem; line-height: 1.35; color: var(--ink); font-weight: 500; }
+.figure-compare { font-size: 0.8rem; color: var(--ink-2); }
+.dateline {
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin: 1.25rem 0 0;
+  max-width: 72ch;
 }
 .scroll-cue {
-  /* In flow, pushed to the bottom of the hero by the flex column, so it can
-     never sit on top of the dateline when the hero is taller than a phone. */
   margin-top: auto;
   padding-top: 2.5rem;
   align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  color: var(--text-dim);
+  gap: 0.2rem;
+  color: var(--ink-2);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   animation: bob 2.2s ease-in-out infinite;
 }
 .scroll-cue-arrow { font-size: 1rem; }
-.hero { position: relative; }
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(6px); }
 }
 
-/* ---- Chapters + scrolly --------------------------------------------------- */
-.chapter { padding: 5rem 1.5rem 3rem; max-width: 1280px; margin: 0 auto; }
-.chapter-head { max-width: var(--max-width); margin: 0 auto 2.5rem; }
+/* ---- Chapters --------------------------------------------------------------- */
+/* Sections are separated by hairlines that run the full width of the page. */
+.chapter {
+  border-top: 1px solid var(--rule);
+  padding: 4rem 1.5rem 3rem;
+}
+.chapter-inner { max-width: var(--wide); margin: 0 auto; }
 
+.chapter-head {
+  max-width: 960px;
+  margin: 0 0 2.75rem;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+/* The stamp: a specimen tag in rust ink, set slightly askew. */
+.stamp {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--harm);
+  box-shadow: inset 0 0 0 1px rgba(181, 72, 42, 0.25);
+  color: var(--harm);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-8deg);
+  margin-top: 0.55rem;
+}
+.chapter-head h2 {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+  max-width: 22ch;
+  margin: 0 0 0.85rem;
+}
+.answer {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.3rem;
+  line-height: 1.4;
+  color: var(--ink);
+  max-width: 50ch;
+  margin: 0;
+}
+
+/* ---- Scrolly: steps beside a pinned graphic ------------------------------- */
 .scrolly {
   display: grid;
   grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
-  gap: 2rem;
+  gap: 2.5rem;
   align-items: start;
 }
-
 .steps { display: flex; flex-direction: column; }
 .step {
   min-height: 80vh;
@@ -199,27 +264,29 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
 }
 /* The sticky panel lets go when its container ends, so the last step needs
    enough room beneath it to reach the viewport centre with the panel still
-   fully on screen. */
+   fully on screen. Trimming the first step's lead-in only affects the space
+   before scrolling starts. */
 .step:last-child { padding-bottom: 60vh; }
-/* Trimming the first step's lead-in is safe — it only affects space before
-   scrolling starts. The last step's trailing padding is what keeps the
-   sticky `.graphic` panel pinned while its card is the active one; shrinking
-   it un-sticks the panel early and lets the next chapter's fixed nav clip
-   the still-visible graphic, so it stays at the full step height. */
 .step:first-child { padding-top: 4vh; }
 
-.step-card {
-  background: var(--bg-elev);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 1.25rem 1.5rem;
-  opacity: 0.55;
-  transition: opacity 0.3s ease;
+.step-body {
+  border-left: 3px solid var(--rule);
+  padding: 0.2rem 0 0.2rem 1.25rem;
+  opacity: 0.6;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
 }
-.step.is-active .step-card { opacity: 1; }
-.step-card h3 { color: var(--text); }
-.step-card p { margin: 0; color: var(--text-dim); font-size: 1rem; max-width: 34ch; }
+.step.is-active .step-body { opacity: 1; border-color: var(--harm); }
+.step-body h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 0.55rem;
+}
+.step-body p { margin: 0; max-width: 36ch; font-size: 1rem; color: var(--ink); }
 
+/* The pinned panel has no background and no border: its charts draw their
+   own hairline frame. Layers stack and fade; never display:none, because a
+   hidden layer still has to be measurable (Leaflet, D3 both size on mount). */
 .graphic {
   position: sticky;
   top: var(--nav-h);
@@ -229,10 +296,6 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
 .g {
   position: absolute;
   inset: 1.25rem;
-  background: var(--bg-elev);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1rem;
   display: flex;
   flex-direction: column;
   opacity: 0;
@@ -244,69 +307,238 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   visibility: visible;
   transition: opacity 250ms ease, visibility 0s linear 0s;
 }
-
 .chart-canvas {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  border-radius: 6px;
   overflow: hidden;
 }
+.g-caption {
+  flex: 0 0 auto;
+  margin: 0.65rem 0 0;
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  max-width: 70ch;
+}
 
-/* The map and its overlays (year label, replay readout, legend) all need to
-   be positioned relative to the map's own box, not `.g`'s — `.g` also holds
-   the caption row below the map, which would otherwise throw off any
-   "bottom: …" offset measured from `.g` itself. */
+/* ---- The map: the one dark object, pasted into the notebook ---------------- */
 .map-frame {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  border-radius: 6px;
+  border: 1px solid var(--ink);
+  padding: 2px;
+  background: var(--paper);
   overflow: hidden;
 }
 .map-canvas {
   position: absolute;
-  inset: 0;
-  background: #12161f;
+  inset: 2px;
+  background: var(--map-sea);
 }
+.map-year {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(18, 22, 31, 0.8);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+  line-height: 1;
+  color: var(--map-point);
+  z-index: 500;
+  pointer-events: none;
+}
+.legend {
+  position: absolute;
+  bottom: 1.4rem;
+  right: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 190px;
+  color: var(--paper-2);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  z-index: 500;
+  pointer-events: none;
+}
+.legend-bar {
+  height: 8px;
+  background: linear-gradient(to right,
+    var(--map-land) 0%,
+    #fff4a3 25%,
+    #ffa944 55%,
+    var(--map-point) 80%,
+    #b32d2d 100%);
+}
+.legend-scale { display: flex; justify-content: space-between; font-family: var(--font-mono); }
 
-.g-caption {
-  flex: 0 0 auto;
-  margin: 0.6rem 0 0;
-  color: var(--text-dim);
+.g[data-g="map"]:not(.is-points) .replay { display: none; }
+.g[data-g="map"].is-points .map-year,
+.g[data-g="map"].is-points .legend { display: none; }
+.replay {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(18, 22, 31, 0.82);
+  backdrop-filter: blur(6px);
+  z-index: 650;
+  pointer-events: none;
+}
+.replay-month {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  color: var(--paper);
+}
+.replay-count {
+  font-family: var(--font-mono);
+  font-weight: 500;
   font-size: 0.75rem;
+  color: var(--paper-2);
+}
+.replay .hurt { color: var(--map-injury); }
+
+.map-key {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  margin: 0.6rem 0 0;
+  color: var(--ink-2);
+  font-size: 0.75rem;
+}
+.g[data-g="map"].is-points .map-key { display: flex; }
+.map-key .key-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.map-key .dot { display: inline-block; border-radius: 50%; }
+.map-key .dot-sighting { width: 8px; height: 8px; background: var(--map-point); }
+.map-key .dot-injury {
+  width: 12px;
+  height: 12px;
+  background: var(--map-injury);
+  border: 2px solid var(--map-sea);
+  box-shadow: 0 0 0 1px var(--map-injury);
+}
+
+/* Leaflet chrome inside the dark inset */
+.leaflet-container { font-family: inherit; outline: none; background: var(--map-sea); }
+.leaflet-control-attribution {
+  background: rgba(18, 22, 31, 0.8) !important;
+  color: var(--paper-2) !important;
+  font-size: 0.66rem;
+  padding: 2px 6px;
+}
+.leaflet-control-attribution a { color: var(--paper-2); text-decoration-color: var(--paper-2); }
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.leaflet-popup-content-wrapper { border-radius: 0; border: 1px solid var(--ink); }
+.leaflet-popup-content { margin: 0.7rem 0.9rem; font-size: 0.85rem; line-height: 1.45; }
+.leaflet-popup-content strong { font-family: var(--font-serif); font-style: italic; font-weight: 600; }
+.leaflet-popup-close-button { color: var(--ink-2) !important; }
+
+/* Prefecture-name label used by focusTohoku(): handwritten in the margin,
+   no box, legible over the dark land. */
+.pref-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--paper);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14px;
   letter-spacing: 0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7);
+  padding: 0;
 }
+.pref-label::before { display: none; }
 
-/* ---- Prose chapter (03) --------------------------------------------------- */
-.prose { max-width: 66ch; margin: 0 auto; }
-.prose p { max-width: 66ch; }
-.prose em { font-style: normal; color: var(--text); font-weight: 600; }
-.prose .close { font-weight: 700; color: var(--text); margin-top: 2rem; }
-.prose .viz {
-  height: min(46vh, 420px);
-  margin: 1.75rem 0;
+/* ---- Chapter 04: inline figures, no pinned panel --------------------------- */
+.inline-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem 3.5rem;
 }
-
-/* ---- Generic chart/map surface -------------------------------------------- */
-.viz {
-  width: 100%;
-  height: min(55vh, 520px);
-  background: var(--bg-elev);
-  border-radius: 8px;
-  overflow: hidden;
+.inline-figure { margin: 0; display: flex; flex-direction: column; }
+.inline-figure h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 0.55rem;
 }
+.inline-figure p { max-width: 44ch; font-size: 1rem; margin: 0 0 1rem; }
+.inline-figure .chart-canvas { flex: 0 0 auto; height: min(48vh, 420px); }
+.inline-figure .g-caption { margin-top: 0.65rem; }
 
-/* ---- Mobile: single column, sticky graphic on top -------------------------- */
+/* ---- Methods ---------------------------------------------------------------- */
+.methods {
+  border-top: 1px solid var(--rule);
+  padding: 3.5rem 1.5rem 4.5rem;
+}
+.methods-inner { max-width: var(--wide); margin: 0 auto; }
+.methods h2 { font-size: 1.75rem; font-weight: 700; margin: 0 0 1.25rem; }
+.methods h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.4rem;
+}
+.methods p { max-width: 66ch; font-size: 0.95rem; }
+.sources {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  max-width: 78ch;
+}
+.sources li {
+  border-top: 1px solid var(--rule);
+  padding: 0.6rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.sources li:last-child { border-bottom: 1px solid var(--rule); }
+.sources .src-name { font-weight: 500; }
+.sources .src-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-2); }
+
+/* ---- Phones: single column, panel pinned across the top --------------------- */
 @media (max-width: 800px) {
-  /* .graphic comes after .steps in the markup, but on mobile it needs to sit
-     visually above them so it can stay pinned while the steps scroll past
-     underneath it — flex + order flips that without touching DOM order. */
-  /* The base rule's `align-items: start` is for the desktop grid; left in
-     place it also applies here and, since `.graphic`'s children are all
-     absolutely positioned (no intrinsic width), stretch-less alignment
-     collapses `.graphic` to zero width. */
+  body { font-size: 16px; }
+  .chapter-nav nav { padding: 0 1rem; gap: 1rem; }
+  .chapter-nav a { font-size: 0.72rem; letter-spacing: 0; }
+  /* backdrop-filter re-composites on every scroll frame; on phones that is
+     the difference between a smooth scroll and a stuttering one. */
+  .chapter-nav, .map-year, .replay { backdrop-filter: none; }
+  .chapter-nav { background: var(--paper); }
+
+  .hero { padding: 2rem 1rem 1rem; }
+  h1 { margin-bottom: 1.5rem; }
+  .hero-figures { grid-template-columns: 1fr; gap: 0; padding: 0; border-top: 0; }
+  .figure { padding: 0.85rem 0; border-top: 1px solid var(--rule); }
+  .figure::before { display: none; }
+  .figure .num { font-size: 2rem; }
+
+  .chapter { padding: 3rem 1rem 2rem; }
+  .chapter-head { grid-template-columns: 36px minmax(0, 1fr); gap: 0.9rem; margin-bottom: 1.75rem; }
+  .stamp { width: 36px; height: 36px; font-size: 0.85rem; margin-top: 0.35rem; }
+  .answer { font-size: 1.15rem; }
+
+  /* .graphic comes after .steps in the markup, but on a phone it sits
+     visually above them and stays pinned while the steps scroll past
+     underneath. The desktop grid's align-items:start would collapse the
+     panel (its children are all absolutely positioned), so stretch. */
   .scrolly { display: flex; flex-direction: column; align-items: stretch; }
   .graphic {
     order: -1;
@@ -315,260 +547,36 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
     height: 46vh;
     z-index: 2;
     margin-bottom: 1rem;
+    background: var(--paper);
   }
-  .g { inset: 0.5rem; padding: 0.6rem; }
-  .g-caption { display: none; }
+  .g { inset: 0.5rem 0.25rem; }
+  .g-caption { font-size: 0.68rem; line-height: 1.35; margin-top: 0.4rem; }
   .steps { position: relative; z-index: 1; }
-  /* Each step fills the strip below the pinned panel, so the card that is
-     active sits in the readable band rather than under the graphic. */
   /* The reading band is what is left under the pinned panel (46vh + nav).
-     One step fills it, so the active card is the one under the panel and
+     One step fills it, so the active text is the one under the panel and
      nothing has to slide beneath it before the next step takes over. */
   .step { min-height: 48vh; padding: 0.75rem 0 2rem; align-items: flex-start; }
   .step:last-child { padding-bottom: 30vh; }
-  .step-card p { font-size: 0.95rem; }
-  /* Credited in the Methods footer; on the phone-sized map it wraps to two
-     lines and sits on top of the legend. */
+  .step-body { padding-left: 0.9rem; }
+  .step-body h3 { font-size: 1.2rem; }
+  .step-body p { font-size: 0.95rem; }
+
+  /* Credited in Methods; on a phone-sized map it wraps and sits on the legend. */
   .leaflet-control-attribution { display: none; }
-  .legend { width: 140px; bottom: 0.75rem; right: 0.75rem; }
-  /* Casualty rows: two boxes in a short panel. Drop the readouts, tighten,
-     and let the layer scroll if a very short viewport still overflows. */
-  .g[data-g="rows"] { overflow-y: auto; }
-  .g[data-g="rows"] .cmp { padding: 0.75rem 0.9rem 0.8rem; }
-  .g[data-g="rows"] .cmp-read { display: none; }
-  .g[data-g="rows"] .cmp-head p { margin-bottom: 0.4rem; }
-  .g[data-g="rows"] .cmp-head h3 { font-size: 0.9rem; }
-  .g[data-g="rows"] .cmp-rows { gap: 0.3rem; }
-  .g[data-g="rows"] .cmp-bar { height: 12px; }
-  /* backdrop-filter re-composites on every scroll frame; on phones that is
-     the difference between a smooth scroll and a stuttering one. */
-  .step-card { background: rgba(26, 31, 46, 0.96); backdrop-filter: none; }
-  .chapter-nav, .map-year, .replay { backdrop-filter: none; }
-  .chapter-nav { background: rgba(15, 20, 25, 0.97); }
+  .legend { width: 170px; bottom: 0.75rem; right: 0.75rem; font-size: 0.62rem; }
+  .legend-scale span { white-space: nowrap; }
+  .map-key { margin-top: 0.4rem; font-size: 0.7rem; }
+
+  .inline-figures { grid-template-columns: 1fr; gap: 2.5rem; }
+  .inline-figure .chart-canvas { height: 300px; }
+
+  .methods { padding: 2.5rem 1rem 3.5rem; }
 }
 
-/* ---- Choropleth / point-map legend, overlaid on the map -------------------- */
-.map-year {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.35rem 0.75rem;
-  background: rgba(15, 20, 25, 0.75);
-  backdrop-filter: blur(6px);
-  border-radius: 6px;
-  font-size: clamp(1.4rem, 2.6vw, 2rem);
-  font-weight: 800;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  z-index: 500;
-  pointer-events: none;
+/* Narrow phones (360px): four labels still on one line, no overflow. */
+@media (max-width: 400px) {
+  .chapter-nav nav { padding: 0 0.75rem; gap: 0.75rem; }
+  .chapter-nav a { font-size: 0.68rem; }
+  .hero { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .chapter, .methods { padding-left: 0.75rem; padding-right: 0.75rem; }
 }
-
-.legend {
-  position: absolute;
-  bottom: 1.6rem;
-  right: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  width: 190px;
-  color: var(--text-dim);
-  font-size: 0.7rem;
-  letter-spacing: 0.02em;
-  z-index: 500;
-  pointer-events: none;
-}
-.legend-bar {
-  height: 10px;
-  border-radius: 3px;
-  background: linear-gradient(to right,
-    #2a2f40 0%,
-    #fff4a3 25%,
-    #ffa944 55%,
-    #ff5e3a 80%,
-    #b32d2d 100%);
-}
-.legend-scale {
-  display: flex;
-  justify-content: space-between;
-}
-
-/* Replay readout, top-left over the map */
-.g[data-g="map"]:not(.is-points) .replay { display: none; }
-.g[data-g="map"].is-points .map-year,
-.g[data-g="map"].is-points .legend { display: none; }
-.replay {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.5rem 0.85rem;
-  background: rgba(15, 20, 25, 0.78);
-  backdrop-filter: blur(6px);
-  border-radius: 8px;
-  z-index: 650;
-  pointer-events: none;
-}
-.replay-month {
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-.replay-count {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-dim);
-  font-variant-numeric: tabular-nums;
-}
-.replay .hurt { color: var(--injury); }
-
-/* Map key: red dot = sighting/trace, ringed yellow dot = injury. Only makes
-   sense once points are on screen. */
-.map-key {
-  display: none;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.25rem;
-  margin: 0.6rem 0 0;
-  color: var(--text-dim);
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
-}
-.g[data-g="map"].is-points .map-key { display: flex; }
-.map-key .key-item { display: inline-flex; align-items: center; gap: 0.4rem; }
-.map-key .dot { display: inline-block; border-radius: 50%; }
-.map-key .dot-sighting { width: 8px; height: 8px; background: var(--accent); }
-.map-key .dot-injury {
-  width: 12px;
-  height: 12px;
-  background: var(--injury);
-  border: 2px solid #0f1419;
-  box-shadow: 0 0 0 1px var(--injury);
-}
-
-/* ---- Maps ------------------------------------------------------------- */
-/* Leaflet chrome, restyled for the dark palette */
-.leaflet-container {
-  font-family: inherit;
-  outline: none;
-  background: #12161f;
-}
-.leaflet-control-attribution {
-  background: rgba(15, 20, 25, 0.8) !important;
-  color: var(--text-dim) !important;
-  font-size: 0.68rem;
-  padding: 2px 6px;
-}
-.leaflet-control-attribution a { color: var(--text-dim); }
-.leaflet-bar a {
-  background: var(--bg-elev);
-  color: var(--text);
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-.leaflet-bar a:hover { background: #252b3d; color: var(--text); }
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  background: var(--bg-elev);
-  color: var(--text);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-}
-.leaflet-popup-content-wrapper { border-radius: 8px; }
-.leaflet-popup-content { margin: 0.7rem 0.9rem; font-size: 0.85rem; line-height: 1.45; }
-.leaflet-popup-content strong { color: var(--accent-hot); }
-.leaflet-popup-close-button { color: var(--text-dim) !important; }
-
-/* Prefecture-name tooltip used by focusTohoku()'s Akita/Iwate labels: no
-   background box, just legible text laid over the map. */
-.pref-label {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 8px rgba(0, 0, 0, 0.6);
-  padding: 0;
-}
-.pref-label::before { display: none; }
-
-/* ---- Same-months comparison rows (chapter 2 "rows" graphic) --------------- */
-.cmp {
-  background: transparent;
-  padding: 0 0 1rem;
-}
-.cmp:last-child { padding-bottom: 0; }
-.cmp-head h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-.cmp-head p {
-  margin: 0.15rem 0 0.75rem;
-  font-size: 0.75rem;
-  color: var(--text-dim);
-}
-.cmp-rows { display: flex; flex-direction: column; gap: 0.4rem; }
-.cmp-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-variant-numeric: tabular-nums;
-}
-.cmp-year {
-  width: 3.6rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-dim);
-}
-.cmp-track { flex-grow: 1; display: flex; }
-.cmp-bar {
-  display: block;
-  height: 14px;
-  border-radius: 0 3px 3px 0;
-  background: #3c4560;
-}
-.cmp-value {
-  width: 2.6rem;
-  text-align: right;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-dim);
-}
-.cmp-row.is-current .cmp-year,
-.cmp-row.is-current .cmp-value { color: var(--text); }
-.cmp-row.is-current .cmp-bar { background: var(--accent); }
-.cmp-read {
-  margin: 0.75rem 0 0;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  color: var(--text-dim);
-}
-
-/* ---- Dateline / footer ----------------------------------------------------- */
-.dateline {
-  color: var(--text-dim);
-  font-size: 0.75rem;
-  line-height: 1.5;
-  margin: 0.75rem 0 0;
-  max-width: 68ch;
-}
-
-.methods {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 3rem 1.5rem 4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.methods h2 { font-size: 1.15rem; }
-.methods p { max-width: 66ch; color: var(--text-dim); font-size: 0.9rem; }
-.sources { font-size: 0.85rem; }
-.sources a { color: var(--accent-hot); }
-
-a { color: var(--accent-hot); }
-a:focus-visible { outline: 2px solid var(--accent-hot); outline-offset: 2px; }
