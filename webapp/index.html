@@ -98,7 +98,7 @@
             <div class="step" data-step="replay">
               <div class="step-body">
                 <h3>Report by report.</h3>
-                <p>Akita and Iwate publish totals only. Toyama, Niigata, Gunma and Saitama publish each report with a location. The map plays their fiscal 2025 month by month: 64 reports in April, 1,795 in October. Yellow marks are people injured.</p>
+                <p>Toyama, Niigata, Gunma and Saitama publish each report with a location as open data. Akita does too, through its クマダス system, and those reports will join this map in a later update. The map plays their fiscal 2025 month by month: 64 reports in April, 1,795 in October. Yellow marks are people injured.</p>
               </div>
             </div>
           </div>
@@ -203,7 +203,7 @@
           <span class="stamp" aria-hidden="true">03</span>
           <div>
             <h2>Will autumn 2026 repeat autumn 2025?</h2>
-            <p class="answer">Probably not. Spring is far ahead, but spring does not set the autumn, and the beech crop is forecast good. A July forecast this good has never ended in a region-wide failure.</p>
+            <p class="answer">Probably not. Spring was far ahead, but spring does not set the autumn, the beech crop is forecast good, and in every prefecture with comparable data July and August were below 2025.</p>
           </div>
         </div>
 
@@ -213,6 +213,13 @@
               <div class="step-body">
                 <h3>The busiest spring in 14 years.</h3>
                 <p>April to June 2026: 12,628 sightings. The previous high was 7,601 in fiscal 2024. Fiscal 2025 had 7,555 at the same point.</p>
+              </div>
+            </div>
+
+            <div class="step" data-step="summer">
+              <div class="step-body">
+                <h3>The surge did not last the summer.</h3>
+                <p>Three prefectures and one group publish their counts ahead of the ministry. Akita, July 2026: 904 sightings, against 1,055 in July 2025. August: 251 against 766. Miyagi: 222 against 250, then 132 against 225. Toyama, Niigata, Gunma and Saitama together: 363 against 420, then 134 against 320. Iwate changed how it counts in April 2026 and cannot be compared. The ministry&rsquo;s own July figures are due in September.</p>
               </div>
             </div>
 
@@ -242,6 +249,11 @@
             <div class="g" data-g="monthly">
               <div id="monthly" class="chart-canvas"></div>
               <p class="g-caption">Sightings per month, fiscal 2013 to 2026. Closed years in grey, fiscal 2025 in black, fiscal 2026 in green to June. Ministry of the Environment.</p>
+            </div>
+
+            <div class="g" data-g="summer">
+              <div id="summer" class="chart-canvas"></div>
+              <p class="g-caption">Sightings per month, April to August, fiscal 2026 against fiscal 2025, from each prefecture&rsquo;s own publication. Each panel has its own scale. 2025 values from the Ministry of the Environment.</p>
             </div>
 
             <div class="g" data-g="scatter">
@@ -307,7 +319,7 @@
       <p id="index-definition">The Tohoku Regional Forest Office surveys beech only, at fixed points in Aomori, Iwate, Miyagi, Akita and Yamagata (up to 145 points). Its own definition of the index, quoted: &ldquo;区分 / 開花（結実）状況 / 豊凶指数: 全体 樹冠全体にたくさんの花（実）がついている ５; 部分 樹冠上部に多くの花（実）がついている ３; 一部 ごくわずかに花（実）がついている １; 非開花（非結実） まったく花（実）がついていない ０. 結実予測は、各調査箇所の調査結果を数値化、集計し豊凶指数を算出して、下表のとおり結実の豊凶を推測します。 豊凶指数 3.5以上 豊作 / 2.0以上3.5未満 並作 / 1.0以上2.0未満 凶作 / 1.0未満 大凶作. 注：豊凶指数1.0未満でも一部に開花・結実が見られる場合もあり、誤解を避けるため、平成29年度から豊凶区分の「皆無」を「大凶作」に変更しました。 (東北森林管理局. The prefecture index is the mean of the per-point scores over the points surveyed that year.)&rdquo; The July flowering survey gives the forecast; the autumn fruiting survey gives the result. Both use the same points and the same index.</p>
 
       <h3>Point data</h3>
-      <p>Four prefectures publish individual reports as open data: Toyama, Niigata, Gunma and Saitama. The other 43, including Akita and Iwate, publish totals only. Hokkaido's feed began in May 2026 and is not in the month-by-month replay.</p>
+      <p>Five prefectures publish individual reports as open data: Toyama, Niigata, Gunma, Saitama and, through its クマダス system, Akita (CC BY 4.0, records with coordinates from October 2023). Akita&rsquo;s reports are not yet on the map. Iwate, Miyagi and most other prefectures publish totals; the ministry compiles them about six weeks after month end. The summer panel uses Akita, Miyagi and Iwate&rsquo;s own publications for 2026 and the ministry&rsquo;s table for 2025. Hokkaido&rsquo;s feed began in May 2026 and is not in the month-by-month replay.</p>
 
       <h3>Sources</h3>
       <ul class="sources">

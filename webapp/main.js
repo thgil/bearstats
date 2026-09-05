@@ -48,6 +48,7 @@ const PANEL_CHARTS = [
   { key: "mast",       module: "./chart-mast.js",       fn: "mountMast",       id: "mast" },
   { key: "alternate",  module: "./chart-alternate.js",  fn: "mountAlternate",  id: "alternate" },
   { key: "weather",    module: "./chart-weather.js",    fn: "mountWeather",    id: "weather" },
+  { key: "summer",     module: "./chart-summer.js",     fn: "mountSummer",     id: "summer" },
   { key: "scatter",    module: "./chart-scatter.js",    fn: "mountScatter",    id: "scatter" },
   { key: "forecast",   module: "./chart-forecast.js",   fn: "mountForecast",   id: "forecast" },
   { key: "casualties", module: "./chart-casualties.js", fn: "mountCasualties", id: "casualties" },

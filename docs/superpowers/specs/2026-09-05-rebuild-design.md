@@ -72,7 +72,7 @@ header.chapter-nav (44px, paper, hairline below)
 section#hero
 section#ch-1  steps: annual, harm, where, heat, replay   graphics: annual | harm | map | heat
 section#ch-2  steps: mast, alternate, weather             graphics: mast | alternate | weather
-section#ch-3  steps: spring, scatter, forecast, casualties graphics: monthly | scatter | forecast | casualties
+section#ch-3  steps: spring, summer, scatter, forecast, casualties graphics: monthly | summer | scatter | forecast | casualties
 section#ch-4  inline (no sticky): licences chart, population dumbbells
 footer#methods
 ```
@@ -88,6 +88,7 @@ footer#methods
 | alternate | Akita five-site strip 2002-2025 | play | setProgress(1) |
 | weather | JJA temp/precip vs index scatter or strip | play | setProgress(1) |
 | spring | monthly lines: 13 closed years in --rule, 2025 in --ink, 2026 in --sight | play | setProgress(1) |
+| summer | small multiples Apr-Aug 2026 vs 2025: Akita, Miyagi, sample4, Iwate (not comparable) from context.recent | play | setProgress(1) |
 | scatter | Apr-Jun vs Oct-Nov, 13 points, vertical line at 12,628 | play | setProgress(1) |
 | forecast | panel: five prefecture tiles 2026 vs 2025 vs 2023 + three survey rows + track record | play | setProgress(1) |
 | casualties | Apr-Jul injured and killed, 2016-2026, two bar rows | play | setProgress(1) |

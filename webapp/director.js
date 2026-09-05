@@ -15,7 +15,7 @@ export const REPLAY_GUARD_MS = 2500;
 const CHAPTER_STEPS = {
   1: ["annual", "harm", "where", "heat", "replay"],
   2: ["mast", "alternate", "weather"],
-  3: ["spring", "scatter", "forecast", "casualties"],
+  3: ["spring", "summer", "scatter", "forecast", "casualties"],
 };
 
 /** Which chapter (1, 2 or 3) a step belongs to. */
@@ -98,6 +98,7 @@ export const STEPS = {
 
   // ---- 03 This year ---------------------------------------------------------
   spring: playable("monthly", "monthly", "spring13"),
+  summer: playable("summer", "summer"),
   scatter: playable("scatter", "scatter"),
   forecast: playable("forecast", "forecast"),
   casualties: playable("casualties", "casualties"),

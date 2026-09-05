@@ -19,6 +19,8 @@ const SPEC_STEPS = {
   alternate: { chapter: 2, graphic: "alternate" },
   weather: { chapter: 2, graphic: "weather" },
   spring: { chapter: 3, graphic: "monthly" },
+
+  summer: { chapter: 3, graphic: "summer" },
   scatter: { chapter: 3, graphic: "scatter" },
   forecast: { chapter: 3, graphic: "forecast" },
   casualties: { chapter: 3, graphic: "casualties" },
