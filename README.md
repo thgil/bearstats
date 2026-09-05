@@ -47,9 +47,25 @@ python fetch_arcgis.py
 python fetch_hokkaido.py
 python fetch_geojson.py
 python build_json.py
+python build_context.py
 ```
 
-Outputs four JSON files into `webapp/data/`.
+Outputs five JSON files into `webapp/data/`.
+
+### Context data (`build_context.py` → `webapp/data/context.json`)
+
+The ministry's live tables only reach back five fiscal years. The longer and
+wider series the page needs to say whether the problem is getting worse live as
+CSVs under `data-pipeline/research/` (tracked in git, one `source_url` and
+`publish_date` per row): monthly national sightings FY2013 onward from four
+editions of `syutubotu.pdf`, prefecture-by-month sightings, monthly victims and
+deaths FY2014 onward, the Tohoku Regional Forest Office beech index FY2012 to
+FY2026 plus the Akita, Miyagi, Toyama, Niigata and MoE mast tables,
+hunting-licence holders 1975 to 2021, the draft guideline's population table,
+and JMA summer weather. `build_context.py` merges them into one file; the
+extractor next to each CSV (and the README beside it) says which PDF it came
+from and how it was read. Those extractors are run by hand when a source
+publishes, not by `fetch_all.py`.
 
 ### A note on the ministry's PDFs
 

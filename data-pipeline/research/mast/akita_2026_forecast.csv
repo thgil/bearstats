@@ -1,6 +1,6 @@
-site,forecast_2026
-hachimori,○ (豊作)
-moriyoshizan,○ (豊作)
-tazawako,△ (並作)
-higashinaruse,○ (豊作)
-chokai,○ (豊作)
+site,forecast_2026,source_url,publish_date,publish_date_basis,source_file,method
+hachimori,○ (豊作),https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ豊凶予報2026.pdf,2025-11-07,page 更新日 2025年11月07日; PDF prints 2025年11月発表,data-pipeline/raw/research/mast/akita-buna-2026-forecast.pdf,pdftotext -layout text layer (pre-existing extraction)
+moriyoshizan,○ (豊作),https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ豊凶予報2026.pdf,2025-11-07,page 更新日 2025年11月07日; PDF prints 2025年11月発表,data-pipeline/raw/research/mast/akita-buna-2026-forecast.pdf,pdftotext -layout text layer (pre-existing extraction)
+tazawako,△ (並作),https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ豊凶予報2026.pdf,2025-11-07,page 更新日 2025年11月07日; PDF prints 2025年11月発表,data-pipeline/raw/research/mast/akita-buna-2026-forecast.pdf,pdftotext -layout text layer (pre-existing extraction)
+higashinaruse,○ (豊作),https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ豊凶予報2026.pdf,2025-11-07,page 更新日 2025年11月07日; PDF prints 2025年11月発表,data-pipeline/raw/research/mast/akita-buna-2026-forecast.pdf,pdftotext -layout text layer (pre-existing extraction)
+chokai,○ (豊作),https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ豊凶予報2026.pdf,2025-11-07,page 更新日 2025年11月07日; PDF prints 2025年11月発表,data-pipeline/raw/research/mast/akita-buna-2026-forecast.pdf,pdftotext -layout text layer (pre-existing extraction)

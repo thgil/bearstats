@@ -1,16 +1,71 @@
-fiscal_year,prefecture,points_full,points_partial,points_slight,points_none,points_total,mast_index,actual_category,source_pdf,source_url,publish_date
-2023,青森県,0,0,2,33,35,0.1,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20
-2023,岩手県,0,0,1,23,24,0.0,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20
-2023,宮城県,0,0,0,6,6,0.0,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20
-2023,秋田県,0,0,5,43,48,0.1,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20
-2023,山形県,0,0,3,19,22,0.1,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20
-2024,青森県,22,9,3,3,37,3.8,豊作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31
-2024,岩手県,2,17,2,2,23,2.7,並作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31
-2024,宮城県,5,0,0,1,6,4.2,豊作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31
-2024,秋田県,16,9,19,5,49,2.6,並作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31
-2024,山形県,5,11,2,3,21,2.9,並作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31
-2025,青森県,0,0,7,31,38,0.2,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06
-2025,岩手県,0,0,3,21,24,0.1,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06
-2025,宮城県,0,0,1,5,6,0.2,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06
-2025,秋田県,0,0,2,46,48,0.0,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06
-2025,山形県,0,0,1,20,21,0.0,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06
+fiscal_year,prefecture,points_full,points_partial,points_slight,points_none,points_total,mast_index,actual_category,source_pdf,source_url,publish_date,method,notes
+2012,青森県,0,1,11,26,38,0.4,皆無,tohoku-buna-45.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-45.pdf,2012-11-21,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2012,岩手県,0,0,1,23,24,0.04,皆無,tohoku-buna-45.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-45.pdf,2012-11-21,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),index printed to two decimals in the PDF
+2012,宮城県,1,2,2,1,6,2.2,並作,tohoku-buna-45.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-45.pdf,2012-11-21,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2012,秋田県,1,1,28,25,55,0.7,皆無,tohoku-buna-45.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-45.pdf,2012-11-21,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2012,山形県,0,0,4,18,22,0.2,皆無,tohoku-buna-45.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-45.pdf,2012-11-21,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2013,青森県,18,10,8,2,38,3.4,並作,tohoku-buna-46.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-46.pdf,2013-11-22,pdftotext -layout text layer,
+2013,岩手県,14,6,2,2,24,3.8,豊作,tohoku-buna-46.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-46.pdf,2013-11-22,pdftotext -layout text layer,
+2013,宮城県,6,0,0,0,6,5.0,豊作,tohoku-buna-46.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-46.pdf,2013-11-22,pdftotext -layout text layer,
+2013,秋田県,21,10,24,0,55,2.9,並作,tohoku-buna-46.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-46.pdf,2013-11-22,pdftotext -layout text layer,
+2013,山形県,4,7,10,1,22,2.3,並作,tohoku-buna-46.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-46.pdf,2013-11-22,pdftotext -layout text layer,
+2014,青森県,1,1,17,18,37,0.8,皆無,tohoku-buna-48.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-48.pdf,2015-03-27,pdftotext -layout text layer,"printed 0.8 in buna-48 but the printed counts 1/1/17/18 of 37 give 0.68; the office's later summary tables (buna-50, buna-52, buna-12) restate this year as 0.7, the archive page as 0.8; kept as printed in the primary. Release dated 2015-03-27"
+2014,岩手県,0,0,4,20,24,0.2,皆無,tohoku-buna-48.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-48.pdf,2015-03-27,pdftotext -layout text layer,
+2014,宮城県,0,0,4,2,6,0.7,皆無,tohoku-buna-48.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-48.pdf,2015-03-27,pdftotext -layout text layer,
+2014,秋田県,0,2,13,39,54,0.4,皆無,tohoku-buna-48.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-48.pdf,2015-03-27,pdftotext -layout text layer,
+2014,山形県,0,0,5,17,22,0.2,皆無,tohoku-buna-48.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-48.pdf,2015-03-27,pdftotext -layout text layer,2 points not surveyed (road washout)
+2015,青森県,6,9,16,6,37,2.0,並作,tohoku-buna-50.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-50.pdf,2015-12-09,pdftotext -layout text layer,
+2015,岩手県,17,5,1,1,24,4.2,豊作,tohoku-buna-50.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-50.pdf,2015-12-09,pdftotext -layout text layer,
+2015,宮城県,1,4,0,0,5,3.4,並作,tohoku-buna-50.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-50.pdf,2015-12-09,pdftotext -layout text layer,
+2015,秋田県,9,11,18,14,52,1.8,凶作,tohoku-buna-50.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-50.pdf,2015-12-09,pdftotext -layout text layer,
+2015,山形県,10,8,2,2,22,3.5,豊作,tohoku-buna-50.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-50.pdf,2015-12-09,pdftotext -layout text layer,5 points not surveyed in total (road washout); 140 surveyed
+2016,青森県,0,2,14,22,38,0.5,皆無,tohoku-buna-52.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-52.pdf,2016-11-16,pdftotext -layout text layer,
+2016,岩手県,0,0,1,21,22,0.045,皆無,tohoku-buna-52.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-52.pdf,2016-11-16,pdftotext -layout text layer,index printed to three decimals in the PDF
+2016,宮城県,0,0,0,6,6,0.0,皆無,tohoku-buna-52.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-52.pdf,2016-11-16,pdftotext -layout text layer,
+2016,秋田県,0,0,5,48,53,0.1,皆無,tohoku-buna-52.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-52.pdf,2016-11-16,pdftotext -layout text layer,
+2016,山形県,0,0,3,19,22,0.1,皆無,tohoku-buna-52.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-52.pdf,2016-11-16,pdftotext -layout text layer,4 points not surveyed in total (road washout); 141 surveyed
+2017,青森県,1,9,13,15,38,1.2,凶作,tohoku-buna-13.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-13.pdf,2017-11-27,pdftotext -layout text layer,
+2017,岩手県,0,5,13,6,24,1.2,凶作,tohoku-buna-13.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-13.pdf,2017-11-27,pdftotext -layout text layer,
+2017,宮城県,0,1,1,4,6,0.7,大凶作,tohoku-buna-13.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-13.pdf,2017-11-27,pdftotext -layout text layer,
+2017,秋田県,1,3,22,27,53,0.7,大凶作,tohoku-buna-13.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-13.pdf,2017-11-27,pdftotext -layout text layer,
+2017,山形県,0,0,8,14,22,0.4,大凶作,tohoku-buna-13.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-13.pdf,2017-11-27,pdftotext -layout text layer,2 points not surveyed in total (road closed); 143 surveyed; class 皆無 renamed 大凶作 from this year
+2018,青森県,2,5,22,9,38,1.2,凶作,tohoku-buna-17.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-17.pdf,2018-11-05,pdftotext -layout text layer,
+2018,岩手県,2,6,15,1,24,1.8,凶作,tohoku-buna-17.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-17.pdf,2018-11-05,pdftotext -layout text layer,
+2018,宮城県,1,3,1,1,6,2.5,並作,tohoku-buna-17.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-17.pdf,2018-11-05,pdftotext -layout text layer,
+2018,秋田県,4,16,23,11,54,1.7,凶作,tohoku-buna-17.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-17.pdf,2018-11-05,pdftotext -layout text layer,
+2018,山形県,14,4,3,1,22,3.9,豊作,tohoku-buna-17.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-17.pdf,2018-11-05,pdftotext -layout text layer,1 point not surveyed in total; 144 surveyed
+2019,青森県,0,1,19,18,38,0.6,大凶作,tohoku-buna-25.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-25.pdf,2019-11-12,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2019,岩手県,0,0,3,21,24,0.1,大凶作,tohoku-buna-25.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-25.pdf,2019-11-12,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2019,宮城県,0,0,2,4,6,0.3,大凶作,tohoku-buna-25.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-25.pdf,2019-11-12,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2019,秋田県,0,0,10,45,55,0.2,大凶作,tohoku-buna-25.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-25.pdf,2019-11-12,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2019,山形県,0,0,1,21,22,0.0,大凶作,tohoku-buna-25.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-25.pdf,2019-11-12,visual read of scanned PDF (no text layer; page rendered with pdftoppm and read with the Read tool),
+2020,青森県,7,12,17,2,38,2.3,並作,tohoku-buna-27.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-27.pdf,2020-11-11,pdftotext -layout text layer,
+2020,岩手県,1,4,12,6,23,1.3,凶作,tohoku-buna-27.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-27.pdf,2020-11-11,pdftotext -layout text layer,
+2020,宮城県,0,1,1,4,6,0.7,大凶作,tohoku-buna-27.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-27.pdf,2020-11-11,pdftotext -layout text layer,
+2020,秋田県,11,8,28,7,54,2.0,並作,tohoku-buna-27.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-27.pdf,2020-11-11,pdftotext -layout text layer,
+2020,山形県,1,0,2,18,21,0.3,大凶作,tohoku-buna-27.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-27.pdf,2020-11-11,pdftotext -layout text layer,3 points not surveyed in total (road damage); 142 surveyed
+2021,青森県,1,4,20,13,38,1.0,凶作,tohoku-buna-29.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-29.pdf,2021-11-11,pdftotext -layout text layer,
+2021,岩手県,1,0,10,12,23,0.7,大凶作,tohoku-buna-29.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-29.pdf,2021-11-11,pdftotext -layout text layer,
+2021,宮城県,0,2,4,0,6,1.7,凶作,tohoku-buna-29.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-29.pdf,2021-11-11,pdftotext -layout text layer,
+2021,秋田県,0,0,11,43,54,0.2,大凶作,tohoku-buna-29.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-29.pdf,2021-11-11,pdftotext -layout text layer,
+2021,山形県,2,3,13,3,21,1.5,凶作,tohoku-buna-29.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-29.pdf,2021-11-11,pdftotext -layout text layer,3 points not surveyed in total (road damage); 142 surveyed
+2022,青森県,10,14,11,1,36,2.9,並作,tohoku-buna-38.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-38.pdf,2022-10-26,pdftotext -layout text layer,2 points not surveyed (road damage)
+2022,岩手県,6,9,5,3,23,2.7,並作,tohoku-buna-40.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-40.pdf,2022-10-28,pdftotext -layout text layer,1 point not surveyed (road damage)
+2022,宮城県,0,2,2,2,6,1.3,凶作,tohoku-buna-39.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-39.pdf,2022-10-07,pdftotext -layout text layer,
+2022,秋田県,21,9,16,6,52,2.8,並作,tohoku-buna-36.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-36.pdf,2022-10-26,pdftotext -layout text layer,3 points not surveyed (road damage)
+2022,山形県,8,8,2,3,21,3.1,並作,tohoku-buna-37.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-37.pdf,2022-10-21,pdftotext -layout text layer,1 point not surveyed (road damage)
+2023,青森県,0,0,2,33,35,0.1,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20,"text layer (pre-existing row, values unchanged)",
+2023,岩手県,0,0,1,23,24,0.0,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20,"text layer (pre-existing row, values unchanged)",
+2023,宮城県,0,0,0,6,6,0.0,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20,"text layer (pre-existing row, values unchanged)",
+2023,秋田県,0,0,5,43,48,0.1,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20,"text layer (pre-existing row, values unchanged)",
+2023,山形県,0,0,3,19,22,0.1,大凶作,buna-r5-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/koho/press/attach/pdf/index-18.pdf,2023-10-20,"text layer (pre-existing row, values unchanged)",
+2024,青森県,22,9,3,3,37,3.8,豊作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31,"text layer (pre-existing row, values unchanged)",
+2024,岩手県,2,17,2,2,23,2.7,並作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31,"text layer (pre-existing row, values unchanged)",
+2024,宮城県,5,0,0,1,6,4.2,豊作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31,"text layer (pre-existing row, values unchanged)",
+2024,秋田県,16,9,19,5,49,2.6,並作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31,"text layer (pre-existing row, values unchanged)",
+2024,山形県,5,11,2,3,21,2.9,並作,buna-r6-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/attach/pdf/index-125.pdf,2024-10-31,"text layer (pre-existing row, values unchanged)",
+2025,青森県,0,0,7,31,38,0.2,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06,"text layer (pre-existing row, values unchanged)",
+2025,岩手県,0,0,3,21,24,0.1,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06,"text layer (pre-existing row, values unchanged)",
+2025,宮城県,0,0,1,5,6,0.2,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06,"text layer (pre-existing row, values unchanged)",
+2025,秋田県,0,0,2,46,48,0.0,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06,"text layer (pre-existing row, values unchanged)",
+2025,山形県,0,0,1,20,21,0.0,大凶作,buna-r7-fruiting.pdf,https://www.rinya.maff.go.jp/tohoku/sidou/attach/pdf/buna-55.pdf,2025-11-06,"text layer (pre-existing row, values unchanged)",

@@ -1,103 +1,103 @@
-station,station_ja,year,jja_mean_temp_c,jja_precip_total_mm,jja_sunshine_total_h
-akita,秋田,2009,22.03,548.0,440.9
-akita,秋田,2010,24.1,539.0,510.2
-akita,秋田,2011,23.23,442.0,540.2
-akita,秋田,2012,23.37,321.0,692.2
-akita,秋田,2013,23.4,798.0,556.1
-akita,秋田,2014,23.5,588.5,508.9
-akita,秋田,2015,22.83,459.5,553.4
-akita,秋田,2016,23.2,476.5,591.3
-akita,秋田,2017,22.37,634.0,562.4
-akita,秋田,2018,23.3,581.0,517.0
-akita,秋田,2019,23.57,519.5,611.6
-akita,秋田,2020,23.37,607.0,500.3
-akita,秋田,2021,24.1,498.5,661.5
-akita,秋田,2022,23.4,538.0,482.8
-akita,秋田,2023,25.37,558.5,636.6
-akita,秋田,2024,24.5,492.0,562.0
-akita,秋田,2025,25.3,480.0,611.3
-aomori,青森,2009,20.0,452.5,413.3
-aomori,青森,2010,22.77,433.5,483.6
-aomori,青森,2011,21.77,256.0,538.4
-aomori,青森,2012,21.4,311.5,642.3
-aomori,青森,2013,21.53,461.0,553.9
-aomori,青森,2014,21.63,503.0,505.1
-aomori,青森,2015,21.5,194.5,571.9
-aomori,青森,2016,21.13,456.5,537.0
-aomori,青森,2017,20.97,391.5,560.5
-aomori,青森,2018,21.07,473.5,479.7
-aomori,青森,2019,21.67,284.5,638.4
-aomori,青森,2020,21.9,428.5,555.7
-aomori,青森,2021,22.27,248.5,645.5
-aomori,青森,2022,21.73,773.5,487.9
-aomori,青森,2023,24.2,211.0,605.0
-aomori,青森,2024,23.3,432.0,519.4
-aomori,青森,2025,24.4,434.5,645.9
-morioka,盛岡,2009,21.17,495.0,394.9
-morioka,盛岡,2010,23.73,654.5,462.7
-morioka,盛岡,2011,22.5,427.0,459.2
-morioka,盛岡,2012,22.57,230.0,543.5
-morioka,盛岡,2013,22.23,736.5,447.9
-morioka,盛岡,2014,22.53,520.5,434.6
-morioka,盛岡,2015,22.27,322.0,503.0
-morioka,盛岡,2016,21.93,547.0,491.7
-morioka,盛岡,2017,21.5,635.0,461.2
-morioka,盛岡,2018,22.4,423.5,449.1
-morioka,盛岡,2019,22.2,305.5,479.7
-morioka,盛岡,2020,22.4,803.0,419.7
-morioka,盛岡,2021,22.97,410.0,484.5
-morioka,盛岡,2022,22.27,658.5,424.9
-morioka,盛岡,2023,24.47,600.5,556.0
-morioka,盛岡,2024,24.0,842.5,529.9
-morioka,盛岡,2025,24.77,341.0,588.8
-niigata,新潟,2009,23.33,465.0,439.2
-niigata,新潟,2010,25.63,312.5,647.6
-niigata,新潟,2011,24.9,574.0,580.3
-niigata,新潟,2012,24.63,229.0,677.9
-niigata,新潟,2013,24.7,771.0,540.3
-niigata,新潟,2014,24.33,541.0,542.2
-niigata,新潟,2015,24.07,331.5,566.4
-niigata,新潟,2016,24.33,353.0,617.1
-niigata,新潟,2017,23.7,749.0,547.2
-niigata,新潟,2018,25.03,386.5,637.7
-niigata,新潟,2019,24.5,425.0,601.3
-niigata,新潟,2020,24.53,831.5,508.2
-niigata,新潟,2021,24.77,474.5,625.7
-niigata,新潟,2022,24.97,676.5,561.0
-niigata,新潟,2023,26.4,357.0,728.7
-niigata,新潟,2024,25.47,475.5,522.9
-niigata,新潟,2025,26.3,551.0,724.1
-toyama,富山,2009,23.87,668.5,387.0
-toyama,富山,2010,26.0,527.0,610.1
-toyama,富山,2011,25.23,630.0,496.7
-toyama,富山,2012,25.27,421.0,649.4
-toyama,富山,2013,25.7,996.0,604.3
-toyama,富山,2014,24.83,732.0,493.3
-toyama,富山,2015,24.63,464.0,532.3
-toyama,富山,2016,25.1,590.0,566.7
-toyama,富山,2017,24.43,1037.0,527.4
-toyama,富山,2018,25.97,641.5,670.7
-toyama,富山,2019,24.93,612.5,505.9
-toyama,富山,2020,25.23,666.5,491.2
-toyama,富山,2021,25.1,655.0,545.1
-toyama,富山,2022,25.83,682.5,532.3
-toyama,富山,2023,27.0,612.0,677.0
-toyama,富山,2024,26.53,468.0,603.7
-toyama,富山,2025,27.13,494.0,717.2
-yamagata,山形,2009,22.43,389.0,371.2
-yamagata,山形,2010,24.97,540.0,571.5
-yamagata,山形,2011,23.8,343.0,495.7
-yamagata,山形,2012,23.57,230.0,591.4
-yamagata,山形,2013,23.57,581.0,491.1
-yamagata,山形,2014,23.5,409.0,468.7
-yamagata,山形,2015,23.4,255.5,510.0
-yamagata,山形,2016,23.3,586.5,528.9
-yamagata,山形,2017,22.93,581.5,460.5
-yamagata,山形,2018,24.23,375.5,558.5
-yamagata,山形,2019,23.4,451.0,486.7
-yamagata,山形,2020,23.97,591.5,481.7
-yamagata,山形,2021,24.1,274.0,538.1
-yamagata,山形,2022,24.07,407.0,467.1
-yamagata,山形,2023,25.43,386.5,604.2
-yamagata,山形,2024,25.2,399.5,449.4
-yamagata,山形,2025,26.13,254.0,638.6
+station,station_ja,year,jja_mean_temp_c,jja_precip_total_mm,jja_sunshine_total_h,source_url,publish_date,publish_date_basis
+akita,秋田,2009,22.03,548.0,440.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2009&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2010,24.1,539.0,510.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2010&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2011,23.23,442.0,540.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2011&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2012,23.37,321.0,692.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2012&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2013,23.4,798.0,556.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2013&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2014,23.5,588.5,508.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2014&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2015,22.83,459.5,553.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2015&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2016,23.2,476.5,591.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2016&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2017,22.37,634.0,562.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2017&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2018,23.3,581.0,517.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2018&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2019,23.57,519.5,611.6,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2019&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2020,23.37,607.0,500.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2020&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2021,24.1,498.5,661.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2021&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2022,23.4,538.0,482.8,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2022&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2023,25.37,558.5,636.6,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2023&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2024,24.5,492.0,562.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2024&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+akita,秋田,2025,25.3,480.0,611.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=32&block_no=47582&year=2025&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2009,20.0,452.5,413.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2009&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2010,22.77,433.5,483.6,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2010&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2011,21.77,256.0,538.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2011&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2012,21.4,311.5,642.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2012&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2013,21.53,461.0,553.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2013&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2014,21.63,503.0,505.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2014&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2015,21.5,194.5,571.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2015&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2016,21.13,456.5,537.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2016&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2017,20.97,391.5,560.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2017&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2018,21.07,473.5,479.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2018&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2019,21.67,284.5,638.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2019&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2020,21.9,428.5,555.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2020&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2021,22.27,248.5,645.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2021&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2022,21.73,773.5,487.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2022&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2023,24.2,211.0,605.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2023&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2024,23.3,432.0,519.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2024&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+aomori,青森,2025,24.4,434.5,645.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=31&block_no=47575&year=2025&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2009,21.17,495.0,394.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2009&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2010,23.73,654.5,462.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2010&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2011,22.5,427.0,459.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2011&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2012,22.57,230.0,543.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2012&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2013,22.23,736.5,447.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2013&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2014,22.53,520.5,434.6,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2014&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2015,22.27,322.0,503.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2015&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2016,21.93,547.0,491.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2016&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2017,21.5,635.0,461.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2017&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2018,22.4,423.5,449.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2018&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2019,22.2,305.5,479.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2019&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2020,22.4,803.0,419.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2020&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2021,22.97,410.0,484.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2021&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2022,22.27,658.5,424.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2022&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2023,24.47,600.5,556.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2023&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2024,24.0,842.5,529.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2024&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+morioka,盛岡,2025,24.77,341.0,588.8,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=33&block_no=47584&year=2025&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2009,23.33,465.0,439.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2009&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2010,25.63,312.5,647.6,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2010&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2011,24.9,574.0,580.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2011&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2012,24.63,229.0,677.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2012&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2013,24.7,771.0,540.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2013&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2014,24.33,541.0,542.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2014&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2015,24.07,331.5,566.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2015&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2016,24.33,353.0,617.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2016&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2017,23.7,749.0,547.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2017&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2018,25.03,386.5,637.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2018&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2019,24.5,425.0,601.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2019&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2020,24.53,831.5,508.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2020&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2021,24.77,474.5,625.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2021&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2022,24.97,676.5,561.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2022&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2023,26.4,357.0,728.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2023&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2024,25.47,475.5,522.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2024&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+niigata,新潟,2025,26.3,551.0,724.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=54&block_no=47604&year=2025&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2009,23.87,668.5,387.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2009&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2010,26.0,527.0,610.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2010&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2011,25.23,630.0,496.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2011&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2012,25.27,421.0,649.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2012&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2013,25.7,996.0,604.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2013&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2014,24.83,732.0,493.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2014&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2015,24.63,464.0,532.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2015&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2016,25.1,590.0,566.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2016&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2017,24.43,1037.0,527.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2017&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2018,25.97,641.5,670.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2018&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2019,24.93,612.5,505.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2019&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2020,25.23,666.5,491.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2020&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2021,25.1,655.0,545.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2021&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2022,25.83,682.5,532.3,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2022&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2023,27.0,612.0,677.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2023&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2024,26.53,468.0,603.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2024&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+toyama,富山,2025,27.13,494.0,717.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=55&block_no=47607&year=2025&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2009,22.43,389.0,371.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2009&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2010,24.97,540.0,571.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2010&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2011,23.8,343.0,495.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2011&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2012,23.57,230.0,591.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2012&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2013,23.57,581.0,491.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2013&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2014,23.5,409.0,468.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2014&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2015,23.4,255.5,510.0,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2015&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2016,23.3,586.5,528.9,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2016&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2017,22.93,581.5,460.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2017&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2018,24.23,375.5,558.5,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2018&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2019,23.4,451.0,486.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2019&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2020,23.97,591.5,481.7,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2020&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2021,24.1,274.0,538.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2021&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2022,24.07,407.0,467.1,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2022&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2023,25.43,386.5,604.2,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2023&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2024,25.2,399.5,449.4,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2024&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)
+yamagata,山形,2025,26.13,254.0,638.6,https://www.data.jma.go.jp/stats/etrn/view/monthly_s1.php?prec_no=35&block_no=47588&year=2025&month=&day=&view=,2026-09-05,fetch date (JMA pages carry no publish date; raw/research/weather/html/<station>_<year>.html)

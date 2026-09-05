@@ -1,15 +1,15 @@
-fy,source,snapshot,printed_total,sum_ok,m04,m05,m06,m07,m08,m09,m10,m11,m12,m01,m02,m03
-2013,syutubotu-2016-snapshot.pdf,2016-12-01,9133,True,314,1063,1837,1798,1799,914,615,539,177,31,13,33
-2014,syutubotu-2016-snapshot.pdf,2016-12-01,15981,True,521,1397,1908,2314,2691,2884,2546,1400,194,31,28,67
-2015,syutubotu-2016-snapshot.pdf,2016-12-01,9597,True,459,1397,2072,1909,1473,696,856,449,171,39,18,58
-2016,syutubotu-2021-snapshot.pdf,2021-03-26,18116,True,506,1880,3626,3240,2520,1418,2589,1855,347,41,32,62
-2017,syutubotu-2021-snapshot.pdf,2021-03-26,12812,True,479,1655,2934,2670,2279,1347,771,411,141,43,20,62
-2018,syutubotu-2022-snapshot.pdf,2022-06-06,12809,True,548,2056,3113,2503,2023,812,727,666,198,42,38,83
-2019,syutubotu-2022-snapshot.pdf,2022-06-06,18317,True,446,1651,2929,3205,2663,2159,2679,1951,374,100,63,97
-2020,syutubotu-2022-snapshot.pdf,2022-06-06,20887,True,515,1622,2814,2994,3303,2539,4213,2288,367,59,71,102
-2021,syutubotu-2022-snapshot.pdf,2022-06-06,12766,False,537,1612,2412,2406,1762,1073,1393,1062,310,47,50,71
-2022,syutubotu.pdf,2026-08-06,11136,True,437,1526,2413,1939,1809,1050,1026,562,183,42,51,98
-2023,syutubotu.pdf,2026-08-06,24348,True,593,1974,3124,2845,2169,2686,5983,3700,805,190,127,152
-2024,syutubotu.pdf,2026-08-06,20513,True,689,2453,4459,3260,2917,2054,2235,1283,636,264,120,143
-2025,syutubotu.pdf,2026-08-06,50801,True,800,2528,4227,5161,4069,4766,15998,10338,1851,484,250,329
-2026,syutubotu.pdf,2026-08-06,12628,True,1787,4581,6260,0,0,0,0,0,0,0,0,0
+fy,source,snapshot,printed_total,sum_ok,m04,m05,m06,m07,m08,m09,m10,m11,m12,m01,m02,m03,source_url,publish_date,publish_date_basis
+2013,syutubotu-2016-snapshot.pdf,2016-12-01,9133,True,314,1063,1837,1798,1799,914,615,539,177,31,13,33,http://web.archive.org/web/20161223083529/http://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2016-12-01,edition date printed in the PDF header
+2014,syutubotu-2016-snapshot.pdf,2016-12-01,15981,True,521,1397,1908,2314,2691,2884,2546,1400,194,31,28,67,http://web.archive.org/web/20161223083529/http://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2016-12-01,edition date printed in the PDF header
+2015,syutubotu-2016-snapshot.pdf,2016-12-01,9597,True,459,1397,2072,1909,1473,696,856,449,171,39,18,58,http://web.archive.org/web/20161223083529/http://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2016-12-01,edition date printed in the PDF header
+2016,syutubotu-2021-snapshot.pdf,2021-03-26,18116,True,506,1880,3626,3240,2520,1418,2589,1855,347,41,32,62,http://web.archive.org/web/20210418123348/http://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2021-03-26,edition date printed in the PDF header
+2017,syutubotu-2021-snapshot.pdf,2021-03-26,12812,True,479,1655,2934,2670,2279,1347,771,411,141,43,20,62,http://web.archive.org/web/20210418123348/http://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2021-03-26,edition date printed in the PDF header
+2018,syutubotu-2022-snapshot.pdf,2022-06-06,12809,True,548,2056,3113,2503,2023,812,727,666,198,42,38,83,http://web.archive.org/web/20220630075831/https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2022-06-06,edition date printed in the PDF header
+2019,syutubotu-2022-snapshot.pdf,2022-06-06,18317,True,446,1651,2929,3205,2663,2159,2679,1951,374,100,63,97,http://web.archive.org/web/20220630075831/https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2022-06-06,edition date printed in the PDF header
+2020,syutubotu-2022-snapshot.pdf,2022-06-06,20887,True,515,1622,2814,2994,3303,2539,4213,2288,367,59,71,102,http://web.archive.org/web/20220630075831/https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2022-06-06,edition date printed in the PDF header
+2021,syutubotu-2022-snapshot.pdf,2022-06-06,12766,False,537,1612,2412,2406,1762,1073,1393,1062,310,47,50,71,http://web.archive.org/web/20220630075831/https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2022-06-06,edition date printed in the PDF header
+2022,syutubotu.pdf,2026-08-06,11136,True,437,1526,2413,1939,1809,1050,1026,562,183,42,51,98,https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2026-08-06,edition date printed in the PDF header
+2023,syutubotu.pdf,2026-08-06,24348,True,593,1974,3124,2845,2169,2686,5983,3700,805,190,127,152,https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2026-08-06,edition date printed in the PDF header
+2024,syutubotu.pdf,2026-08-06,20513,True,689,2453,4459,3260,2917,2054,2235,1283,636,264,120,143,https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2026-08-06,edition date printed in the PDF header
+2025,syutubotu.pdf,2026-08-06,50801,True,800,2528,4227,5161,4069,4766,15998,10338,1851,484,250,329,https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2026-08-06,edition date printed in the PDF header
+2026,syutubotu.pdf,2026-08-06,12628,True,1787,4581,6260,0,0,0,0,0,0,0,0,0,https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf,2026-08-06,edition date printed in the PDF header

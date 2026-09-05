@@ -1,29 +1,29 @@
-year,buna_tohoku_forest_office,buna_miyagi_survey,mizunara_miyagi_survey
-1998,皆無(=大凶作),,
-1999,皆無(=大凶作),,
-2000,豊作,,
-2001,皆無(=大凶作),,
-2002,凶作,,
-2003,皆無(=大凶作),,
-2004,並作,,
-2005,豊作,,
-2006,皆無(=大凶作),,
-2007,凶作,,
-2008,凶作,,
-2009,並作,,
-2010,皆無(=大凶作),,
-2011,凶作,,
-2012,皆無(=大凶作),,
-2013,豊作,豊作,並作
-2014,皆無(=大凶作),凶作,凶作
-2015,並作,豊作,豊作
-2016,皆無(=大凶作),凶作,凶作
-2017,大凶作,凶作,豊作
-2018,並作,豊作,凶作
-2019,大凶作,凶作,並作
-2020,大凶作,凶作,凶作
-2021,凶作,並作,並作
-2022,凶作,並作,並作
-2023,大凶作,凶作,凶作
-2024,豊作,豊作,並作
-2025,大凶作,凶作,凶作
+year,buna_tohoku_forest_office,buna_miyagi_survey,mizunara_miyagi_survey,source_url,publish_date,publish_date_basis,source_file,method
+1998,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+1999,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2000,豊作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2001,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2002,凶作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2003,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2004,並作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2005,豊作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2006,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2007,凶作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2008,凶作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2009,並作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2010,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2011,凶作,,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2012,皆無(=大凶作),,,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2013,豊作,豊作,並作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2014,皆無(=大凶作),凶作,凶作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2015,並作,豊作,豊作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2016,皆無(=大凶作),凶作,凶作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2017,大凶作,凶作,豊作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2018,並作,豊作,凶作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2019,大凶作,凶作,並作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2020,大凶作,凶作,凶作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2021,凶作,並作,並作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2022,凶作,並作,並作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2023,大凶作,凶作,凶作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2024,豊作,豊作,並作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)
+2025,大凶作,凶作,凶作,https://www.pref.miyagi.jp/documents/24763/r7graph_2.pdf,2025-11-10,PDF CreationDate (pdfinfo); no date printed in the file,data-pipeline/raw/research/mast/miyagi-r7graph_2.pdf,pdftotext -layout text layer (pre-existing extraction)

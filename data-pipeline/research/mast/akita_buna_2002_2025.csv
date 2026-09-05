@@ -1,25 +1,25 @@
-year,hachimori,moriyoshizan,tazawako,higashinaruse,chokai
-2002,x,-,x,x,x
-2003,x,-,△,x,x
-2004,x,-,x,x,△
-2005,x,○,△,○,x
-2006,x,x,x,x,x
-2007,x,x,x,x,x
-2008,x,x,x,△,x
-2009,x,x,x,x,x
-2010,x,x,x,x,x
-2011,x,x,x,x,△
-2012,x,x,x,x,x
-2013,x,○,△,○,x
-2014,x,x,x,x,x
-2015,x,○,△,○,△
-2016,x,x,x,x,x
-2017,x,△,x,x,x
-2018,x,x,x,○,○
-2019,x,x,x,x,x
-2020,△,△,x,x,x
-2021,x,x,x,x,x
-2022,x,○,○,○,○
-2023,x,x,x,x,x
-2024,○,○,○,△,△
-2025,x,x,x,x,x
+year,hachimori,moriyoshizan,tazawako,higashinaruse,chokai,source_url,publish_date,publish_date_basis,source_file,method
+2002,x,-,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2003,x,-,△,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2004,x,-,x,x,△,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2005,x,○,△,○,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2006,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2007,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2008,x,x,x,△,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2009,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2010,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2011,x,x,x,x,△,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2012,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2013,x,○,△,○,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2014,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2015,x,○,△,○,△,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2016,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2017,x,△,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2018,x,x,x,○,○,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2019,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2020,△,△,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2021,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2022,x,○,○,○,○,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2023,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2024,○,○,○,△,△,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"
+2025,x,x,x,x,x,https://www.pref.akita.lg.jp/uploads/public/archive_0000077382_00/ブナ・ミズナラ豊凶結果2025.pdf,2025-11-07,page 更新日 2025年11月07日 (raw/research/akita-page.html); PDF CreationDate 2025-11-06,data-pipeline/raw/research/mast/akita-buna-mizunara-2002-2025.pdf,"pdftotext -layout text layer (pre-existing extraction; symbols x=×, -=－ 調査なし)"

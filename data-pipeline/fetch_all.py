@@ -1,7 +1,7 @@
 """Run every fetcher + extractor + build, in order.
 
 Exit 0 only if every step succeeds. Individual fetcher failures continue
-(we still want as much data as possible); build_json failure is fatal.
+(we still want as much data as possible); a build failure is fatal.
 """
 from __future__ import annotations
 
@@ -15,7 +15,11 @@ SCRIPTS = [
     "fetch_hokkaido.py",
     "fetch_geojson.py",
     "build_json.py",
+    # Reads the tracked CSVs under research/ (no fetch step: those are built by
+    # the extractors next to them, by hand, when a source publishes).
+    "build_context.py",
 ]
+BUILDS = {"build_json.py", "build_context.py"}
 
 
 def main() -> int:
@@ -24,7 +28,7 @@ def main() -> int:
         print(f"\n=== {script} ===")
         rc = subprocess.call([sys.executable, script])
         if rc != 0:
-            if script == "build_json.py":
+            if script in BUILDS:
                 print(f"FATAL: {script} failed (rc={rc})", file=sys.stderr)
                 return rc
             print(f"[warn] {script} exited {rc}; continuing", file=sys.stderr)
