@@ -29,8 +29,8 @@ const TITLES = {
   deaths: "People killed",
 };
 
-export function mountRows(container, timeline, metric) {
-  const data = ytdRows(timeline, metric);
+export function mountRows(container, timeline, metric, limit = 6) {
+  const data = ytdRows(timeline, metric, limit);
   if (!data) return;
 
   const current = data.rows[data.rows.length - 1];
@@ -98,7 +98,7 @@ function readout(current, prior, closedYears) {
   const diff = current.value - prior.value;
 
   const gap = Math.abs(diff) <= 2
-    ? `${diff === 0 ? "Level with" : diff > 0 ? `${diff} above` : `${Math.abs(diff)} below`} FY${prior.year} at the same point — a gap this small tells us little on its own.`
+    ? `${diff === 0 ? "Level with" : diff > 0 ? `${diff} above` : `${Math.abs(diff)} below`} FY${prior.year} at the same point. A gap this small tells us little on its own.`
     : `${Math.abs(diff)} ${diff > 0 ? "above" : "below"} FY${prior.year} at the same point.`;
 
   const matched = matchedFullYear(current.value, closedYears);

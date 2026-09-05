@@ -2,7 +2,7 @@
   --bg: #0f1419;
   --bg-elev: #1a1f2e;
   --text: #e8e8ea;
-  --text-dim: #9aa0b4;
+  --text-dim: #aab0c3;
   --accent: #ff3b30;
   --accent-hot: #ff5e3a;
   --pale: #fff4a3;
@@ -90,7 +90,13 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   padding: 0 1.5rem;
   display: flex;
   gap: 1.5rem;
+  /* The bar is a fixed 44px that the sticky panels are offset by, so the
+     labels must never wrap onto a second line. */
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.chapter-nav nav::-webkit-scrollbar { display: none; }
 .chapter-nav a {
   color: var(--text-dim);
   text-decoration: none;
@@ -115,9 +121,10 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: calc(var(--nav-h) + 2rem) 1.5rem 4rem;
+  padding: calc(var(--nav-h) + 2rem) 1.5rem 2rem;
   text-align: left;
 }
+.hero-content { margin: auto 0; }
 .hero-content {
   max-width: var(--max-width);
   width: 100%;
@@ -150,10 +157,11 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   font-weight: 600;
 }
 .scroll-cue {
-  position: absolute;
-  left: 50%;
-  bottom: 2rem;
-  transform: translateX(-50%);
+  /* In flow, pushed to the bottom of the hero by the flex column, so it can
+     never sit on top of the dateline when the hero is taller than a phone. */
+  margin-top: auto;
+  padding-top: 2.5rem;
+  align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -167,8 +175,8 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
 .scroll-cue-arrow { font-size: 1rem; }
 .hero { position: relative; }
 @keyframes bob {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, 6px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
 }
 
 /* ---- Chapters + scrolly --------------------------------------------------- */
@@ -205,7 +213,7 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
-  opacity: 0.35;
+  opacity: 0.55;
   transition: opacity 0.3s ease;
 }
 .step.is-active .step-card { opacity: 1; }
@@ -323,6 +331,15 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
      lines and sits on top of the legend. */
   .leaflet-control-attribution { display: none; }
   .legend { width: 140px; bottom: 0.75rem; right: 0.75rem; }
+  /* Casualty rows: two boxes in a short panel. Drop the readouts, tighten,
+     and let the layer scroll if a very short viewport still overflows. */
+  .g[data-g="rows"] { overflow-y: auto; }
+  .g[data-g="rows"] .cmp { padding: 0.75rem 0.9rem 0.8rem; }
+  .g[data-g="rows"] .cmp-read { display: none; }
+  .g[data-g="rows"] .cmp-head p { margin-bottom: 0.4rem; }
+  .g[data-g="rows"] .cmp-head h3 { font-size: 0.9rem; }
+  .g[data-g="rows"] .cmp-rows { gap: 0.3rem; }
+  .g[data-g="rows"] .cmp-bar { height: 12px; }
   /* backdrop-filter re-composites on every scroll frame; on phones that is
      the difference between a smooth scroll and a stuttering one. */
   .step-card { background: rgba(26, 31, 46, 0.96); backdrop-filter: none; }

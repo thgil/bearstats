@@ -82,8 +82,10 @@ async function boot() {
       return chart;
     });
 
-    safeMount("rows-injuries", () => mountRows(document.getElementById("rows-injuries"), data.timeline, "injuries"));
-    safeMount("rows-deaths", () => mountRows(document.getElementById("rows-deaths"), data.timeline, "deaths"));
+    // Two boxes have to share a 46vh panel on a phone; three years each is what fits.
+    const rowLimit = window.innerWidth < 800 ? 3 : 6;
+    safeMount("rows-injuries", () => mountRows(document.getElementById("rows-injuries"), data.timeline, "injuries", rowLimit));
+    safeMount("rows-deaths", () => mountRows(document.getElementById("rows-deaths"), data.timeline, "deaths", rowLimit));
 
     // Chapter 3's inline chart: its own instance, in "caution" view, outside
     // the director's remit (chapter 3 has no sticky graphic panel).
@@ -137,6 +139,10 @@ async function boot() {
     // first card.
     director.showGraphic(1, "map");
     director.showGraphic(2, "monthly");
+    // ...and in their finished state, so a reader who arrives fast or whose
+    // browser skips a trigger still sees a complete chart, never bare axes.
+    director.enter("months", "settle");
+    director.enter("years", "settle");
 
     const scroller = typeof scrollama === "function" ? scrollama() : null;
     if (scroller) {
@@ -153,10 +159,10 @@ async function boot() {
           if (prev) activateStep(prev, "settle");
         });
 
-      window.addEventListener("resize", () => {
-        scroller.setup({ step: ".step", offset: stepOffset() });
-        scroller.resize();
-      });
+      // Only recompute positions. Calling setup() again here re-initialised
+      // scrollama on every iOS toolbar show/hide and dropped step triggers,
+      // which left chapter panels showing an un-played chart.
+      window.addEventListener("resize", () => scroller.resize());
     }
 
     // ---- Chapter nav highlight ----------------------------------------------
