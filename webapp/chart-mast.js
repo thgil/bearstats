@@ -361,7 +361,7 @@ export function mountMast(container, data) {
       .attr("opacity", 1);
     bars.interrupt().transition().delay((_, i) => i * 40 + 120).duration(420).ease(d3.easeCubicOut)
       .attr("y", d => baseline - y(d.octSightings))
-      .attr("height", d => y(d.octSightings));
+      .attr("height", d => Math.max(0, y(d.octSightings)));
     callout.interrupt().transition().delay(rows.length * 40 + 300).duration(300).attr("opacity", 1);
     callout2.interrupt().transition().delay(rows.length * 40 + 300).duration(300).attr("opacity", 1);
     note.interrupt().transition().delay(rows.length * 40 + 400).duration(300).attr("opacity", 1);
@@ -371,7 +371,7 @@ export function mountMast(container, data) {
     tile.interrupt().attr("opacity", (d, i) => (revealFraction(t, i, rows.length) > 0 ? 1 : 0));
     bars.interrupt()
       .attr("y", (d, i) => baseline - revealFraction(t, i, barRows.length) * y(d.octSightings))
-      .attr("height", (d, i) => revealFraction(t, i, barRows.length) * y(d.octSightings));
+      .attr("height", (d, i) => Math.max(0, revealFraction(t, i, barRows.length) * y(d.octSightings)));
     callout.interrupt().attr("opacity", t >= 0.92 ? 1 : 0);
     callout2.interrupt().attr("opacity", t >= 0.92 ? 1 : 0);
     note.interrupt().attr("opacity", t >= 0.92 ? 1 : 0);

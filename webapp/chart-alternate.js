@@ -313,7 +313,8 @@ export function mountAlternate(container, data) {
 
     // Its own year ticks, 2002...2025, thinned to whatever the tile width
     // actually allows.
-    const tick6Step = x6.bandwidth() < 12 ? 4 : x6.bandwidth() < 20 ? 2 : 1;
+    // A four-digit 9px label is about 24px wide, so thin until they clear.
+    const tick6Step = Math.max(1, Math.ceil(26 / x6.bandwidth()));
     const tickY = rowH + akitaTickH - 3;
     svg.append("g").selectAll("text")
       .data(akitaFiveSite.filter((_, i) => i % tick6Step === 0))

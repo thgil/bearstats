@@ -358,7 +358,7 @@ export function mountSummer(container, data) {
 
     // Hairline frame — the panel itself has no background.
     g.append("rect")
-      .attr("x", M.left).attr("y", plotTop).attr("width", plotW).attr("height", plotH)
+      .attr("x", M.left).attr("y", plotTop).attr("width", Math.max(0, plotW)).attr("height", Math.max(0, plotH))
       .attr("fill", "none").attr("stroke", T.rule).attr("stroke-width", 1);
 
     const monthX = d3.scaleBand()
@@ -470,7 +470,7 @@ export function mountSummer(container, data) {
     allBars.forEach(b => {
       if (b.value == null) return;
       const f = summerBarFraction(t, b.i, MONTHS.length);
-      b.rect.attr("y", b.y0 - f * (b.y0 - b.y1)).attr("height", f * (b.y0 - b.y1));
+      b.rect.attr("y", b.y0 - f * (b.y0 - b.y1)).attr("height", Math.max(0, f * (b.y0 - b.y1)));
     });
     const op = summerCalloutOpacity(t);
     allCallouts.forEach(c => c.attr("opacity", op));
@@ -492,7 +492,7 @@ export function mountSummer(container, data) {
         .delay((b.i / n) * 0.85 * duration)
         .duration((0.85 * duration) / n + 200)
         .ease(d3.easeCubicOut)
-        .attr("y", b.y1).attr("height", b.y0 - b.y1);
+        .attr("y", b.y1).attr("height", Math.max(0, b.y0 - b.y1));
     });
     allCallouts.forEach(c => c.transition().delay(0.85 * duration).duration(0.15 * duration + 150).attr("opacity", 1));
     allFooters.forEach(f => f.transition().delay(0.85 * duration).duration(0.15 * duration + 150).attr("opacity", 1));

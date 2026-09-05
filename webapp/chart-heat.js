@@ -176,7 +176,7 @@ export function mountHeat(container, data) {
   const legendStops = [0, maxV / 2, maxV];
   const legendSwatch = 11;
   const legendGap = 3;
-  const legendFmt = v => (v >= 1000 ? d3.format("~s")(v) : Math.round(v).toLocaleString());
+  const legendFmt = v => Math.round(v).toLocaleString();
   const legendLabels = legendStops.map(legendFmt);
   const gColorLegend = svg.append("g");
   // Measure each label so the swatches sit flush right regardless of digit
