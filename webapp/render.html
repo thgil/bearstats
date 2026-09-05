@@ -6,21 +6,41 @@
 <!-- This page is not linked from the site; it is only ever opened by
      tools/render-video.mjs to grab one 1920x1080 frame at a time. It has to
      be self-contained (its own styles, not styles.css) because another
-     workstream owns the live page's CSS and can change it under us. -->
+     workstream owns the live page's CSS and can change it under us. Tokens
+     below mirror webapp/styles.css (Field Notebook system,
+     docs/superpowers/specs/2026-09-05-rebuild-design.md §3) so the reused
+     chart modules, which read these CSS variables via getComputedStyle,
+     draw with the same palette and type as the live page. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="lib/leaflet.css">
 <style>
   :root {
-    --bg: #0f1419;
-    --bg-elev: #1a1f2e;
-    --text: #e8e8ea;
-    --text-dim: #9aa0b4;
-    --accent: #ff3b30;
-    --injury: #ffd166;
-    --field: #333b52;
-    --bench: #7d87a8;
+    --paper: #f6f1e7;
+    --paper-2: #efe8d8;
+    --ink: #2b2620;
+    --ink-2: #4d453d;
+    --rule: #d8cdb8;
+    --sight: #4a6741;
+    --sight-2: #7f9a6c;
+    --harm: #b5482a;
+    --harm-2: #d98b6f;
+    --mast-0: #2b2620;
+    --mast-1: #4b4237;
+    --mast-2: #6d604f;
+    --mast-3: #958468;
+    --mast-4: #c2b48e;
+    --mast-5: #efe6d2;
+    --map-sea: #12161f;
+    --map-land: #1e2433;
+    --map-border: #38425c;
+    --map-point: #ff5e3a;
+    --map-injury: #ffd166;
+
+    --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --font-sans: "Public Sans", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -29,9 +49,9 @@
     width: 1920px;
     height: 1080px;
     overflow: hidden;
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
   }
 
   .stage {
@@ -40,10 +60,11 @@
     width: 1920px;
     height: 1080px;
     display: flex;
-    background: var(--bg);
+    background: var(--paper);
   }
 
-  /* Title block: eyebrow, rule, title, dek, dateline pinned to the bottom. */
+  /* Title block: eyebrow, rust hairline, title, dek, dateline pinned to the
+     bottom. Same 560px column and layout as before the restyle. */
   .title-block {
     flex: 0 0 560px;
     width: 560px;
@@ -53,39 +74,49 @@
   }
   .eyebrow {
     margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: var(--ink-2);
   }
   .rule {
     margin-top: 14px;
-    width: 64px;
-    height: 3px;
-    background: var(--accent);
-    border-radius: 2px;
+    width: 100%;
+    height: 2px;
+    background: var(--harm);
   }
   .title {
-    margin: 28px 0 0;
+    margin: 32px 0 0;
+    font-family: var(--font-serif);
     font-size: 56px;
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.01em;
-    color: var(--text);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    color: var(--ink);
   }
   .dek {
-    margin: 22px 0 0;
+    margin: 24px 0 0;
+    font-family: var(--font-sans);
     font-size: 22px;
-    line-height: 1.4;
-    font-weight: 500;
-    color: var(--text-dim);
-    max-width: 42ch;
+    line-height: 1.45;
+    font-weight: 400;
+    color: var(--ink-2);
+    max-width: 40ch;
   }
   .dateline {
     margin: auto 0 0;
+    font-family: var(--font-sans);
     font-size: 16px;
-    color: var(--text-dim);
+    color: var(--ink-2);
+  }
+  /* Every numeral renders in the mono type, tabular so figures line up
+     (render.js wraps digit runs in this span). */
+  .mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
   }
 
   /* Graphic: fills the rest of the stage with 48px of padding around
@@ -102,7 +133,17 @@
     left: 48px;
   }
 
-  .map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* The map is the one dark object on the paper stage: a 1px ink border
+     with a 2px paper ring, so it reads as a photograph pasted into the
+     notebook (spec §3), rather than a full-bleed dark panel. */
+  .map-frame {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--ink);
+    padding: 2px;
+    background: var(--paper);
+  }
+  .map-canvas { position: absolute; inset: 2px; width: auto; height: auto; background: var(--map-sea); }
   /* Charts size their type in px against their own box, which is tuned for
      a ~900px panel on the site. Mounting at half size and scaling the SVG up
      2x gives 1080p-legible text and strokes without touching the charts. */
@@ -111,101 +152,75 @@
      which includes transforms, so scaling first would just re-measure 2x. */
   .chart-canvas.is-scaled { transform: scale(2); transform-origin: 0 0; }
 
-  /* Replay readout (month-replay scene), top-left over the map. */
+  /* Replay readout (month-replay scene), top-left over the map, matching
+     the live page's .replay panel (styles.css) at scene scale. */
   .replay-readout {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 24px;
+    left: 24px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    padding: 18px 26px;
+    background: rgba(18, 22, 31, 0.82);
+    backdrop-filter: blur(6px);
     z-index: 650;
     pointer-events: none;
   }
   .replay-month {
-    font-size: 44px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--text);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 1.15;
+    color: var(--paper);
     font-variant-numeric: tabular-nums;
   }
   .replay-count {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 26px;
+    color: var(--paper-2);
     font-variant-numeric: tabular-nums;
   }
-  .replay-count .hurt { color: var(--injury); }
+  .replay-count .hurt { color: var(--map-injury); }
 
   /* Key, bottom-left: red dot for sighting/trace, ringed yellow for injury. */
   .map-key {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: 24px;
+    left: 24px;
     display: flex;
     gap: 32px;
-    color: var(--text-dim);
+    color: var(--paper-2);
+    font-family: var(--font-sans);
     font-size: 17px;
     letter-spacing: 0.01em;
     z-index: 650;
   }
   .map-key .key-item { display: inline-flex; align-items: center; gap: 10px; }
   .map-key .dot { display: inline-block; border-radius: 50%; }
-  .map-key .dot-sighting { width: 14px; height: 14px; background: var(--accent); }
+  .map-key .dot-sighting { width: 14px; height: 14px; background: var(--map-point); }
   .map-key .dot-injury {
     width: 18px;
     height: 18px;
-    background: var(--injury);
-    border: 3px solid var(--bg);
-    box-shadow: 0 0 0 2px var(--injury);
+    background: var(--map-injury);
+    border: 3px solid var(--map-sea);
+    box-shadow: 0 0 0 2px var(--map-injury);
   }
-
-  /* Year scene: big year label top-right, legend bottom-right. */
-  .year-label {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 96px;
-    font-weight: 800;
-    color: var(--accent);
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-    z-index: 650;
-  }
-  .legend {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 340px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    color: var(--text-dim);
-    font-size: 16px;
-    letter-spacing: 0.01em;
-    z-index: 650;
-  }
-  .legend-bar {
-    height: 16px;
-    border-radius: 4px;
-    background: linear-gradient(to right,
-      #2a2f40 0%,
-      #fff4a3 25%,
-      #ffa944 55%,
-      #ff5e3a 80%,
-      #b32d2d 100%);
-  }
-  .legend-scale { display: flex; justify-content: space-between; }
 
   /* Prefecture-name tooltip (unused by these scenes, but map-story.js can
-     create one if focusTohoku is ever added to a scene — keep it legible). */
+     create one if focusTohoku is ever added to a scene — keep it legible
+     against the dark inset). */
   .pref-label {
     background: transparent;
     border: none;
     box-shadow: none;
-    color: var(--text);
+    color: var(--paper);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 600;
     font-size: 14px;
-    font-weight: 700;
     letter-spacing: 0.02em;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 8px rgba(0, 0, 0, 0.6);
     padding: 0;
@@ -213,7 +228,7 @@
   .pref-label::before { display: none; }
 
   /* Leaflet chrome: no controls in a rendered frame. */
-  .leaflet-container { font-family: inherit; outline: none; background: #12161f; }
+  .leaflet-container { font-family: inherit; outline: none; background: var(--map-sea); }
   .leaflet-control-attribution,
   .leaflet-control-zoom,
   .leaflet-popup { display: none !important; }

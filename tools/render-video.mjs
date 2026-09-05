@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Headless frame-by-frame renderer for the four bearstats X videos.
+// Headless frame-by-frame renderer for the five bearstats X videos.
 //
-// Usage: node render-video.mjs [scene ...]     (default: all four scenes)
+// Usage: node render-video.mjs [scene ...]     (default: all five scenes)
 //
 // For each scene this serves webapp/ over plain HTTP, opens
 // render.html?scene=...&frame=0 in Chrome via playwright-core (channel:
@@ -29,8 +29,8 @@ const FFMPEG = "/opt/homebrew/bin/ffmpeg";
 const FFPROBE = "/opt/homebrew/bin/ffprobe";
 
 const FPS = 30;
-const DURATIONS = { replay: 15, years: 8, overtake: 10, deaths: 8 };
-const ALL_SCENES = ["replay", "years", "overtake", "deaths"];
+const DURATIONS = { record: 8, heat: 10, mast: 10, forecast: 8, replay: 15 };
+const ALL_SCENES = ["record", "heat", "mast", "forecast", "replay"];
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
