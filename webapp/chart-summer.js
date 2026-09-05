@@ -28,6 +28,11 @@ export function summerPanels(ctx) {
     }));
     let latestMonthIndex = -1;
     pairs.forEach((p, i) => { if (p.y2026 != null) latestMonthIndex = i; });
+    // A month is only "partial" on this chart if the series' as_of date falls
+    // inside it. Miyagi's as_of is 2 September, so its August is complete
+    // even though the builder flags the series as partial for September.
+    const asOfMonth = s.as_of ? Number(s.as_of.slice(5, 7)) : null;
+    const asOfIndex = asOfMonth ? (asOfMonth + 8) % 12 : -1;
     return {
       key: s.key,
       label: s.label || s.key,
@@ -36,7 +41,7 @@ export function summerPanels(ctx) {
       asOf: s.as_of || null,
       comparable: s.comparable !== false,
       note: s.note || null,
-      partialMonth: !!s.partial_month,
+      partialMonth: !!s.partial_month && asOfIndex === latestMonthIndex,
       pairs,
       latestMonthIndex,
     };
@@ -252,7 +257,9 @@ export function mountSummer(container, data) {
       .padding(0.12);
 
     const maxVal = d3.max(panel.pairs, d => Math.max(d.y2025 || 0, d.y2026 || 0)) || 1;
-    const y = d3.scaleLinear().domain([0, maxVal * 1.15]).range([plotBottom, plotTop]);
+    // 30% headroom: the callout lives in the top band of the panel, clear
+    // of even the tallest bar.
+    const y = d3.scaleLinear().domain([0, maxVal * 1.3]).range([plotBottom, plotTop]);
 
     if (!compact) {
       panel.pairs.forEach(d => {
@@ -295,15 +302,17 @@ export function mountSummer(container, data) {
       const label = latest.y2025 != null
         ? `${latest.month} ${latest.y2026.toLocaleString()} vs ${latest.y2025.toLocaleString()}`
         : `${latest.month} ${latest.y2026.toLocaleString()}`;
-      const nearRight = bx > M.left + plotW * 0.6;
+      // The text sits in the headroom at the panel's top right; the leader
+      // runs from the bar top up to it, so it never crosses a neighbour.
+      const textY = plotTop + 11;
       callout.append("line")
-        .attr("x1", bx).attr("y1", topY).attr("x2", bx).attr("y2", Math.max(plotTop, topY - 10))
+        .attr("x1", bx).attr("y1", topY).attr("x2", bx).attr("y2", textY + 4)
         .attr("stroke", T.ink).attr("stroke-width", 1);
       callout.append("circle").attr("cx", bx).attr("cy", topY).attr("r", 3).attr("fill", T.ink);
       callout.append("text")
-        .attr("x", nearRight ? bx - 5 : bx + 5)
-        .attr("y", Math.max(plotTop + 9, topY - 13))
-        .attr("text-anchor", nearRight ? "end" : "start")
+        .attr("x", M.left + plotW - 4)
+        .attr("y", textY)
+        .attr("text-anchor", "end")
         .style("font-family", T.serif).style("font-style", "italic")
         .attr("font-size", compact ? 10 : 11).attr("fill", T.ink)
         .style("paint-order", "stroke")
