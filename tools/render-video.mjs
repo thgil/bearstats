@@ -29,8 +29,8 @@ const FFMPEG = "/opt/homebrew/bin/ffmpeg";
 const FFPROBE = "/opt/homebrew/bin/ffprobe";
 
 const FPS = 30;
-const DURATIONS = { record: 8, heat: 10, mast: 10, forecast: 8, replay: 15 };
-const ALL_SCENES = ["record", "heat", "mast", "forecast", "replay"];
+const DURATIONS = { record: 8, heat: 10, mast: 10, forecast: 8, summer: 8, replay: 15 };
+const ALL_SCENES = ["record", "heat", "mast", "forecast", "summer", "replay"];
 
 const MIME = {
   ".html": "text/html; charset=utf-8",

@@ -21,12 +21,13 @@ import { mountAnnual } from "./chart-annual.js";
 import { mountHeat } from "./chart-heat.js";
 import { mountMast } from "./chart-mast.js";
 import { mountForecast } from "./chart-forecast.js";
+import { mountSummer } from "./chart-summer.js";
 
 const params = new URLSearchParams(location.search);
 const scene = params.get("scene") || "replay";
 const fps = Number(params.get("fps")) || 30;
 
-const DEFAULT_DURATION = { record: 8, heat: 10, mast: 10, forecast: 8, replay: 15 };
+const DEFAULT_DURATION = { record: 8, heat: 10, mast: 10, forecast: 8, summer: 8, replay: 15 };
 const dur = Number(params.get("dur")) || DEFAULT_DURATION[scene] || 10;
 
 const COPY = {
@@ -49,6 +50,11 @@ const COPY = {
     title: "The 2026 beech crop is forecast good",
     dek: "Tohoku July mean index 3.9, against 0.44 in 2025 and 0.54 in 2023. A July forecast of 並作 or better has never ended in 大凶作 in 31 cases.",
     dateline: "Tohoku Regional Forest Office, 7 July 2026 · bearstats.pages.dev",
+  },
+  summer: {
+    title: "The spring surge did not last the summer",
+    dek: "Sightings per month, April to August, fiscal 2026 against 2025, from each prefecture. Akita, August: 251 against 766. Miyagi: 132 against 225. Toyama, Niigata, Gunma and Saitama: 134 against 320.",
+    dateline: "Akita クマダス (31 Aug), Miyagi (2 Sep), prefectural point feeds (4 Sep); 2025 from the Ministry of the Environment · bearstats.pages.dev",
   },
   replay: {
     title: "Bear reports in four prefectures, month by month",
@@ -155,8 +161,9 @@ const setupRecord = data => setupChartScene(mountAnnual, data);
 const setupHeat = data => setupChartScene(mountHeat, data);
 const setupMast = data => setupChartScene(mountMast, data);
 const setupForecast = data => setupChartScene(mountForecast, data);
+const setupSummer = data => setupChartScene(mountSummer, data);
 
-const SETUP = { record: setupRecord, heat: setupHeat, mast: setupMast, forecast: setupForecast, replay: setupReplay };
+const SETUP = { record: setupRecord, heat: setupHeat, mast: setupMast, forecast: setupForecast, summer: setupSummer, replay: setupReplay };
 
 /** Fonts affect text metrics, and Leaflet needs a layout pass (plus
  * invalidateSize, since the map was created before webfonts/layout settled)
