@@ -12,8 +12,10 @@ typed in here except the source catalogue at the bottom.
 """
 from __future__ import annotations
 
+import calendar
 import json
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +27,7 @@ from utils import RAW_DIR, REPO_ROOT, WEBAPP_DATA_DIR, ensure_dir, utc_now_iso
 
 RESEARCH = REPO_ROOT / "data-pipeline" / "research"
 ENV_RAW = RAW_DIR / "env"
+RECENT_DIR = RESEARCH / "recent"
 
 # Romaji keys are the ones prefecture-totals.json already uses, so the webapp
 # can join on them. The research CSVs name prefectures three ways (青森, 青森県,
@@ -153,6 +156,127 @@ def build_tohoku_office(forecast: pd.DataFrame, actual: pd.DataFrame) -> list[di
             "forecast_url": _str(r.source_url),
         })
     return rows
+
+
+AKITA_KUMADAS_URL = "https://ckan.pref.akita.lg.jp/dataset/050008_shizenhogoka_003"
+IWATE_LANDING_URL = "https://www.pref.iwate.jp/kurashikankyou/shizen/yasei/1049881/1056087.html"
+MIYAGI_LANDING_URL = "https://www.pref.miyagi.jp/soshiki/sizenhogo/r8kumamokugeki.html"
+
+IWATE_FY2026_NOTE = (
+    "Iwate changed to counting through the Bears app in April 2026; the "
+    "prefecture says FY2026 differs in nature from earlier years."
+)
+
+# The four prefectures whose ArcGIS point feeds (webapp/data/points-recent.json)
+# also run ahead of the ministry's table, bundled as one line since no single
+# one of them is large enough on its own to be worth a dedicated series.
+SAMPLE4_PREFS = ["toyama", "niigata", "gunma", "saitama"]
+
+
+def _moe_fy_months(moe_df: pd.DataFrame, pref_ja: str, fy: int) -> list[int | float | None]:
+    """Twelve fiscal-month values for one prefecture-year from the ministry's
+    prefecture-by-month CSV, or twelve nulls if that prefecture-year isn't in it."""
+    if moe_df.empty:
+        return [None] * 12
+    cols = [f"{m}月" for m in FISCAL_MONTHS]
+    sub = moe_df[(moe_df["prefecture"] == pref_ja) & (moe_df["fiscal_year"] == fy)]
+    if sub.empty:
+        return [None] * 12
+    r = sub.iloc[0]
+    return [_num(r[c]) for c in cols]
+
+
+def _fy2026_array(by_month: dict[int, Any], as_of: date | None) -> tuple[list[int | None], bool, str | None]:
+    """Twelve fiscal-month values for the running year, truncated at the month
+    `as_of` falls in (later months stay null even if the source prints a 0
+    placeholder for them, e.g. Miyagi's table already has a zeroed-out row for
+    every month through March). `partial_month` is true unless `as_of` lands on
+    the last calendar day of its month, i.e. the final included month may not
+    yet be fully reported."""
+    if as_of is None:
+        return [None] * 12, True, None
+    cutoff = FISCAL_MONTHS.index(as_of.month)
+    arr = [_num(by_month.get(m)) for m in FISCAL_MONTHS[: cutoff + 1]] + [None] * (11 - cutoff)
+    partial = calendar.monthrange(as_of.year, as_of.month)[1] != as_of.day
+    return arr, partial, as_of.isoformat()
+
+
+def _prefecture_recent_series(key: str, label: str, source: str, url: str, comparable: bool,
+                              note: str | None, moe_pref_ja: str, moe_df: pd.DataFrame,
+                              monthly_df: pd.DataFrame, count_col: str) -> dict:
+    fy2025 = _moe_fy_months(moe_df, moe_pref_ja, 2025)
+    fy26 = monthly_df[monthly_df["fiscal_year"] == 2026] if not monthly_df.empty else monthly_df
+    as_of = date.fromisoformat(str(fy26["as_of"].iloc[0])) if len(fy26) else None
+    by_month = dict(zip(fy26["month"], fy26[count_col])) if len(fy26) else {}
+    fy2026, partial_month, as_of_str = _fy2026_array(by_month, as_of)
+    return {
+        "key": key, "label": label, "source": source, "url": url,
+        "as_of": as_of_str, "comparable": comparable, "note": note,
+        "partial_month": partial_month,
+        "fy2025": fy2025, "fy2026": fy2026,
+    }
+
+
+def build_sample4_series(points: list[dict]) -> dict:
+    """The four smaller ArcGIS prefectures (webapp/data/points-recent.json),
+    bundled into one line: monthly point counts, fiscal years 2025 and 2026."""
+    counts: dict[tuple[int, int], int] = {}
+    max_date: date | None = None
+    for p in points:
+        if p.get("pref") not in SAMPLE4_PREFS or not p.get("date"):
+            continue
+        d = date.fromisoformat(p["date"])
+        fy = d.year if d.month >= 4 else d.year - 1
+        counts[(fy, d.month)] = counts.get((fy, d.month), 0) + 1
+        if max_date is None or d > max_date:
+            max_date = d
+
+    def months_for(fy: int) -> dict[int, int | None]:
+        if not any(k[0] == fy for k in counts):
+            return {m: None for m in FISCAL_MONTHS}
+        return {m: counts.get((fy, m), 0) for m in FISCAL_MONTHS}
+
+    fy2025 = [_num(v) for v in months_for(2025).values()]
+    fy2026, partial_month, as_of_str = _fy2026_array(months_for(2026), max_date)
+    return {
+        "key": "sample4", "label": "Toyama, Niigata, Gunma and Saitama",
+        "source": "Prefectural ArcGIS open data (point reports)", "url": "",
+        "as_of": as_of_str, "comparable": True,
+        "partial_month": partial_month,
+        "fy2025": fy2025, "fy2026": fy2026,
+    }
+
+
+def build_recent(moe_df: pd.DataFrame, akita_df: pd.DataFrame, iwate_df: pd.DataFrame,
+                 miyagi_df: pd.DataFrame, points: list[dict]) -> dict:
+    """Prefecture-published counts that run ahead of the ministry's own table:
+    Akita's クマダス point feed, and one-page monthly PDFs from Iwate and Miyagi,
+    plus a bundle of the four smaller ArcGIS-point prefectures. FY2025 always
+    comes from the ministry's own CSV (the point of the FY2025 numbers here is
+    to show the prefectural source agrees with it); FY2026 always comes from
+    the prefectural source, since the ministry hasn't published it yet.
+
+    If a prefectural download failed, fetch_recent.py leaves the tracked CSV
+    under research/recent/ untouched from its last successful run (or, on a
+    fresh checkout with no raw cache, extraction never ran and the CSV is
+    whatever is committed to git) — `_csv()` already warns on a missing file
+    and returns an empty frame, so a series simply comes back all-null rather
+    than failing the whole build.
+    """
+    akita = _prefecture_recent_series(
+        "akita", "Akita", "Akita Prefecture クマダス open data (CC BY 4.0)", AKITA_KUMADAS_URL,
+        True, "Same count as the ministry's table: FY2025 total 13,592 in both.",
+        "秋田", moe_df, akita_df, "bear_reports")
+    miyagi = _prefecture_recent_series(
+        "miyagi", "Miyagi", "Miyagi Prefecture 令和8年度クマ目撃等情報", MIYAGI_LANDING_URL,
+        True, "Same series as the ministry's table for FY2025 (3,559 total); this "
+              "prefecture tally is usually published before the ministry's own monthly update.",
+        "宮城", moe_df, miyagi_df, "count")
+    iwate = _prefecture_recent_series(
+        "iwate", "Iwate", "Iwate Prefecture ツキノワグマ出没状況", IWATE_LANDING_URL,
+        False, IWATE_FY2026_NOTE, "岩手", moe_df, iwate_df, "count")
+    sample4 = build_sample4_series(points)
+    return {"built_at": utc_now_iso(), "series": [akita, miyagi, iwate, sample4]}
 
 
 AKITA_SITES = ["hachimori", "moriyoshizan", "tazawako", "higashinaruse", "chokai"]
@@ -400,8 +524,24 @@ def _csv(path: Path, **kw) -> pd.DataFrame:
     return pd.read_csv(path, **kw)
 
 
+def _points_recent() -> list[dict]:
+    path = WEBAPP_DATA_DIR / "points-recent.json"
+    if not path.exists():
+        print(f"  [warn] missing {path.relative_to(REPO_ROOT)}; sample4 recent series will be empty", file=sys.stderr)
+        return []
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def build_context() -> dict:
     mast_dir, moe_dir, weather_dir = RESEARCH / "mast", RESEARCH / "moe", RESEARCH / "weather"
+
+    recent = build_recent(
+        _csv(moe_dir / "sightings-by-prefecture-by-month-by-fy.csv"),
+        _csv(RECENT_DIR / "akita_monthly.csv"),
+        _csv(RECENT_DIR / "iwate_monthly.csv"),
+        _csv(RECENT_DIR / "miyagi_monthly.csv"),
+        _points_recent(),
+    )
 
     tohoku = build_tohoku_office(
         _csv(mast_dir / "tohoku_forest_office_flowering_forecast.csv"),
@@ -417,6 +557,7 @@ def build_context() -> dict:
         "monthly_national": build_monthly_national(_csv(moe_dir / "national-monthly-sightings-fy2013-fy2026.csv")),
         "prefecture_month": build_prefecture_month(_csv(moe_dir / "sightings-by-prefecture-by-month-by-fy.csv")),
         "casualties_monthly": build_casualties_monthly(_csv(moe_dir / "injuries_monthly_fy2014_fy2026.csv")),
+        "recent": recent,
         "mast": {
             "tohoku_office": tohoku,
             "akita_sites": akita,

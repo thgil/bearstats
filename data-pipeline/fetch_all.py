@@ -15,8 +15,13 @@ SCRIPTS = [
     "fetch_hokkaido.py",
     "fetch_geojson.py",
     "build_json.py",
-    # Reads the tracked CSVs under research/ (no fetch step: those are built by
-    # the extractors next to them, by hand, when a source publishes).
+    # Downloads and extracts prefectural sighting counts (Akita, Iwate,
+    # Miyagi) that run ahead of the ministry's own table, into research/recent/.
+    "fetch_recent.py",
+    # Reads the tracked CSVs under research/ (no fetch step for most of them:
+    # those are built by the extractors next to them, by hand, when a source
+    # publishes; research/recent/ is the exception, refreshed by fetch_recent.py
+    # just above).
     "build_context.py",
 ]
 BUILDS = {"build_json.py", "build_context.py"}

@@ -54,6 +54,7 @@ python fetch_arcgis.py
 python fetch_hokkaido.py
 python fetch_geojson.py
 python build_json.py
+python fetch_recent.py
 python build_context.py
 ```
 
@@ -73,6 +74,25 @@ and JMA summer weather. `build_context.py` merges them into one file; the
 extractor next to each CSV (and the README beside it) says which PDF it came
 from and how it was read. Those extractors are run by hand when a source
 publishes, not by `fetch_all.py`.
+
+### Prefectural recent data (`fetch_recent.py` → `context.recent`)
+
+The ministry's own `syutubotu.pdf` runs a few weeks behind; several
+prefectures publish their own tallies sooner. `fetch_recent.py` downloads
+Akita's クマダス point-level CSV (CC BY 4.0, updated daily), and one-page
+monthly PDFs scraped off Iwate's and Miyagi's own bear pages, into
+`data-pipeline/raw/research/recent/`, then extracts them into tracked CSVs
+under `data-pipeline/research/recent/` and prints cross-checks against the
+ministry's prefecture-by-month CSV (exact match for Akita's closed FY2025,
+within 1% for the still-running FY2026). `build_context.py` folds those CSVs,
+plus the four smaller ArcGIS-point prefectures already in
+`webapp/data/points-recent.json`, into `context.recent`: FY2025 always comes
+from the ministry's own table, FY2026 always from the prefectural source
+(the ministry hasn't published it yet). Iwate switched to counting sightings
+through its "Bears" app in April 2026, so its FY2026 series is marked
+`comparable: false`. A failed prefectural download is non-fatal — `fetch_all.py`
+keeps going, and `build_context.py` falls back to whatever CSV is already
+tracked in git, warning rather than failing the build.
 
 ### A note on the ministry's PDFs
 
