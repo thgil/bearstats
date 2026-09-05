@@ -20,7 +20,14 @@ to graphic actions). Design: `docs/superpowers/specs/2026-09-05-scrolly-redesign
 ```bash
 cd webapp && python3 -m http.server 8000   # then open http://localhost:8000/
 webapp/tests/run-tests.sh                   # node --test, pure helpers only
+cd tools && npm install && node review-shots.mjs   # screenshots every scroll step at six viewports,
+                                                   # fails on overlap, empty charts, low contrast
 ```
+
+Nothing is deployed without a clean `review-shots` run and a human read of
+`media/review/*/` (see `docs/GOAL.md`, definition of done). Research behind
+the claims on the page: `docs/GOAL.md`, `docs/research/stats-and-claims.md`,
+`docs/research/gaps.md`; extracted primary data under `data-pipeline/research/`.
 
 Deploys to GitHub Pages on push to `main` (`.github/workflows/pages.yml`) and,
 by hand, to Cloudflare Pages:
