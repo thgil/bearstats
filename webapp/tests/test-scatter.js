@@ -64,3 +64,40 @@ test("declutterLabels pushes an overlapping label down by at least one box heigh
   assert.equal(placed[0].y, 100);
   assert.ok(placed[1].y >= 112, `expected the second label pushed down, got ${placed[1].y}`);
 });
+
+test("declutterLabels turns upward, and clears the collision, when maxY blocks the usual downward nudge", () => {
+  // Same tight cluster as above, but bounded so the label can't be pushed
+  // down at all — it must find clearance above instead.
+  const placed = declutterLabels(
+    [{ fy: 2015, x: 50, y: 100 }, { fy: 2022, x: 52, y: 101 }],
+    34, 12,
+    { minY: 0, maxY: 101 }
+  );
+  assert.equal(placed[0].y, 100);
+  assert.ok(placed[1].y <= 101, "the second label must respect maxY");
+  assert.ok(Math.abs(placed[0].y - placed[1].y) >= 12, "the two labels must no longer collide");
+});
+
+test("declutterLabels never places a label past minY or maxY, even if a collision can't fully clear", () => {
+  const placed = declutterLabels(
+    [{ fy: 2015, x: 50, y: 50 }, { fy: 2022, x: 52, y: 50 }, { fy: 2023, x: 54, y: 50 }],
+    34, 12,
+    { minY: 40, maxY: 60 }
+  );
+  for (const p of placed) {
+    assert.ok(p.y >= 40 && p.y <= 60, `label for fy ${p.fy} left its bounds at y=${p.y}`);
+  }
+});
+
+test("declutterLabels keeps a label off an unlabelled obstacle point, but not off its own", () => {
+  // An obstacle sharing the label's own fy sits right where the label
+  // starts (100) — if that one were not ignored, this would already
+  // "collide" and needlessly nudge. A second, unrelated obstacle
+  // (different fy) one box away is what should actually move it.
+  const placed = declutterLabels(
+    [{ fy: 2015, x: 50, y: 100 }],
+    34, 12,
+    { obstacles: [{ fy: 2015, x: 50, y: 100, w: 12, h: 12 }, { fy: 2099, x: 52, y: 101, w: 12, h: 12 }] }
+  );
+  assert.ok(Math.abs(placed[0].y - 101) >= 12, `expected clearance from the unrelated obstacle, got y=${placed[0].y}`);
+});

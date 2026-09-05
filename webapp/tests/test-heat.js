@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { heatCells, nationalMonthTotal, columnOpacityForProgress, TOHOKU_PREFS } from "../chart-heat.js";
+import { heatCells, nationalMonthTotal, columnOpacityForProgress, prefLabel, TOHOKU_PREFS } from "../chart-heat.js";
 
 const ctx = JSON.parse(readFileSync(new URL("../data/context.json", import.meta.url)));
 
@@ -56,4 +56,16 @@ test("columnOpacityForProgress: column 0 is visible before the last column, all 
 
 test("columnOpacityForProgress handles nCols=0", () => {
   assert.equal(columnOpacityForProgress(0.5, 0, 0), 1);
+});
+
+test("prefLabel reads the capitalised label straight off context.population", () => {
+  assert.equal(prefLabel(ctx, "hokkaido"), "Hokkaido");
+  assert.equal(prefLabel(ctx, "fukushima"), "Fukushima");
+  assert.equal(prefLabel(ctx, "yamaguchi"), "Yamaguchi");
+});
+
+test("prefLabel falls back to capitalising the key when population has no entry or no context", () => {
+  assert.equal(prefLabel(ctx, "not-a-real-pref"), "Not-a-real-pref");
+  assert.equal(prefLabel(null, "akita"), "Akita");
+  assert.equal(prefLabel({}, "akita"), "Akita");
 });

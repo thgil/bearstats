@@ -59,15 +59,54 @@ export function whatIfRange(ctx, spring2026) {
  * one already placed — several years cluster within a few pixels of each
  * other (FY2015 and FY2022 both sit near 4k/1.5k), and left alone their
  * "FY'xx" labels print on top of each other.
+ *
+ * `bounds.maxY`, when given, is a floor the nudging must not cross — the
+ * chart uses it to keep labels off the x-axis's own tick labels below the
+ * frame. Once a label would have to cross maxY to escape a collision, the
+ * search switches direction and nudges up instead; `bounds.minY` is the
+ * matching ceiling. `bounds.obstacles` is a further list of fixed points
+ * (a chart's every dot, not just the labelled ones) a label must also clear
+ * — decluttering away from another label can otherwise land a label
+ * straight on top of some unrelated, unlabelled point. Each label's own
+ * text runs rightward from its (x, y) anchor, not outward in every
+ * direction, so an obstacle only counts as being in the way when it falls
+ * in that same rightward strip (a small tolerance covers a dot sitting
+ * just barely left of the anchor); each obstacle may carry its own `fy` so
+ * a label skips the check against its own dot (which sits deliberately
+ * close by design) and its own `w`/`h` footprint, defaulting to boxW/boxH.
+ * None of `bounds` is set by default, so plain two/three-arg calls behave
+ * exactly as before (always nudging down, nothing else to avoid).
  */
-export function declutterLabels(items, boxW = 34, boxH = 12) {
+export function declutterLabels(items, boxW = 34, boxH = 12, bounds = {}) {
+  const { minY = -Infinity, maxY = Infinity, obstacles = [] } = bounds;
   const placed = [];
   return items.map(it => {
-    let y = it.y;
+    let y = Math.min(maxY, Math.max(minY, it.y));
+    const collides = yy => placed.some(p => Math.abs(p.x - it.x) < boxW && Math.abs(p.y - yy) < boxH)
+      || obstacles.some(o => {
+        if (o.fy === it.fy) return false;
+        const dx = o.x - it.x;
+        return dx > -4 && dx < (o.w ?? boxW) && Math.abs(o.y - yy) < (o.h ?? boxH);
+      });
+    // Walk in one direction (down, as before) until either the collision
+    // clears or the walk would cross a bound — at which point it turns
+    // around and continues the other way, rather than bouncing back to the
+    // position that just collided. Every candidate is re-clamped to the
+    // bounds (a direction flip can still overshoot the opposite bound in a
+    // tight space), and if clamping leaves a step with nowhere new to go,
+    // the search stops rather than spin in place until the guard runs out.
+    let dir = 1;
     let guard = 0;
-    while (placed.some(p => Math.abs(p.x - it.x) < boxW && Math.abs(p.y - y) < boxH) && guard < 10) {
-      y += boxH;
+    while (collides(y) && guard < 20) {
       guard++;
+      let next = y + dir * boxH;
+      if (next > maxY || next < minY) {
+        dir = -dir;
+        next = y + dir * boxH;
+      }
+      next = Math.min(maxY, Math.max(minY, next));
+      if (next === y) break;
+      y = next;
     }
     placed.push({ x: it.x, y });
     return { ...it, y };
@@ -99,8 +138,13 @@ function readTokens() {
   };
 }
 
-const MARGIN = { top: 28, right: 20, bottom: 34, left: 46 };
+const MARGIN = { top: 28, right: 20, bottom: 40, left: 46 };
 const SPRING_2026 = 12628;
+// Below this width there isn't room for all 13 years' labels without them
+// colliding, so only the years that carry the chart's claims — plus any
+// point tall enough to need pointing out regardless — get one.
+const NARROW_LABEL_W = 500;
+const ALWAYS_LABEL_YEARS = new Set([2025, 2023, 2024, 2020, 2014, 2013]);
 
 export function mountScatter(container, data) {
   container.innerHTML = "";
@@ -141,7 +185,7 @@ export function mountScatter(container, data) {
       .attr("y1", MARGIN.top).attr("y2", MARGIN.top + plotH)
       .attr("stroke", T.rule).attr("stroke-width", 1).attr("opacity", 0.4);
     gAxis.append("text")
-      .attr("x", x(v)).attr("y", MARGIN.top + plotH + 16)
+      .attr("x", x(v)).attr("y", MARGIN.top + plotH + 15)
       .attr("text-anchor", "middle")
       .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
       .text(d3.format("~s")(v));
@@ -154,8 +198,11 @@ export function mountScatter(container, data) {
       .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
       .text(d3.format("~s")(v));
   });
+  // The axis title gets its own row below the tick labels, not the same
+  // baseline — with only a couple of tick digits ("2k", "12k") the two rows
+  // never touch, at any panel width.
   gAxis.append("text")
-    .attr("x", MARGIN.left + plotW / 2).attr("y", H - 4)
+    .attr("x", MARGIN.left + plotW / 2).attr("y", MARGIN.top + plotH + 32)
     .attr("text-anchor", "middle")
     .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
     .text("Apr-Jun sightings");
@@ -194,13 +241,31 @@ export function mountScatter(container, data) {
     .attr("fill", d => (RECORD_YEARS.has(d.fy) ? T.ink : T.sight))
     .attr("opacity", 0);
 
+  // Below the narrow-label width, only the years the chart's own claims
+  // name — plus any point tall enough that it would otherwise be a mystery
+  // dot — get a label; the rest still plot as dots.
+  const showAllLabels = W >= NARROW_LABEL_W;
+  const labelPoints = showAllLabels
+    ? points
+    : points.filter(d => ALWAYS_LABEL_YEARS.has(d.fy) || d.autumn > 8000);
+
   const labelPositions = declutterLabels(
-    points.map(d => ({ fy: d.fy, x: x(d.spring) + 6, y: y(d.autumn) - 6 }))
+    labelPoints.map(d => ({ fy: d.fy, x: x(d.spring) + 6, y: y(d.autumn) - 6 })),
+    34, 12,
+    {
+      // Never let a label cross down into the axis frame's own tick-label
+      // row, nor up past the top of the plot.
+      minY: MARGIN.top + 10, maxY: MARGIN.top + plotH - 6,
+      // Nor let it get nudged onto some other, unlabelled year's own dot.
+      obstacles: points.map(d => ({ fy: d.fy, x: x(d.spring), y: y(d.autumn) })),
+    }
   );
   const labelY = new Map(labelPositions.map(p => [p.fy, p.y]));
+  const indexByFy = new Map(points.map((p, i) => [p.fy, i]));
+  const n = points.length;
 
   const labels = svg.append("g").selectAll("text")
-    .data(points)
+    .data(labelPoints)
     .join("text")
     .attr("x", d => x(d.spring) + 6)
     .attr("y", d => labelY.get(d.fy))
@@ -227,19 +292,22 @@ export function mountScatter(container, data) {
       .text(noteText);
   }
 
+  // Labels may be a subset of points (narrow panels), but their reveal
+  // timing still follows each label's own year's place in the full
+  // sequence, so a label never appears before or long after its dot.
   function renderFrame(t) {
-    const n = points.length;
     dots.attr("opacity", (d, i) => pointRevealOpacity(t, i, n));
-    labels.attr("opacity", (d, i) => pointRevealOpacity(t, i, n));
+    labels.attr("opacity", d => pointRevealOpacity(t, indexByFy.get(d.fy), n));
     gLine.attr("opacity", t >= 0.9 ? Math.min(1, (t - 0.9) / 0.1) : 0);
     gNote.attr("opacity", t >= 0.9 ? Math.min(1, (t - 0.9) / 0.1) : 0);
   }
 
   function play() {
     dots.interrupt(); labels.interrupt(); gLine.interrupt(); gNote.interrupt();
-    const n = points.length;
     dots.transition().delay((_, i) => (i / n) * 0.85 * 1500).duration(260).attr("opacity", 1);
-    labels.transition().delay((_, i) => (i / n) * 0.85 * 1500 + 80).duration(260).attr("opacity", 1);
+    labels.transition()
+      .delay(d => (indexByFy.get(d.fy) / n) * 0.85 * 1500 + 80)
+      .duration(260).attr("opacity", 1);
     gLine.transition().delay(1500 * 0.9).duration(300).attr("opacity", 1);
     gNote.transition().delay(1500 * 0.9).duration(300).attr("opacity", 1);
   }

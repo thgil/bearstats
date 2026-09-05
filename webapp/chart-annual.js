@@ -188,31 +188,60 @@ export function mountAnnual(container, data) {
   }
 
   // The FY2026 stub's own label. It's always the rightmost bar and its
-  // neighbour (FY2025) is the tallest bar on the chart, so there is no y
-  // at the stub's own height where a wide label could clear it on the
-  // left — the label shortens to just the figure when the bars are
-  // narrow, where "Apr-Jun" would otherwise spill across the FY2025 bar.
-  // It's always end-anchored on the frame's own right edge rather than
-  // centred on the bar: centred can run past the viewBox at any panel
-  // width once the margin is small relative to the font size, not only
-  // at the narrowest ones.
+  // neighbour (FY2025) is the tallest bar on the chart, so there is no
+  // fixed spot that works at every panel width — instead we try, in
+  // order: the full "Apr-Jun N" text centred above the stub, the same
+  // text end-anchored on the stub's own right edge, then the bare number
+  // in each of those spots, and only if none of those clears FY2025's
+  // bar do we fall back to setting the (short) number inside the stub
+  // itself, below its hatched top edge, in --ink-2.
   const partialRow = rows.find(r => r.partial);
   if (partialRow) {
-    const bandwidth = plotW / rows.length;
-    const stubText = bandwidth < 24
-      ? partialRow.total.toLocaleString()
-      : `Apr-Jun ${partialRow.total.toLocaleString()}`;
-    gLabels.append("text")
-      .attr("x", MARGIN.left + plotW)
-      .attr("y", y(partialRow.total) - 8)
-      .attr("text-anchor", "end")
-      .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
-      // A paper-coloured halo: when narrow this label's left end can sit
-      // over FY2025's (near-black) bar, where plain --ink-2 text would be
-      // unreadable.
+    const idx = rows.indexOf(partialRow);
+    const prevRow = idx > 0 ? rows[idx - 1] : null;
+    const bandwidth = x.bandwidth();
+    const stubX0 = x(partialRow.fy);
+    const stubX1 = stubX0 + bandwidth;
+    const stubCenter = stubX0 + bandwidth / 2;
+    const stubTop = y(partialRow.total);
+    // The only bar a left-extending label can run into is FY2025's, its
+    // immediate left neighbour — every earlier bar is further away still.
+    const prevBarRight = prevRow ? x(prevRow.fy) + x.bandwidth() : MARGIN.left;
+    const frameRight = MARGIN.left + plotW;
+    const shortText = partialRow.total.toLocaleString();
+    const longText = `Apr-Jun ${shortText}`;
+
+    const makeLabel = (text, anchor, xPos, yPos, fill) => gLabels.append("text")
+      .attr("x", xPos).attr("y", yPos)
+      .attr("text-anchor", anchor)
+      .style("font-family", T.sans).attr("font-size", 10).attr("fill", fill)
+      // A paper-coloured halo: guards against the rare case a candidate
+      // position still grazes a grid line or the bar edge.
       .style("paint-order", "stroke")
       .attr("stroke", T.paper).attr("stroke-width", 3).attr("stroke-linejoin", "round")
-      .text(stubText);
+      .text(text);
+
+    let placed = null;
+    outer: for (const text of [longText, shortText]) {
+      for (const anchor of ["middle", "end"]) {
+        const xPos = anchor === "middle" ? stubCenter : stubX1;
+        const node = makeLabel(text, anchor, xPos, stubTop - 8, T.ink2);
+        const bbox = node.node().getBBox();
+        const clearsFY2025 = bbox.x >= prevBarRight + 3;
+        const withinFrame = bbox.x + bbox.width <= Math.max(frameRight, W - 2);
+        if (clearsFY2025 && withinFrame) {
+          placed = node;
+          break outer;
+        }
+        node.remove();
+      }
+    }
+
+    if (!placed) {
+      // No spot above the stub clears FY2025's bar — set it inside the
+      // stub's own hatched area instead, below the top edge.
+      makeLabel(shortText, "middle", stubCenter, stubTop + 14, T.ink2);
+    }
   }
 
   // The one callout: the record year, serif italic, with a 1px leader and a

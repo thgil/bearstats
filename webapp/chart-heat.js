@@ -14,6 +14,17 @@
 export const TOHOKU_PREFS = ["aomori", "iwate", "miyagi", "akita", "yamagata", "fukushima"];
 const TOP_N = 20;
 
+/** The capitalised display name for a prefecture key: looked up in
+ * context.population's label list where available (it already carries the
+ * correct capitalisation, e.g. "Hokkaido"), falling back to capitalising
+ * the key's first letter for any prefecture missing from that list. */
+export function prefLabel(ctx, pref) {
+  const pop = (ctx && ctx.population) || [];
+  const found = pop.find(p => p.pref === pref);
+  if (found && found.label) return found.label;
+  return pref.charAt(0).toUpperCase() + pref.slice(1);
+}
+
 /** National sightings for one fiscal year and month index (0=Apr..11=Mar),
  * read straight off monthly_national rather than summed from the prefecture
  * table, so it is exact even though only the top rows are drawn. */
@@ -95,6 +106,22 @@ function readTokens() {
 
 const MONTH_LABELS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
 const PHONE_W = 420;
+// Below this width there isn't room for the vertical Tohoku bracket beside
+// a full-width label column without the two touching, so the bracket is
+// dropped in favour of colouring the Tohoku rows' own labels.
+const BRACKET_DROP_W = 500;
+
+let measureCanvas = null;
+/** Pixel width of `text` set in `fontPx`px of `fontFamily` — used to size
+ * the row-label gutter to whatever prefecture names are actually shown,
+ * rather than guessing a fixed width that full capitalised names (Fukushima,
+ * Kagoshima, ...) can overflow. */
+function measureTextWidth(text, fontPx, fontFamily) {
+  if (!measureCanvas) measureCanvas = document.createElement("canvas");
+  const c2d = measureCanvas.getContext("2d");
+  c2d.font = `${fontPx}px ${fontFamily}`;
+  return c2d.measureText(text).width;
+}
 
 export function mountHeat(container, data) {
   container.innerHTML = "";
@@ -119,18 +146,36 @@ export function mountHeat(container, data) {
     .style("height", "100%");
 
   const phone = W < PHONE_W;
+  const dropBracket = W < BRACKET_DROP_W;
   const panels = phone ? [{ heat: heatA, label: "FY2025" }] : [
     { heat: heatA, label: "FY2025" },
     { heat: heatB, label: "FY2024" },
   ];
 
-  const MARGIN = { top: 30, right: 6, bottom: phone ? 14 : 0, left: phone ? 46 : 40 };
+  const bracketW = 4;
+  // The bracket's own budget: the stroke, a gap, and the rotated "Tohoku"
+  // text's thickness — entirely separate from (to the left of) wherever the
+  // row-label column ends up, so the two can never overlap.
+  const bracketGutter = dropBracket ? 0 : 22;
+  const MARGIN = { top: 30, right: 6, bottom: phone ? 18 : 0, left: 8 + bracketGutter };
   const gap = phone ? 0 : 18;
   const panelW = phone ? W - MARGIN.left - MARGIN.right : (W - MARGIN.left - MARGIN.right - gap) / 2;
-  const rowLabelSpace = phone ? 42 : 34;
   const rows = heatA.rows;
   const nRows = rows.length;
-  const bracketW = 4;
+
+  // Row-label font size and gutter width are both fixed across rows (every
+  // row shares the same cellH), so compute them once: the gutter is sized to
+  // whatever the longest visible prefecture name actually measures, so a
+  // full "Fukushima" or "Kagoshima" can never spill left into the bracket.
+  const noteBandH = 14;
+  const availH = H - MARGIN.top - MARGIN.bottom - noteBandH;
+  const cellH = availH / nRows;
+  const rowLabelPx = Math.min(9, Math.max(6, cellH * 0.8));
+  const rowLabels = rows.map(r => prefLabel(ctx, r.pref));
+  const maxLabelW = rowLabels.length
+    ? Math.max(...rowLabels.map(l => measureTextWidth(l, rowLabelPx, T.sans)))
+    : 0;
+  const rowLabelSpace = Math.ceil(maxLabelW) + 10;
 
   const groups = [];
   const allCells = [];
@@ -141,8 +186,6 @@ export function mountHeat(container, data) {
     const x0 = MARGIN.left + rowLabelSpace + pi * (panelW - rowLabelSpace + gap);
     const cellW = (panelW - rowLabelSpace) / 12;
     const plotTop = MARGIN.top;
-    const availH = H - MARGIN.top - MARGIN.bottom - 14; // leave room for a "+N more" note
-    const cellH = availH / nRows;
 
     const g = svg.append("g");
     groups.push(g);
@@ -170,8 +213,10 @@ export function mountHeat(container, data) {
         .text(m);
     });
 
-    // Row (prefecture) labels — thinned to initials if there's no room.
-    const rowLabelPx = Math.min(9, Math.max(6, cellH * 0.8));
+    // Row (prefecture) labels, full capitalised names — the gutter above is
+    // already sized to the longest one, so nothing here needs truncating.
+    // Below the bracket-drop width the Tohoku/non-Tohoku split is carried by
+    // colour instead of the bracket (see below).
     rows.forEach((r, ri) => {
       if (pi !== 0) return; // only the left-most panel carries row labels
       if (cellH < 5) return; // too tight to label individually
@@ -179,31 +224,48 @@ export function mountHeat(container, data) {
         .attr("x", MARGIN.left + rowLabelSpace - 6)
         .attr("y", plotTop + ri * cellH + cellH / 2 + rowLabelPx * 0.32)
         .attr("text-anchor", "end")
-        .style("font-family", T.sans).attr("font-size", rowLabelPx).attr("fill", T.ink2)
-        .text(r.pref.slice(0, cellH < 10 ? 3 : 8));
+        .style("font-family", T.sans).attr("font-size", rowLabelPx)
+        .attr("fill", dropBracket && r.tohoku ? T.ink : T.ink2)
+        .text(prefLabel(ctx, r.pref));
     });
 
-    // Tohoku bracket, left-most panel only.
-    if (pi === 0) {
+    // Tohoku bracket, left-most panel only, and only once there is a
+    // dedicated gutter (bracketGutter) for it to sit in — entirely left of
+    // the label column, never sharing space with it.
+    if (pi === 0 && !dropBracket) {
       const tohokuRows = rows.filter(r => r.tohoku);
       if (tohokuRows.length) {
         const first = rows.indexOf(tohokuRows[0]);
         const last = rows.lastIndexOf(tohokuRows[tohokuRows.length - 1]);
         const by0 = plotTop + first * cellH;
         const by1 = plotTop + (last + 1) * cellH;
+        const bracketX = MARGIN.left - bracketGutter + bracketW + 2;
         g.append("path")
-          .attr("d", `M${MARGIN.left - bracketW},${by0} h${bracketW} v${by1 - by0} h${-bracketW}`)
+          .attr("d", `M${bracketX},${by0} h${bracketW} v${by1 - by0} h${-bracketW}`)
           .attr("fill", "none").attr("stroke", T.ink2).attr("stroke-width", 1);
         g.append("text")
-          .attr("x", MARGIN.left - bracketW - 3)
+          .attr("x", bracketX - 3)
           .attr("y", (by0 + by1) / 2)
           .attr("text-anchor", "end")
           .attr("dominant-baseline", "middle")
           .style("font-family", T.serif).style("font-style", "italic")
           .attr("font-size", 10).attr("fill", T.ink2)
-          .attr("transform", `rotate(-90 ${MARGIN.left - bracketW - 3} ${(by0 + by1) / 2})`)
+          .attr("transform", `rotate(-90 ${bracketX - 3} ${(by0 + by1) / 2})`)
           .text("Tohoku");
       }
+    }
+
+    // Below the bracket-drop width, a small heading over the label column
+    // (in the same row as the month header, so it can't collide with any
+    // row's own label) says what the ink-coloured rows below it are.
+    if (pi === 0 && dropBracket && rows.some(r => r.tohoku)) {
+      g.append("text")
+        .attr("x", MARGIN.left + rowLabelSpace - 6)
+        .attr("y", plotTop - 5)
+        .attr("text-anchor", "end")
+        .style("font-family", T.serif).style("font-style", "italic")
+        .attr("font-size", 9).attr("fill", T.ink2)
+        .text("Tohoku");
     }
 
     // Cells.
@@ -269,7 +331,7 @@ export function mountHeat(container, data) {
 
   if (phone) {
     svg.append("text")
-      .attr("x", MARGIN.left + rowLabelSpace).attr("y", H - 2)
+      .attr("x", MARGIN.left + rowLabelSpace).attr("y", H - 4)
       .style("font-family", T.sans).attr("font-size", 9).attr("fill", T.ink2)
       .text("FY2024 shown at wider sizes, same colour scale.");
   }
