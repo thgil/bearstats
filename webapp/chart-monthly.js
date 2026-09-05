@@ -526,6 +526,12 @@ export function mountMonthlyChart(container, data) {
 
   function play() {
     if (!state) return;
+    // Reduced motion: jump to the finished drawing, as the other charts do.
+    if (typeof window !== "undefined" && window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setProgress(1);
+      return;
+    }
     gLines.selectAll("path").interrupt();
     gMarks.selectAll("*").interrupt();
     state.paths.forEach(p => {

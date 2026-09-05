@@ -93,6 +93,18 @@ async function boot() {
 
     const graphics = {};
 
+    // The hero opens on the 14-year monthly overlay, drawn on load.
+    safeMount("hero-chart", () => {
+      if (!monthlyMod?.mountMonthlyChart) return null;
+      const el = document.getElementById("hero-chart");
+      if (!el) return null;
+      const hero = monthlyMod.mountMonthlyChart(el, chartData);
+      hero.setView?.("spring13");
+      hero.play?.();
+      return hero;
+    });
+
+
     graphics.map = safeMount("map", () => {
       if (!mapMod?.mountStoryMap) return null;
       return mapMod.mountStoryMap(document.getElementById("map"), {

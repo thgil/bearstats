@@ -24,29 +24,36 @@
 
   <main>
     <section id="hero" class="hero">
-      <div class="hero-content">
-        <p class="eyebrow">Japan &middot; bear sightings and attacks &middot; <span id="updated">updated 4 September 2026</span></p>
-        <h1>Spring 2026 had the most bear sightings in 14 years. By August the surge was over, and the beech crop that drives autumn attacks is forecast good.</h1>
+      <div class="hero-grid">
+        <div class="hero-content">
+          <p class="eyebrow">Japan &middot; bear sightings and attacks &middot; <span id="updated">updated 4 September 2026</span></p>
+          <h1><span class="line">A record spring.</span> <span class="line">A quiet August.</span> <span class="line">A good crop coming.</span></h1>
+          <p class="dek">Bear sightings in spring 2026 were the highest in 14 years of records. In July and August they fell below 2025 in every prefecture with comparable data, and the beech crop that drives autumn attacks is forecast good.</p>
 
-        <div class="hero-figures">
-          <div class="figure figure-sight">
-            <span class="num">12,628</span>
-            <span class="figure-label">sightings, April to June 2026</span>
-            <span class="figure-compare">7,555 in 2025</span>
+          <div class="hero-figures">
+            <div class="figure figure-sight">
+              <span class="num">12,628</span>
+              <span class="figure-label">sightings, April to June 2026</span>
+              <span class="figure-compare">7,555 in 2025</span>
+            </div>
+            <div class="figure figure-sight">
+              <span class="num">251</span>
+              <span class="figure-label">sightings in Akita, August 2026</span>
+              <span class="figure-compare">766 in August 2025</span>
+            </div>
+            <div class="figure figure-mast">
+              <span class="num">3.9</span>
+              <span class="figure-label">beech index, Tohoku forecast, July 2026</span>
+              <span class="figure-compare">0.44 in July 2025</span>
+            </div>
           </div>
-          <div class="figure figure-sight">
-            <span class="num">251</span>
-            <span class="figure-label">sightings in Akita, August 2026</span>
-            <span class="figure-compare">766 in August 2025</span>
-          </div>
-          <div class="figure figure-mast">
-            <span class="num">3.9</span>
-            <span class="figure-label">beech index, Tohoku forecast, July 2026</span>
-            <span class="figure-compare">0.44 in July 2025</span>
-          </div>
+
+          <p class="dateline">Ministry of the Environment to 30 June 2026 &middot; Akita クマダス open data to 31 August &middot; Tohoku Regional Forest Office survey, 7 July 2026. A sighting is a report, not a bear. <a href="#methods">Methods and sources</a></p>
         </div>
-
-        <p class="dateline">Sources: Ministry of the Environment (sightings to 30 June 2026, injuries and deaths to 31 July 2026); Akita Prefecture クマダス open data (to 31 August 2026); Tohoku Regional Forest Office beech survey (7 July 2026). A sighting is a report made to a prefecture. It is not a count of bears.</p>
+        <figure class="hero-figure">
+          <div id="hero-chart" class="hero-chart"></div>
+          <figcaption>Sightings per month, fiscal 2013 to 2026. Fiscal 2025 in black, fiscal 2026 in green to June. Ministry of the Environment.</figcaption>
+        </figure>
       </div>
       <div class="scroll-cue" aria-hidden="true">
         <span>Scroll</span>
