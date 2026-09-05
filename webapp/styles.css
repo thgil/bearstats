@@ -260,7 +260,14 @@ h1 {
    screen: with the trigger line at 60vh, the card needs to start at least
    60vh below the scrolly's top, or the panel is not yet pinned and the chart
    is cut off at the bottom of the viewport. Phones use their own rule. */
-@media (min-width: 800px) { .steps { padding-top: 40vh; } }
+@media (min-width: 800px) {
+  /* scrollama fires on the step's own top edge (padding included), so the
+     first step's top must sit 60vh below the scrolly's top for the panel to
+     be pinned when it fires. The first card then loses its own top padding
+     so it does not land at the very bottom of the screen. */
+  .steps { padding-top: 62vh; }
+  .step:first-child { padding-top: 3vh; min-height: 58vh; }
+}
 .step {
   min-height: 80vh;
   padding: 25vh 0;

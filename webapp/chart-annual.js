@@ -238,9 +238,17 @@ export function mountAnnual(container, data) {
     }
 
     if (!placed) {
-      // No spot above the stub clears FY2025's bar — set it inside the
-      // stub's own hatched area instead, below the top edge.
-      makeLabel(shortText, "middle", stubCenter, stubTop + 14, T.ink2);
+      // No spot above the stub clears FY2025's bar. Run the number up the
+      // inside of the stub instead, rotated, with a paper halo over the
+      // hatching: on a phone the stub is only ~25px wide but ~90px tall.
+      const midY = (stubTop + y(0)) / 2;
+      gLabels.append("text")
+        .attr("transform", `translate(${stubCenter + 4}, ${midY}) rotate(-90)`)
+        .attr("text-anchor", "middle")
+        .style("font-family", T.mono).attr("font-size", 11).attr("fill", T.ink2)
+        .style("paint-order", "stroke")
+        .attr("stroke", T.paper).attr("stroke-width", 3).attr("stroke-linejoin", "round")
+        .text(shortText);
     }
   }
 
