@@ -1,0 +1,1 @@
+N=total estimated Hyogo Prefecture Asiatic black bear population (hierarchical Bayesian model); Nm=marked (tagged-and-released) subpopulation available for recapture. Source: Sakata, Kishimoto & Seki 2011, Hyogo Wildlife Monograph vol.3 p.26-38, Table 5 (p.10 of PDF).

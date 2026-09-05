@@ -1,0 +1,45 @@
+## Table 1
+| Year | Akita JJA temp °C | Akita JJA precip mm | Morioka JJA temp °C | Morioka JJA precip mm | Akita beech, July forecast (index) | Akita beech, autumn actual (index) | Iwate beech, autumn actual (index) | Akita pref. 5 sites | Oct sightings Akita | Oct sightings Iwate | Oct sightings national |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2019 | 23.6 | 519.5 | 22.2 | 305.5 |  |  |  | 0○ 0△ 5× | 40 | 65 | 2679 |
+| 2020 | 23.4 | 607.0 | 22.4 | 803.0 |  |  |  | 0○ 2△ 3× | 116 | 275 | 4213 |
+| 2021 | 24.1 | 498.5 | 23.0 | 410.0 |  |  |  | 0○ 0△ 5× | 100 | 120 | 1393 |
+| 2022 | 23.4 | 538.0 | 22.3 | 658.5 |  |  |  | 4○ 0△ 1× | 11 | 51 | 1026 |
+| 2023 | 25.4 | 558.5 | 24.5 | 600.5 | 大凶作 0.3 | 大凶作 0.1 | 大凶作 0.0 | 0○ 0△ 5× | 1472 | 1627 | 5983 |
+| 2024 | 24.5 | 492.0 | 24.0 | 842.5 | 並作 2.6 | 並作 2.6 | 並作 2.7 | 3○ 2△ 0× | 37 | 105 | 2235 |
+| 2025 | 25.3 | 480.0 | 24.8 | 341.0 | 大凶作 0.4 | 大凶作 0.0 | 大凶作 0.1 | 0○ 0△ 5× | 5810 | 3088 | 15998 |
+| 2026 | 24.1 | 539.0 | 22.7 | 579.5 | 豊作 3.6 |  |  |  |  |  |  |
+
+## Table 2
+| Mast year Y | Apr-May temp Y-1 | JJA temp Y-1 | JJA precip Y-1 | JJA temp Y | JJA precip Y | Akita 5-site result Y-1 | Akita 5-site result Y | Akita score Y | Miyagi beech (Tohoku office) Y | Oct sightings Akita FY Y |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2010 | 12.7 | 22.0 | 548.0 | 24.1 | 539.0 | 0○ 0△ 5× | 0○ 0△ 5× | 0.0 | 皆無 |  |
+| 2011 | 11.1 | 24.1 | 539.0 | 23.2 | 442.0 | 0○ 0△ 5× | 0○ 1△ 4× | 0.1 | 凶作 |  |
+| 2012 | 11.3 | 23.2 | 442.0 | 23.4 | 321.0 | 0○ 1△ 4× | 0○ 0△ 5× | 0.0 | 皆無 |  |
+| 2013 | 12.4 | 23.4 | 321.0 | 23.4 | 798.0 | 0○ 0△ 5× | 2○ 1△ 2× | 0.5 | 豊作 | 16 |
+| 2014 | 11.4 | 23.4 | 798.0 | 23.5 | 588.5 | 2○ 1△ 2× | 0○ 0△ 5× | 0.0 | 皆無 | 12 |
+| 2015 | 12.6 | 23.5 | 588.5 | 22.8 | 459.5 | 0○ 0△ 5× | 2○ 2△ 1× | 0.6 | 並作 | 6 |
+| 2016 | 13.8 | 22.8 | 459.5 | 23.2 | 476.5 | 2○ 2△ 1× | 0○ 0△ 5× | 0.0 | 皆無 | 28 |
+| 2017 | 13.7 | 23.2 | 476.5 | 22.4 | 634.0 | 0○ 0△ 5× | 0○ 1△ 4× | 0.1 | 大凶作 | 154 |
+| 2018 | 13.1 | 22.4 | 634.0 | 23.3 | 581.0 | 0○ 1△ 4× | 2○ 0△ 3× | 0.4 | 並作 | 14 |
+| 2019 | 12.9 | 23.3 | 581.0 | 23.6 | 519.5 | 2○ 0△ 3× | 0○ 0△ 5× | 0.0 | 大凶作 | 40 |
+| 2020 | 13.1 | 23.6 | 519.5 | 23.4 | 607.0 | 0○ 0△ 5× | 0○ 2△ 3× | 0.2 | 大凶作 | 116 |
+| 2021 | 12.1 | 23.4 | 607.0 | 24.1 | 498.5 | 0○ 2△ 3× | 0○ 0△ 5× | 0.0 | 凶作 | 100 |
+| 2022 | 12.8 | 24.1 | 498.5 | 23.4 | 538.0 | 0○ 0△ 5× | 4○ 0△ 1× | 0.8 | 凶作 | 11 |
+| 2023 | 13.6 | 23.4 | 538.0 | 25.4 | 558.5 | 4○ 0△ 1× | 0○ 0△ 5× | 0.0 | 大凶作 | 1472 |
+| 2024 | 13.3 | 25.4 | 558.5 | 24.5 | 492.0 | 0○ 0△ 5× | 3○ 2△ 0× | 0.8 | 豊作 | 37 |
+| 2025 | 14.2 | 24.5 | 492.0 | 25.3 | 480.0 | 3○ 2△ 0× | 0○ 0△ 5× | 0.0 | 大凶作 | 5810 |
+| 2026 | 12.9 | 25.3 | 480.0 | 24.1 | 539.0 | 0○ 0△ 5× |  |  |  |  |
+
+## Stats
+Akita, mast years 2010-2025 (n=16): good (any site ○) = [2013, 2015, 2018, 2022, 2024]; poor = [2010, 2011, 2012, 2014, 2016, 2017, 2019, 2020, 2021, 2023, 2025]
+  summer Y-1: mean JJA temp good-years 23.8 vs poor-years 23.4; mean JJA precip good-years 520.1 vs poor-years 545.5
+  summer Y: mean JJA temp good-years 23.5 vs poor-years 23.8; mean JJA precip good-years 573.7 vs poor-years 515.0
+  Spearman rho(Akita Apr-May mean temp Y-1, Akita mast score Y) = -0.01, two-sided permutation p = 0.98 (n=16)  [Kon 2010 mechanism; note JMA monthly *mean*, not the minimum temp Kon used]
+  Spearman rho(Akita JJA temp Y-1, Akita mast score Y) = +0.45, two-sided permutation p = 0.09 (n=16)
+  Spearman rho(Akita JJA precip Y-1, Akita mast score Y) = -0.01, two-sided permutation p = 0.98 (n=16)
+  Spearman rho(Akita JJA temp Y, Akita mast score Y) = -0.37, two-sided permutation p = 0.16 (n=16)
+  Spearman rho(Akita JJA precip Y, Akita mast score Y) = +0.16, two-sided permutation p = 0.54 (n=16)
+  Year after every Akita year with any ○: [(2005, '0○ 0△ 5×'), (2013, '0○ 0△ 5×'), (2015, '0○ 0△ 5×'), (2018, '0○ 0△ 5×'), (2022, '0○ 0△ 5×'), (2024, '0○ 0△ 5×')]
+  Spearman rho(Akita mast score Y, Akita Oct sightings FY Y) = -0.53, p = 0.063 (n=13); years 2013-2025
+  Spearman rho(Miyagi beech category Y, national Oct sightings FY Y) = -0.70, p = 0.011 (n=13)
