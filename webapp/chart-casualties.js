@@ -61,8 +61,10 @@ function readTokens() {
   };
 }
 
-const MARGIN = { top: 8, right: 14, bottom: 20, left: 14 };
-const ROW_GAP = 14;
+const MARGIN = { top: 52, right: 14, bottom: 42, left: 34 };
+const ROW_GAP = 22;
+const SUBTITLE_FULL = "One bar = April to July of one year, all Japan";
+const SUBTITLE_SHORT = "One bar = April to July of one year";
 
 export function mountCasualties(container, data) {
   container.innerHTML = "";
@@ -87,6 +89,36 @@ export function mountCasualties(container, data) {
   const rowH = (plotH - ROW_GAP) / 2;
   const rowTop = { injured: MARGIN.top, killed: MARGIN.top + rowH + ROW_GAP };
 
+  // Subtitle: what one mark is, top-left, above everything else.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", 14)
+    .style("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(W < 400 ? SUBTITLE_SHORT : SUBTITLE_FULL);
+
+  // Legend: the running year (ink) against every year before it (harm), the
+  // one colour code on this chart — its own row (2), top-right, so it never
+  // has to share a row with the subtitle at any panel width.
+  const gLegend = svg.append("g");
+  const legendItems = [
+    { color: T.harm, label: `2016 to ${latestYear - 1}` },
+    { color: T.ink, label: String(latestYear) },
+  ];
+  const legendY = 28;
+  let legendX = MARGIN.left + plotW;
+  legendItems.slice().reverse().forEach(item => {
+    const label = gLegend.append("text")
+      .attr("y", legendY)
+      .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text(item.label);
+    legendX -= label.node().getComputedTextLength();
+    label.attr("x", legendX).attr("text-anchor", "start");
+    legendX -= 4;
+    gLegend.append("rect")
+      .attr("x", legendX - 12).attr("y", legendY - 8).attr("width", 12).attr("height", 8)
+      .attr("fill", item.color);
+    legendX -= 12 + 10;
+  });
+
   ["injured", "killed"].forEach(key => {
     svg.append("rect")
       .attr("x", MARGIN.left).attr("y", rowTop[key])
@@ -104,17 +136,33 @@ export function mountCasualties(container, data) {
     .range([rowTop[key] + rowH, rowTop[key]]);
   const yScale = { injured: yFor("injured"), killed: yFor("killed") };
   const peaks = { injured: injuredPeak, killed: killedPeak };
+  const rowTitle = { injured: "People injured, Apr-Jul", killed: "People killed, Apr-Jul" };
 
-  svg.append("text")
-    .attr("x", MARGIN.left + 4).attr("y", rowTop.injured + 12)
-    .style("font-family", T.serif).style("font-style", "italic")
-    .attr("font-size", 12).attr("fill", T.ink)
-    .text("Injured, Apr-Jul");
-  svg.append("text")
-    .attr("x", MARGIN.left + 4).attr("y", rowTop.killed + 12)
-    .style("font-family", T.serif).style("font-style", "italic")
-    .attr("font-size", 12).attr("fill", T.ink)
-    .text("Killed, Apr-Jul");
+  // Y-axis title per row: the unit and window, horizontal, at the top of
+  // that row's own axis — doubles as the row's series label.
+  ["injured", "killed"].forEach(key => {
+    svg.append("text")
+      .attr("x", MARGIN.left).attr("y", rowTop[key] - 6)
+      .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+      .text(rowTitle[key]);
+  });
+
+  // Y-axis tick labels.
+  ["injured", "killed"].forEach(key => {
+    const y = yScale[key];
+    const maxTick = y.domain()[1];
+    [maxTick * 0.5, maxTick].forEach(v => {
+      svg.append("line")
+        .attr("x1", MARGIN.left).attr("x2", MARGIN.left + plotW)
+        .attr("y1", y(v)).attr("y2", y(v))
+        .attr("stroke", T.rule).attr("stroke-width", 1).attr("opacity", 0.5);
+      svg.append("text")
+        .attr("x", MARGIN.left - 6).attr("y", y(v) + 3)
+        .attr("text-anchor", "end")
+        .style("font-family", T.sans).attr("font-size", 9).attr("fill", T.ink2)
+        .text(d3.format("~s")(Math.round(v)));
+    });
+  });
 
   const labelEvery = plotW / rows.length < 16 ? 3 : plotW / rows.length < 26 ? 2 : 1;
   const gAxis = svg.append("g");
@@ -127,6 +175,14 @@ export function mountCasualties(container, data) {
       .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
       .text(`’${String(d.year).slice(2)}`);
   });
+
+  // X-axis title: the year ticks alone ('16, '26...) read as calendar years —
+  // this says they are fiscal years, and repeats the window.
+  gAxis.append("text")
+    .attr("x", MARGIN.left + plotW / 2).attr("y", rowTop.killed + rowH + 30)
+    .attr("text-anchor", "middle")
+    .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+    .text("Fiscal year (April to July)");
 
   function buildRow(key) {
     const y = yScale[key];

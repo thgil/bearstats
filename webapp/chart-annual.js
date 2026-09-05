@@ -80,7 +80,9 @@ function readTokens() {
   };
 }
 
-const MARGIN = { top: 42, right: 14, bottom: 26, left: 44 };
+const MARGIN = { top: 68, right: 14, bottom: 44, left: 44 };
+const SUBTITLE_FULL = "One bar = one fiscal year (April to March), all Japan";
+const SUBTITLE_SHORT = "One bar = one fiscal year, all Japan";
 
 let instanceCount = 0;
 
@@ -117,6 +119,46 @@ export function mountAnnual(container, data) {
     .attr("width", plotW).attr("height", plotH)
     .attr("fill", "none").attr("stroke", T.rule).attr("stroke-width", 1);
 
+  // Subtitle: what one mark is, top-left, above everything else.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", 14)
+    .style("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(W < 400 ? SUBTITLE_SHORT : SUBTITLE_FULL);
+
+  // Legend: the one thing a colour code needs explaining here — the hatch on
+  // the running, partial year — on its own row under the subtitle, so it
+  // never competes with the record callout inside the plot. The record
+  // year's own leader-line label already names it, so it needs no swatch.
+  const partialRowForLegend = rows.find(r => r.partial);
+  const legendSwatchW = 14, legendSwatchH = 9;
+  const gLegend = svg.append("g");
+  let lx = MARGIN.left;
+  const legendY = 30;
+  if (partialRowForLegend) {
+    const patternId2 = `annual-hatch-legend-${instanceCount++}`;
+    svg.append("defs").append("pattern")
+      .attr("id", patternId2).attr("width", 5).attr("height", 5)
+      .attr("patternTransform", "rotate(45)")
+      .attr("patternUnits", "userSpaceOnUse")
+      .append("rect").attr("width", 2).attr("height", 5).attr("fill", T.sight2);
+    gLegend.append("rect")
+      .attr("x", lx).attr("y", legendY - legendSwatchH + 2)
+      .attr("width", legendSwatchW).attr("height", legendSwatchH)
+      .attr("fill", `url(#${patternId2})`)
+      .attr("stroke", T.ink2).attr("stroke-width", 0.75);
+    lx += legendSwatchW + 4;
+    gLegend.append("text")
+      .attr("x", lx).attr("y", legendY)
+      .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text(`fiscal ${partialRowForLegend.fy}, April to June only`);
+  }
+
+  // Y-axis title: the unit, horizontal, at the top of the axis — never rotated.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", MARGIN.top - 10)
+    .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+    .text("Sightings");
+
   // A couple of quiet horizontal grid lines, tick labels in sans.
   const gGrid = svg.append("g");
   y.ticks(4).slice(1).forEach(v => {
@@ -143,6 +185,14 @@ export function mountAnnual(container, data) {
       .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
       .text(`’${String(d.fy).slice(2)}`);
   });
+
+  // X-axis title: the year ticks alone ('13, '25...) read as calendar years —
+  // this says they are fiscal years.
+  gAxis.append("text")
+    .attr("x", MARGIN.left + plotW / 2).attr("y", y(0) + 34)
+    .attr("text-anchor", "middle")
+    .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+    .text("Fiscal year (April to March)");
 
   // Diagonal hatch for the partial FY2026 stub — a bar that is short because
   // the year is short, not because sightings slowed.

@@ -138,8 +138,10 @@ function readTokens() {
   };
 }
 
-const MARGIN = { top: 28, right: 20, bottom: 40, left: 46 };
+const MARGIN = { top: 74, right: 20, bottom: 40, left: 46 };
 const SPRING_2026 = 12628;
+const SUBTITLE_FULL = "One point = one fiscal year, 2013 to 2025";
+const SUBTITLE_SHORT = "One point = one fiscal year";
 // Below this width there isn't room for all 13 years' labels without them
 // colliding, so only the years that carry the chart's claims — plus any
 // point tall enough to need pointing out regardless — get one.
@@ -164,6 +166,44 @@ export function mountScatter(container, data) {
 
   const plotW = W - MARGIN.left - MARGIN.right;
   const plotH = H - MARGIN.top - MARGIN.bottom;
+
+  // Subtitle: what one mark is, top-left row 1.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", 14)
+    .style("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(W < 400 ? SUBTITLE_SHORT : SUBTITLE_FULL);
+
+  // Colour legend: record years (ink) vs the rest (sight) — its own row 2,
+  // top-right, so it never has to share a row with the (possibly long)
+  // subtitle at any panel width.
+  const legendItems = [
+    { color: T.ink, label: "record year" },
+    { color: T.sight, label: "other years" },
+  ];
+  const gLegend = svg.append("g");
+  const legendY = 30;
+  let legendX = MARGIN.left + plotW; // right edge, built leftward
+  legendItems.slice().reverse().forEach(item => {
+    const label = gLegend.append("text")
+      .attr("y", legendY)
+      .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text(item.label);
+    const labelW = label.node().getComputedTextLength();
+    legendX -= labelW;
+    label.attr("x", legendX).attr("text-anchor", "start");
+    legendX -= 14;
+    gLegend.append("circle")
+      .attr("cx", legendX).attr("cy", legendY - 3.5).attr("r", 3.5)
+      .attr("fill", item.color);
+    legendX -= 12;
+  });
+
+  // Y-axis title: the unit, horizontal, at the top of the axis — row 3, just
+  // above the frame.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", MARGIN.top - 10)
+    .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+    .text("October plus November sightings");
 
   const xMax = Math.max(SPRING_2026, d3.max(points, d => d.spring)) * 1.08;
   const yMax = d3.max(points, d => d.autumn) * 1.1;
@@ -205,7 +245,7 @@ export function mountScatter(container, data) {
     .attr("x", MARGIN.left + plotW / 2).attr("y", MARGIN.top + plotH + 32)
     .attr("text-anchor", "middle")
     .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
-    .text("Apr-Jun sightings");
+    .text("April to June sightings");
 
   // The vertical line at spring 2026.
   const lineX = x(SPRING_2026);
@@ -285,7 +325,7 @@ export function mountScatter(container, data) {
       ? `Oct+Nov: ${min}x-${max}x the spring`
       : `Oct+Nov ranged from ${min}x to ${max}x the spring`;
     gNote.append("text")
-      .attr("x", MARGIN.left).attr("y", MARGIN.top - 10)
+      .attr("x", MARGIN.left).attr("y", MARGIN.top - 26)
       .attr("text-anchor", "start")
       .style("font-family", T.serif).style("font-style", "italic")
       .attr("font-size", narrow ? 10 : 12).attr("fill", T.ink2)

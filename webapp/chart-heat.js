@@ -157,11 +157,57 @@ export function mountHeat(container, data) {
   // text's thickness — entirely separate from (to the left of) wherever the
   // row-label column ends up, so the two can never overlap.
   const bracketGutter = dropBracket ? 0 : 22;
-  const MARGIN = { top: 30, right: 6, bottom: phone ? 18 : 0, left: 8 + bracketGutter };
+  const MARGIN = { top: 64, right: 6, bottom: phone ? 18 : 0, left: 8 + bracketGutter };
   const gap = phone ? 0 : 18;
   const panelW = phone ? W - MARGIN.left - MARGIN.right : (W - MARGIN.left - MARGIN.right - gap) / 2;
   const rows = heatA.rows;
   const nRows = rows.length;
+
+  // Subtitle: what one mark is, top-left, above both panels.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", 14)
+    .style("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(W < 400 ? "One cell = one prefecture-month" : "One cell = one prefecture in one month, all Japan");
+
+  // Colour scale legend: three swatches (0, mid, max) on the same ramp the
+  // cells use. On its own row below the subtitle, right-aligned, so it never
+  // has to share horizontal space with the subtitle at any panel width.
+  const legendY = 30;
+  const legendStops = [0, maxV / 2, maxV];
+  const legendSwatch = 11;
+  const legendGap = 3;
+  const legendFmt = v => (v >= 1000 ? d3.format("~s")(v) : Math.round(v).toLocaleString());
+  const legendLabels = legendStops.map(legendFmt);
+  const gColorLegend = svg.append("g");
+  // Measure each label so the swatches sit flush right regardless of digit
+  // count ("0" vs a 5-digit max).
+  const labelWidths = legendLabels.map(l => {
+    const t = gColorLegend.append("text")
+      .style("font-family", T.mono).attr("font-size", 10).text(l);
+    const w = t.node().getComputedTextLength();
+    t.remove();
+    return w;
+  });
+  let cx = W - MARGIN.right;
+  for (let i = legendStops.length - 1; i >= 0; i--) {
+    cx -= labelWidths[i];
+    gColorLegend.append("text")
+      .attr("x", cx).attr("y", legendY)
+      .style("font-family", T.mono).attr("font-size", 10).attr("fill", T.ink2)
+      .text(legendLabels[i]);
+    cx -= legendGap + legendSwatch;
+    gColorLegend.append("rect")
+      .attr("x", cx).attr("y", legendY - legendSwatch + 2)
+      .attr("width", legendSwatch).attr("height", legendSwatch)
+      .attr("fill", color(legendStops[i]))
+      .attr("stroke", T.rule).attr("stroke-width", 0.5);
+    cx -= 9;
+  }
+  const wordLabel = gColorLegend.append("text")
+    .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+    .text("Sightings:");
+  cx -= wordLabel.node().getComputedTextLength() + 5;
+  wordLabel.attr("x", cx).attr("y", legendY);
 
   // Row-label font size and gutter width are both fixed across rows (every
   // row shares the same cellH), so compute them once: the gutter is sized to

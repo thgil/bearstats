@@ -21,7 +21,12 @@
 // Assumes D3 v7 is loaded globally.
 
 const MONTH_LABELS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
-const MARGIN = { top: 26, right: 20, bottom: 34, left: 52 };
+// The dark render.js scenes ("closed"/"running") keep the original tight
+// margin; the light Field Notebook "spring13" view (the only one on the
+// interactive page) gets a taller top/bottom for its subtitle, legend and
+// axis titles — chosen once, per mount, once we know which view this is.
+const MARGIN_DARK = { top: 26, right: 20, bottom: 34, left: 52 };
+const MARGIN_NOTEBOOK = { top: 102, right: 20, bottom: 50, left: 52 };
 
 const INK = "#e8e8ea";
 const DIM = "#9aa0b4";
@@ -194,6 +199,16 @@ export function mountMonthlyChart(container, data) {
     .style("width", "100%")
     .style("height", "100%");
 
+  // The "spring13" view only ever runs on the light Field Notebook page
+  // (main.js is the only caller that passes a context), while "closed" and
+  // "running" only ever run on render.js's dark scenes (no context) — so the
+  // presence of context is a safe signal for which axis palette (and which
+  // margin — the notebook view carries a subtitle, legend and axis titles
+  // the dark scenes don't) to draw once at mount, without either caller
+  // needing to know about the other's theme.
+  const T = context ? readTokens() : null;
+  const MARGIN = T ? MARGIN_NOTEBOOK : MARGIN_DARK;
+
   const plotW = W - MARGIN.left - MARGIN.right;
   const plotH = H - MARGIN.top - MARGIN.bottom;
 
@@ -206,12 +221,6 @@ export function mountMonthlyChart(container, data) {
 
   const line = d3.line().x((_, i) => x(i)).y(v => y(v)).curve(d3.curveMonotoneX);
 
-  // The "spring13" view only ever runs on the light Field Notebook page
-  // (main.js is the only caller that passes a context), while "closed" and
-  // "running" only ever run on render.js's dark scenes (no context) — so the
-  // presence of context is a safe signal for which axis palette to draw once
-  // at mount, without either caller needing to know about the other's theme.
-  const T = context ? readTokens() : null;
   const gridLine = T ? T.rule : "rgba(255,255,255,0.05)";
   const baselineLine = T ? T.rule : "rgba(255,255,255,0.12)";
   const axisFill = T ? T.ink2 : DIM;
@@ -260,6 +269,61 @@ export function mountMonthlyChart(container, data) {
       .text(label);
     if (axisFont) t.style("font-family", axisFont);
   });
+
+  // Field Notebook chrome: subtitle, legend, and axis titles. Only the
+  // "spring13" view (the only one the interactive page ever mounts with a
+  // context) needs these — the dark render.js scenes ("closed"/"running")
+  // never pass one, so this whole block is a no-op for them.
+  if (T) {
+    // Subtitle: what one mark is, top-left row 1.
+    svg.append("text")
+      .attr("x", MARGIN.left).attr("y", 14)
+      .style("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+      .text(W < 420
+        ? "One line = one fiscal year"
+        : "One line = one fiscal year; months April to March");
+
+    // Legend: three colours, row 2, left-aligned under the subtitle.
+    const legendFull = [
+      { color: T.rule, label: "fiscal 2013 to 2024" },
+      { color: T.ink, label: "fiscal 2025" },
+      { color: T.sight, label: "fiscal 2026 to June" },
+    ];
+    const legendShort = [
+      { color: T.rule, label: "2013-24" },
+      { color: T.ink, label: "2025" },
+      { color: T.sight, label: "2026 (Jun)" },
+    ];
+    const legendItems = W < 520 ? legendShort : legendFull;
+    const gLegend = svg.append("g");
+    let lx = MARGIN.left;
+    const legendY = 30;
+    legendItems.forEach(item => {
+      gLegend.append("rect")
+        .attr("x", lx).attr("y", legendY - 9).attr("width", 14).attr("height", 4)
+        .attr("fill", item.color);
+      lx += 18;
+      const t = gLegend.append("text")
+        .attr("x", lx).attr("y", legendY)
+        .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+        .text(item.label);
+      lx += t.node().getComputedTextLength() + 12;
+    });
+
+    // Y-axis title: the unit, horizontal, at the top of the axis.
+    svg.append("text")
+      .attr("x", MARGIN.left).attr("y", MARGIN.top - 10)
+      .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+      .text("Sightings");
+
+    // X-axis title: the month ticks alone don't say which fiscal year they
+    // belong to (a line's own colour/legend does that).
+    gAxis.append("text")
+      .attr("x", MARGIN.left + plotW / 2).attr("y", y(0) + 38)
+      .attr("text-anchor", "middle")
+      .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+      .text("Month of the fiscal year (April to March)");
+  }
 
   const gLines = svg.append("g");
   const gMarks = svg.append("g");
@@ -431,8 +495,47 @@ export function mountMonthlyChart(container, data) {
       ...(accent2025 ? [{ series: accent2025, color: T.ink, width: 2.5 }] : []),
       ...(accent2026 ? [{ series: accent2026, color: T.sight, width: 4 }] : []),
     ];
+
+    // A shaded band over July and August, painted before the lines (so it
+    // sits behind them, not over them) — the next chapter's chart (points by
+    // prefecture) only covers those two extra months, on numbers below
+    // fiscal 2025, so a reader moving straight there shouldn't read that
+    // chart's shorter national total as bears calming down.
+    const bandX0 = x(2.5); // between June and July
+    const bandX1 = x(4.5); // between August and September
+    gLines.append("rect")
+      .attr("x", bandX0).attr("y", MARGIN.top)
+      .attr("width", bandX1 - bandX0).attr("height", plotH)
+      .attr("fill", T.rule).attr("opacity", 0.35);
+
     const paths = buildLines(defs);
     const gLabels = gMarks.append("g").attr("opacity", 0);
+
+    // The band's own note lives in the margin (row 3, under the legend),
+    // not inside the plot — the plot's upper-left is already busy with the
+    // spring callout and FY2026's own per-month values, and the October
+    // peak label sits up near its own spike, so no spot inside the frame is
+    // reliably clear at every panel width. A short leader ties the note back
+    // to the band itself.
+    const bandLines = plotW < 380
+      ? ["National figures end in June.", "Prefectural data (next chart) run to", "August and are below 2025."]
+      : ["National figures end in June. Prefectural data (next chart)", "run to August and are below 2025."];
+    const bandTextX = MARGIN.left;
+    const bandTextY = 50;
+    const bandLineH = 12;
+    const bandText = gLabels.append("text")
+      .attr("x", bandTextX).attr("y", bandTextY)
+      .style("font-family", T.serif).style("font-style", "italic")
+      .attr("font-size", 11).attr("fill", T.ink2);
+    bandLines.forEach((line, i) => {
+      bandText.append("tspan").attr("x", bandTextX).attr("dy", i === 0 ? 0 : bandLineH).text(line);
+    });
+    // Leader from the note down to the band's top edge.
+    const bandCenterX = (bandX0 + bandX1) / 2;
+    gLabels.append("line")
+      .attr("x1", bandTextX).attr("y1", bandTextY - bandLineH + 3)
+      .attr("x2", bandCenterX).attr("y2", MARGIN.top)
+      .attr("stroke", T.ink2).attr("stroke-width", 1).attr("stroke-dasharray", "2 2").attr("opacity", 0.6);
 
     // FY2026's own value at each reported month, with FY2025's same-month
     // value beneath it — the point is how far spring 2026 already clears the

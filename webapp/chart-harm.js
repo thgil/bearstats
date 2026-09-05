@@ -56,8 +56,10 @@ function readTokens() {
   };
 }
 
-const MARGIN = { top: 8, right: 14, bottom: 20, left: 14 };
-const ROW_GAP = 14;
+const MARGIN = { top: 40, right: 14, bottom: 42, left: 34 };
+const ROW_GAP = 22;
+const SUBTITLE_FULL = "One bar = one fiscal year (April to March), all Japan";
+const SUBTITLE_SHORT = "One bar = one fiscal year, all Japan";
 
 export function mountHarm(container, data) {
   container.innerHTML = "";
@@ -81,6 +83,12 @@ export function mountHarm(container, data) {
   const rowH = (plotH - ROW_GAP) / 2;
   const rowTop = { injured: MARGIN.top, killed: MARGIN.top + rowH + ROW_GAP };
 
+  // Subtitle: what one mark is, top-left, above everything else.
+  svg.append("text")
+    .attr("x", MARGIN.left).attr("y", 14)
+    .style("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(W < 400 ? SUBTITLE_SHORT : SUBTITLE_FULL);
+
   // Hairline frame around each row's plot.
   ["injured", "killed"].forEach(key => {
     svg.append("rect")
@@ -101,18 +109,35 @@ export function mountHarm(container, data) {
   const yKilled = yFor("killed");
   const yScale = { injured: yInjured, killed: yKilled };
   const peaks = { injured: injuredPeak, killed: killedPeak };
+  const rowTitle = { injured: "People injured", killed: "People killed" };
 
-  // Row labels, serif italic, at the top-left corner of each row.
-  svg.append("text")
-    .attr("x", MARGIN.left + 4).attr("y", rowTop.injured + 12)
-    .style("font-family", T.serif).style("font-style", "italic")
-    .attr("font-size", 12).attr("fill", T.ink)
-    .text("Injured");
-  svg.append("text")
-    .attr("x", MARGIN.left + 4).attr("y", rowTop.killed + 12)
-    .style("font-family", T.serif).style("font-style", "italic")
-    .attr("font-size", 12).attr("fill", T.ink)
-    .text("Killed");
+  // Y-axis title per row: the unit, horizontal, at the top of that row's own
+  // axis — never rotated — doubling as the row's series label (rule 4: two
+  // rows already say what they are, so no separate legend is needed).
+  ["injured", "killed"].forEach(key => {
+    svg.append("text")
+      .attr("x", MARGIN.left).attr("y", rowTop[key] - 6)
+      .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+      .text(rowTitle[key]);
+  });
+
+  // Y-axis tick labels, one quiet line at each row's own top (the max), so a
+  // bar's height reads against a number, not just against the other bars.
+  ["injured", "killed"].forEach(key => {
+    const y = yScale[key];
+    const maxTick = y.domain()[1];
+    [maxTick * 0.5, maxTick].forEach(v => {
+      svg.append("line")
+        .attr("x1", MARGIN.left).attr("x2", MARGIN.left + plotW)
+        .attr("y1", y(v)).attr("y2", y(v))
+        .attr("stroke", T.rule).attr("stroke-width", 1).attr("opacity", 0.5);
+      svg.append("text")
+        .attr("x", MARGIN.left - 6).attr("y", y(v) + 3)
+        .attr("text-anchor", "end")
+        .style("font-family", T.sans).attr("font-size", 9).attr("fill", T.ink2)
+        .text(d3.format("~s")(Math.round(v)));
+    });
+  });
 
   // Year ticks under the killed row only (both rows share the same x scale),
   // thinned when the panel is narrow.
@@ -128,6 +153,14 @@ export function mountHarm(container, data) {
       .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
       .text(`’${String(d.year).slice(2)}`);
   });
+
+  // X-axis title: the year ticks alone ('08, '25...) read as calendar years —
+  // this says they are fiscal years.
+  gAxis.append("text")
+    .attr("x", MARGIN.left + plotW / 2).attr("y", rowTop.killed + rowH + 30)
+    .attr("text-anchor", "middle")
+    .style("font-family", T.sans).attr("font-size", 11).attr("fill", T.ink2)
+    .text("Fiscal year (April to March)");
 
   function buildRow(key) {
     const y = yScale[key];
