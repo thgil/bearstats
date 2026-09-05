@@ -2,11 +2,15 @@
 // year, overlaid Apr→Mar so any two years compare at the same point in the
 // season.
 //
-// Two views share one scaffold. "closed" is the three finished quiet years
+// Three views share one scaffold. "closed" is the three finished quiet years
 // plus FY2025's autumn spike — the point is that autumn broke the pattern.
 // "running" holds FY2026's opening months up against FY2025, the record year
-// it is chasing, with the other closed years pushed to the background. Both
-// views keep the same y-domain (the max across every year) so the switch
+// it is chasing, with the other closed years pushed to the background.
+// "spring13" (added for the rebuild's §4 "spring" step) draws the full
+// 14-year series from context.json: every closed year FY2013-2024 as a quiet
+// field, FY2025 as the record year, FY2026 as the running year — the point
+// is that FY2026's spring already clears every spring before it. All three
+// views keep the same y-domain (the max across every year) so switching
 // between them doesn't rescale the axis under the reader.
 //
 // play() and setProgress(t) are two views onto the same progress model: a
@@ -25,6 +29,24 @@ const FIELD = "#333b52";
 const BENCH = "#7d87a8";
 const HOT = "#ff3b30";
 
+/** Field Notebook tokens for the "spring13" view, read at mount (not at
+ * import time) so this module never depends on stylesheet load order. The
+ * "closed"/"running" views keep the render-pipeline's original dark palette
+ * above — they're unchanged and still used by render.js. */
+function readTokens() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
+  return {
+    ink: v("--ink", "#2b2620"),
+    ink2: v("--ink-2", "#5a5148"),
+    rule: v("--rule", "#d8cdb8"),
+    sight: v("--sight", "#4a6741"),
+    serif: v("--font-serif", "Georgia, 'Times New Roman', serif"),
+    sans: v("--font-sans", "system-ui, sans-serif"),
+    mono: v("--font-mono", "ui-monospace, monospace"),
+  };
+}
+
 /**
  * Pull the raw monthly series out of the timeline JSON. Unlike chart-pace's
  * cumulative tracks, these are NOT running totals — a mid-season year reads
@@ -41,6 +63,47 @@ export function monthlySeries(timeline) {
       partial: partial.has(year),
       values: monthly[String(year)].slice(),
     }));
+}
+
+/**
+ * The same shape as monthlySeries(), but for context.json's 14-year
+ * monthly_national block (FY2013-2026) — the "closed"/"running" views only
+ * have the 5 years on national-timeline.json, but "spring13" needs the full
+ * series. Trailing nulls (the months of a running year not yet reported) are
+ * trimmed off so `values` always matches the old timeline convention: a
+ * partial year's array simply stops after its last reported month.
+ */
+export function contextMonthlySeries(ctx) {
+  const mn = ctx && ctx.monthly_national;
+  if (!mn || !mn.years) return [];
+  const sightings = mn.sightings || {};
+  return mn.years.map(year => {
+    const raw = sightings[String(year)] || [];
+    let lastIdx = -1;
+    raw.forEach((v, i) => { if (v != null) lastIdx = i; });
+    const values = raw.slice(0, lastIdx + 1);
+    return { year, partial: values.length < 12, values };
+  });
+}
+
+/**
+ * FY2026's Apr-Jun total against every prior year's Apr-Jun total, derived
+ * rather than written down so the "highest in N years" claim cannot go stale.
+ */
+export function springRecordCallout(series, currentYear = 2026) {
+  const current = series.find(s => s.year === currentYear);
+  if (!current || current.values.length < 3) return null;
+  const total = current.values[0] + current.values[1] + current.values[2];
+  const priorTotals = series
+    .filter(s => s.year !== currentYear && s.values.length >= 3)
+    .map(s => s.values[0] + s.values[1] + s.values[2]);
+  const isRecord = priorTotals.every(v => v <= total);
+  return {
+    total,
+    isRecord,
+    span: series.length,
+    text: `${total.toLocaleString()} Apr-Jun, highest in ${series.length} years`,
+  };
 }
 
 /** Index of a series' highest month. Used instead of hard-coding "June" — one
@@ -102,12 +165,27 @@ const LABEL_START = 0.8;
 const LABEL_END = 1;
 const TOTAL_MS = 1900;
 
-export function mountMonthlyChart(container, timeline) {
+/**
+ * Accepts either the raw timeline object (render.js's original convention)
+ * or `{ timeline, context }` (main.js's convention, spec §6) — normalised
+ * here so both callers work without either having to know about the other.
+ */
+function normalizeMonthlyData(data) {
+  if (data && typeof data === "object" && data.timeline) {
+    return { timeline: data.timeline, context: data.context || null };
+  }
+  return { timeline: data, context: null };
+}
+
+export function mountMonthlyChart(container, data) {
   container.innerHTML = "";
+  const { timeline, context } = normalizeMonthlyData(data);
   const series = monthlySeries(timeline);
   if (!series.length) return { setView() {}, play() {}, setProgress() {}, stop() {} };
 
   const byYear = new Map(series.map(s => [s.year, s]));
+  const contextSeries = context ? contextMonthlySeries(context) : [];
+  const byYearContext = new Map(contextSeries.map(s => [s.year, s]));
   const { width: W, height: H } = container.getBoundingClientRect();
   const svg = d3.select(container)
     .append("svg")
@@ -128,37 +206,59 @@ export function mountMonthlyChart(container, timeline) {
 
   const line = d3.line().x((_, i) => x(i)).y(v => y(v)).curve(d3.curveMonotoneX);
 
+  // The "spring13" view only ever runs on the light Field Notebook page
+  // (main.js is the only caller that passes a context), while "closed" and
+  // "running" only ever run on render.js's dark scenes (no context) — so the
+  // presence of context is a safe signal for which axis palette to draw once
+  // at mount, without either caller needing to know about the other's theme.
+  const T = context ? readTokens() : null;
+  const gridLine = T ? T.rule : "rgba(255,255,255,0.05)";
+  const baselineLine = T ? T.rule : "rgba(255,255,255,0.12)";
+  const axisFill = T ? T.ink2 : DIM;
+  const axisFont = T ? T.sans : null;
+
   // Recessive grid, same conventions as chart-pace.
   const gGrid = svg.append("g");
   y.ticks(4).slice(1).forEach(v => {
     gGrid.append("line")
       .attr("x1", MARGIN.left).attr("x2", MARGIN.left + plotW)
       .attr("y1", y(v)).attr("y2", y(v))
-      .attr("stroke", "rgba(255,255,255,0.05)");
-    gGrid.append("text")
+      .attr("stroke", gridLine);
+    const t = gGrid.append("text")
       .attr("x", MARGIN.left - 10).attr("y", y(v) + 4)
-      .attr("text-anchor", "end").attr("fill", DIM)
+      .attr("text-anchor", "end").attr("fill", axisFill)
       .attr("font-size", 11).attr("font-weight", 500)
       .style("font-variant-numeric", "tabular-nums")
       .text(d3.format("~s")(v));
+    if (axisFont) t.style("font-family", axisFont);
   });
   gGrid.append("line")
     .attr("x1", MARGIN.left).attr("x2", MARGIN.left + plotW)
     .attr("y1", y(0)).attr("y2", y(0))
-    .attr("stroke", "rgba(255,255,255,0.12)");
+    .attr("stroke", baselineLine);
+
+  // Hairline frame around the plot for the Field Notebook view — the panel
+  // itself has no background, so charts draw their own.
+  if (T) {
+    svg.append("rect")
+      .attr("x", MARGIN.left).attr("y", MARGIN.top)
+      .attr("width", plotW).attr("height", plotH)
+      .attr("fill", "none").attr("stroke", T.rule).attr("stroke-width", 1);
+  }
 
   // Month axis, Apr through Mar.
   const gAxis = svg.append("g");
   const labelEvery = plotW / 12 < 34 ? 2 : 1;   // phones: every other month
   MONTH_LABELS.forEach((label, i) => {
     if (i % labelEvery !== 0) return;
-    gAxis.append("text")
+    const t = gAxis.append("text")
       .attr("x", x(i)).attr("y", y(0) + 20)
       .attr("text-anchor", "middle")
-      .attr("fill", DIM)
+      .attr("fill", axisFill)
       .attr("font-size", 11).attr("font-weight", 500)
       .style("font-variant-numeric", "tabular-nums")
       .text(label);
+    if (axisFont) t.style("font-family", axisFont);
   });
 
   const gLines = svg.append("g");
@@ -309,10 +409,119 @@ export function mountMonthlyChart(container, timeline) {
     return { paths, labels: [{ sel: gLabels, start: LABEL_START, end: LABEL_END }] };
   }
 
+  /**
+   * The full 14-year series: every closed year FY2013-2024 as a quiet field,
+   * FY2025 (--ink) as the record year it is chasing, FY2026 (--sight) as the
+   * running year. Falls back to an empty draw if no context was supplied —
+   * this view needs the 14-year series that only context.json carries.
+   */
+  function buildSpring13() {
+    clearDynamic();
+    if (!T) return { paths: [], labels: [] };
+
+    const closedYears = [];
+    for (let yr = 2013; yr <= 2024; yr++) {
+      const s = byYearContext.get(yr);
+      if (s) closedYears.push(s);
+    }
+    const accent2025 = byYearContext.get(2025);
+    const accent2026 = byYearContext.get(2026);
+    const defs = [
+      ...closedYears.map(s => ({ series: s, color: T.rule, width: 2 })),
+      ...(accent2025 ? [{ series: accent2025, color: T.ink, width: 2.5 }] : []),
+      ...(accent2026 ? [{ series: accent2026, color: T.sight, width: 4 }] : []),
+    ];
+    const paths = buildLines(defs);
+    const gLabels = gMarks.append("g").attr("opacity", 0);
+
+    // FY2026's own value at each reported month, with FY2025's same-month
+    // value beneath it — the point is how far spring 2026 already clears the
+    // record year at the same point in its season.
+    if (accent2026 && accent2025) {
+      accent2026.values.forEach((v, i) => {
+        const bv = accent2025.values[i];
+        gLabels.append("circle").attr("cx", x(i)).attr("cy", y(v)).attr("r", 3.5).attr("fill", T.sight);
+        gLabels.append("text")
+          .attr("x", x(i)).attr("y", y(v) - 10)
+          .attr("text-anchor", "middle")
+          .style("font-family", T.mono).attr("font-size", 12).attr("fill", T.sight)
+          .style("font-variant-numeric", "tabular-nums")
+          .text(v.toLocaleString());
+        if (bv != null) {
+          gLabels.append("circle").attr("cx", x(i)).attr("cy", y(bv)).attr("r", 3).attr("fill", T.ink2);
+          gLabels.append("text")
+            .attr("x", x(i)).attr("y", y(bv) + 16)
+            .attr("text-anchor", "middle")
+            .style("font-family", T.mono).attr("font-size", 10).attr("fill", T.ink2)
+            .style("font-variant-numeric", "tabular-nums")
+            .text(bv.toLocaleString());
+        }
+      });
+    }
+
+    // FY2025's October peak, named quietly so the spring gap reads against
+    // the scale of what followed it last year.
+    if (accent2025) {
+      const i = peakMonthIndex(accent2025.values);
+      gLabels.append("circle")
+        .attr("cx", x(i)).attr("cy", y(accent2025.values[i]))
+        .attr("r", 3).attr("fill", T.ink);
+      gLabels.append("text")
+        .attr("x", x(i)).attr("y", y(accent2025.values[i]) - 12)
+        .attr("text-anchor", i > 8 ? "end" : "middle")
+        .style("font-family", T.serif).style("font-style", "italic")
+        .attr("font-size", 12).attr("fill", T.ink)
+        .text(peakCallout(accent2025));
+    }
+
+    // The one callout: FY2026's spring total against every spring before it,
+    // planted at June 2026 (its last reported month) with a 1px leader and a
+    // 4px dot.
+    const callout = springRecordCallout(contextSeries, 2026);
+    if (callout && accent2026 && accent2026.values.length) {
+      const lastIdx = accent2026.values.length - 1;
+      const cx = x(lastIdx);
+      const cy = y(accent2026.values[lastIdx]);
+      const narrowChart = plotW < 320;
+      const nearRight = cx > MARGIN.left + plotW * 0.6;
+      const textX = nearRight ? cx - 10 : cx + 10;
+      // Below both FY2025's October-peak label and the shoulder of its own
+      // curve, which both sit close to the chart's top — this callout's
+      // text is long enough to reach October's x-position on a narrower
+      // panel, so it needs real vertical clearance (scaled to the plot's
+      // own height), not just a fixed few px. On the narrowest (phone)
+      // panel the curve's shoulder is close enough that it needs even more.
+      const textY = MARGIN.top + plotH * (narrowChart ? 0.32 : 0.18);
+      gLabels.append("line")
+        .attr("x1", cx).attr("y1", cy).attr("x2", textX).attr("y2", textY + 4)
+        .attr("stroke", T.sight).attr("stroke-width", 1);
+      gLabels.append("circle").attr("cx", cx).attr("cy", cy).attr("r", 4).attr("fill", T.sight);
+      // Set across two lines: at one line the full sentence is often wide
+      // enough to reach October's peak by itself, on any panel narrower
+      // than a desktop one — wrapping halves how far it has to reach. The
+      // narrowest panel also shrinks the font a step further.
+      const calloutText = gLabels.append("text")
+        .attr("x", textX).attr("y", textY)
+        .attr("text-anchor", nearRight ? "end" : "start")
+        .style("font-family", T.serif).style("font-style", "italic")
+        .attr("font-size", narrowChart ? 11 : 14).attr("fill", T.sight);
+      const [firstLine, secondLine] = callout.text.split(", ");
+      const lineHeight = narrowChart ? 13 : 16;
+      calloutText.append("tspan").attr("x", textX).attr("dy", 0).text(`${firstLine},`);
+      if (secondLine) {
+        calloutText.append("tspan").attr("x", textX).attr("dy", lineHeight).text(secondLine);
+      }
+    }
+
+    return { paths, labels: [{ sel: gLabels, start: LABEL_START, end: LABEL_END }] };
+  }
+
   let state = null;
 
   function setView(view) {
-    state = view === "running" ? buildRunning() : buildClosed();
+    if (view === "running") state = buildRunning();
+    else if (view === "spring13") state = buildSpring13();
+    else state = buildClosed();
   }
 
   function play() {

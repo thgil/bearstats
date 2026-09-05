@@ -9,7 +9,14 @@ import {
   dashOffsetForProgress,
   opacityForProgress,
   declutterY,
+  contextMonthlySeries,
+  springRecordCallout,
+  mountMonthlyChart,
 } from "../chart-monthly.js";
+
+const ctx = JSON.parse(
+  readFileSync(new URL("../data/context.json", import.meta.url))
+);
 
 const timeline = {
   partial_years: [2026],
@@ -165,4 +172,57 @@ test("declutterY sorts by y before decluttering, independent of input order", ()
     15
   );
   assert.deepEqual(placed.map(p => p.key), ["high", "low"]);
+});
+
+// --- contextMonthlySeries / springRecordCallout ("spring13" view) ---------
+
+test("contextMonthlySeries returns all 14 years, FY2013 to FY2026", () => {
+  const s = contextMonthlySeries(ctx);
+  assert.equal(s.length, 14);
+  assert.deepEqual(s.map(x => x.year), Array.from({ length: 14 }, (_, i) => 2013 + i));
+});
+
+test("contextMonthlySeries trims FY2026 to its reported months only", () => {
+  const s = contextMonthlySeries(ctx);
+  const y2026 = s.find(x => x.year === 2026);
+  assert.equal(y2026.partial, true);
+  assert.deepEqual(y2026.values, [1787, 4581, 6260]);
+});
+
+test("contextMonthlySeries keeps closed years at 12 months, not partial", () => {
+  const s = contextMonthlySeries(ctx);
+  for (const year of [2013, 2023, 2024, 2025]) {
+    const series = s.find(x => x.year === year);
+    assert.equal(series.partial, false, `FY${year} should be closed`);
+    assert.equal(series.values.length, 12);
+  }
+  assert.equal(s.find(x => x.year === 2013).values.reduce((a, b) => a + b, 0), 9133);
+  assert.equal(s.find(x => x.year === 2025).values.reduce((a, b) => a + b, 0), 50801);
+});
+
+test("contextMonthlySeries copes with no context", () => {
+  assert.deepEqual(contextMonthlySeries(null), []);
+  assert.deepEqual(contextMonthlySeries({}), []);
+});
+
+test("springRecordCallout: FY2026's 12,628 Apr-Jun is the highest in the 14-year series", () => {
+  const s = contextMonthlySeries(ctx);
+  const callout = springRecordCallout(s, 2026);
+  assert.equal(callout.total, 12628);
+  assert.equal(callout.isRecord, true);
+  assert.equal(callout.span, 14);
+  assert.equal(callout.text, "12,628 Apr-Jun, highest in 14 years");
+});
+
+test("springRecordCallout returns null when the current year isn't in the series", () => {
+  assert.equal(springRecordCallout([{ year: 2025, values: [1, 2, 3] }], 2026), null);
+});
+
+// --- mountMonthlyChart's data argument --------------------------------------
+// This suite has no DOM, so mount() itself is verified visually (see the
+// design task's harness); these two checks only confirm the exported shape.
+
+test("mountMonthlyChart is exported and accepts a data argument", () => {
+  assert.equal(typeof mountMonthlyChart, "function");
+  assert.equal(mountMonthlyChart.length, 2);
 });
