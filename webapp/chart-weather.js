@@ -66,12 +66,51 @@ export function mountWeather(container, data) {
 
   const T = TOKENS();
   const { width: W, height: H } = container.getBoundingClientRect();
-  const M = { top: 16, right: 20, bottom: 34, left: 34 };
+
+  // Fixed side margins, decided before the wrap check below (which needs a
+  // plot-width estimate that does not itself depend on the vertical margins).
+  const SIDE = { right: 20, left: 34 };
+  const plotWEstimate = W - SIDE.left - SIDE.right;
+
+  /** Greedy word-wrap into as many lines as `text` needs to fit maxWidth px
+   * at fontSize — never truncates, so a narrow panel gets a taller axis
+   * title instead of a clipped one. */
+  function wrapTitle(text, maxWidth, fontSize) {
+    const charW = fontSize * 0.56;
+    const maxChars = Math.max(10, Math.floor(maxWidth / charW));
+    if (text.length <= maxChars) return [text];
+    const words = text.split(" ");
+    const lines = [];
+    let line = "";
+    for (const w of words) {
+      const cand = line ? `${line} ${w}` : w;
+      if (cand.length > maxChars && line) { lines.push(line); line = w; }
+      else line = cand;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  const subtitleText = W < 420
+    ? "One dot = one year: no relationship"
+    : "One dot = one year, FY2013-2025: no relationship";
+  const xTitleText = "June to August mean temperature at Akita, the summer before";
+  const xTitleLines = wrapTitle(xTitleText, plotWEstimate, 10.5);
+
+  const subtitleH = 14, yAxisTitleH = 13, xAxisTitleLineH = 13;
+  const xAxisTitleH = xAxisTitleLineH * xTitleLines.length;
+  const M = { top: 8 + subtitleH + yAxisTitleH + 4, right: SIDE.right, bottom: 20 + xAxisTitleH, left: SIDE.left };
 
   const svg = d3.select(container).append("svg")
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%").style("height", "100%");
+
+  // ---- subtitle: what one mark is, the window, and the headline result -----
+  svg.append("text")
+    .attr("x", 2).attr("y", 8 + 9)
+    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(subtitleText);
 
   const noteH = 18; // one line now that the explanation lives in the page caption
   const plotW = W - M.left - M.right;
@@ -84,6 +123,12 @@ export function mountWeather(container, data) {
     .domain([0, 5]).nice()
     .range([M.top + plotH, M.top]);
 
+  // ---- y-axis title: horizontal, above the axis, never rotated -------------
+  svg.append("text")
+    .attr("x", 2).attr("y", M.top - yAxisTitleH + 8)
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("Akita beech score (0 to 5), that autumn");
+
   // Hairline frame.
   svg.append("rect")
     .attr("x", M.left).attr("y", M.top).attr("width", plotW).attr("height", plotH)
@@ -95,6 +140,11 @@ export function mountWeather(container, data) {
     .attr("text-anchor", "middle")
     .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
     .text(d => `${d}°C`);
+  svg.append("g").selectAll("text").data(xTitleLines).join("text")
+    .attr("x", M.left + plotW / 2).attr("y", (d, i) => M.top + plotH + 16 + xAxisTitleLineH * (i + 1))
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text(d => d);
   const yTicks = y.ticks(5);
   svg.append("g").selectAll("text").data(yTicks).join("text")
     .attr("x", M.left - 6).attr("y", d => y(d) + 3)

@@ -79,18 +79,61 @@ export function mountLicences(container, data) {
   const previewTicks = d3.scaleLinear().domain(yDomain).ticks(4);
   const tickCharW = 10 * 0.62; // 10px sans-serif digits/letters, generous estimate
   const widestTickW = Math.max(...previewTicks.map(v => formatK(v).length)) * tickCharW;
-  const M = { top: 16, right: 86, bottom: 26, left: Math.ceil(widestTickW) + 16 };
+
+  // Reserved above the frame: subtitle line, swatch legend, and the y-axis
+  // title (horizontal, never rotated). Below the frame: the x tick row plus
+  // its own axis title, plus the closing note.
+  const subtitleH = 14, legendH = 14, yAxisTitleH = 13, xAxisTitleH = 13;
+  const M = {
+    top: 6 + subtitleH + legendH + yAxisTitleH + 4,
+    right: 86,
+    bottom: 28 + xAxisTitleH,
+    left: Math.ceil(widestTickW) + 16,
+  };
 
   const svg = d3.select(container).append("svg")
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%").style("height", "100%");
 
+  // ---- subtitle: what one line is, and the window ---------------------------
+  svg.append("text")
+    .attr("x", 2).attr("y", 6 + 9)
+    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text("One line = one licence type, 1975 to 2021");
+
+  // ---- legend: swatches for the three lines, in addition to the end labels --
+  const legendY = 6 + subtitleH + 11;
+  const legendItems = [
+    { label: "gun", fill: colors.ink },
+    { label: "trap", fill: colors.sight },
+    { label: "all", fill: colors.rule },
+  ];
+  let legendCx = 2;
+  legendItems.forEach(item => {
+    const sw = 12, sh = 2.5;
+    svg.append("rect")
+      .attr("x", legendCx).attr("y", legendY - sh - 1).attr("width", sw).attr("height", sh)
+      .attr("fill", item.fill);
+    legendCx += sw + 4;
+    svg.append("text")
+      .attr("x", legendCx).attr("y", legendY)
+      .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text(item.label);
+    legendCx += item.label.length * 10 * 0.58 + 14;
+  });
+
   const plotW = W - M.left - M.right;
   const plotH = H - M.top - M.bottom - 16; // 16px reserved for the closing note
 
   const x = d3.scaleLinear().domain(d3.extent(rows, d => d.year)).range([M.left, M.left + plotW]);
   const y = d3.scaleLinear().domain(yDomain).range([M.top + plotH, M.top]);
+
+  // ---- y-axis title: horizontal, above the axis, never rotated --------------
+  svg.append("text")
+    .attr("x", 2).attr("y", M.top - yAxisTitleH + 8)
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("Licence holders");
 
   // Hairline frame + y ticks.
   svg.append("rect")
@@ -123,6 +166,11 @@ export function mountLicences(container, data) {
     .attr("text-anchor", "middle")
     .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
     .text(d => d);
+  svg.append("text")
+    .attr("x", M.left + plotW / 2).attr("y", M.top + plotH + 16 + xAxisTitleH)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("Year");
 
   const lineGens = SERIES.map(s => ({
     ...s,

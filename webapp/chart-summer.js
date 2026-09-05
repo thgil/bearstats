@@ -137,6 +137,46 @@ const GRID_GAP = 14;
 const NOTE_FONT_SIZE = 10.5;
 const NOTE_LINE_H = 13;
 
+/** Panel y-tick label: "1.2k" above 1000, a plain integer below. */
+function formatCount(v) {
+  return v >= 1000 ? `${(Math.round(v / 100) / 10).toFixed(v % 1000 === 0 ? 0 : 1)}k` : String(Math.round(v));
+}
+
+/**
+ * Lay out swatch-legend items left to right, wrapping to a new line whenever
+ * the next item would run past maxWidth. Returns the line count without
+ * drawing anything, so the grid above the legend can be sized first — the
+ * same measure-then-draw split the closing note already uses.
+ */
+function legendLineCount(items, maxWidth, fontSize) {
+  let cx = 0, lines = 1;
+  items.forEach(item => {
+    const itemW = 12 + item.label.length * fontSize * 0.56 + 16;
+    if (cx + itemW > maxWidth && cx > 0) { cx = 0; lines++; }
+    cx += itemW;
+  });
+  return lines;
+}
+
+function drawLegend(svg, items, x0, y0, maxWidth, fontSize, lineH, T) {
+  let cx = x0, cy = y0;
+  items.forEach(item => {
+    const itemW = 12 + item.label.length * fontSize * 0.56 + 16;
+    if (cx + itemW > x0 + maxWidth && cx > x0) { cx = x0; cy += lineH; }
+    const sw = 10;
+    svg.append("rect")
+      .attr("x", cx).attr("y", cy - sw + 2).attr("width", sw).attr("height", sw)
+      .attr("fill", item.fill).attr("stroke", item.strokeSwatch || "none");
+    cx += sw + 4;
+    svg.append("text")
+      .attr("x", cx).attr("y", cy)
+      .attr("font-family", T.sans).attr("font-size", fontSize).attr("fill", T.ink2)
+      .text(item.label);
+    cx += item.label.length * fontSize * 0.56 + 16;
+  });
+  return cy;
+}
+
 export function mountSummer(container, data) {
   container.innerHTML = "";
   const ctx = data && data.context;
@@ -194,9 +234,47 @@ export function mountSummer(container, data) {
   const compact = W < 420;
   const cols = stacked ? 1 : 2;
   const rows = Math.ceil(panels.length / cols);
-  const gridH = H - NOTE_H;
-  const cellW = (W - GRID_GAP * (cols - 1)) / cols;
-  const cellH = (gridH - GRID_GAP * (rows - 1)) / rows;
+  // Four stacked compact panels leave very little height to share; the grid
+  // gap shrinks to give the bars back a few more px each.
+  const gridGap = stacked ? 8 : GRID_GAP;
+
+  // ---- shared legend, above the grid: colour and hatch both explained -------
+  // Full wording at normal widths; compact swaps in shorter labels and a
+  // smaller font so the three items still pack onto one or two lines instead
+  // of the words themselves running the legend to three.
+  const legendFontSize = compact ? 9 : 10;
+  const legendLineH = compact ? 11 : 13;
+  const legendItems = compact
+    ? [
+        { fill: T.rule, label: "grey FY2025" },
+        { fill: T.sight, label: "green FY2026" },
+      ]
+    : [
+        { fill: T.rule, label: "grey = FY2025 (ministry)" },
+        { fill: T.sight, label: "green = FY2026 (prefecture)" },
+      ];
+  if (panels.some(p => !p.comparable)) {
+    legendItems.push(compact
+      ? { fill: `url(#${ruleHatchId})`, strokeSwatch: T.rule, label: "hatched = Iwate (method changed)" }
+      : { fill: `url(#${ruleHatchId})`, strokeSwatch: T.rule, label: "hatched = not comparable (Iwate: method changed)" });
+  }
+  const legendLines = legendLineCount(legendItems, W - 4, legendFontSize);
+  const legendH = legendLines * legendLineH + 6;
+
+  // ---- shared x-axis title, below the grid -----------------------------------
+  const xAxisTitleH = 17;
+
+  const gridH = H - NOTE_H - legendH - xAxisTitleH;
+  const cellW = (W - gridGap * (cols - 1)) / cols;
+  const cellH = (gridH - gridGap * (rows - 1)) / rows;
+  const gridTop = legendH;
+
+  drawLegend(svg, legendItems, 2, legendLineH - 2, W - 4, legendFontSize, legendLineH, T);
+  svg.append("text")
+    .attr("x", W / 2).attr("y", gridTop + gridH + xAxisTitleH - 3)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("Month, 2026 against 2025");
 
   const barFractionState = { t: 0 };
   const allBars = [];
@@ -206,8 +284,8 @@ export function mountSummer(container, data) {
   panels.forEach((panel, idx) => {
     const col = idx % cols;
     const row = Math.floor(idx / cols);
-    const cx = col * (cellW + GRID_GAP);
-    const cy = row * (cellH + GRID_GAP);
+    const cx = col * (cellW + gridGap);
+    const cy = gridTop + row * (cellH + gridGap);
     const g = svg.append("g").attr("transform", `translate(${cx},${cy})`);
 
     const titleSize = compact ? 12 : 13;
@@ -222,10 +300,34 @@ export function mountSummer(container, data) {
     const footerLines = 2;
     const footerH = hasFooter ? 10 * footerLines + 6 : 0;
 
+    // The one callout per panel, at the latest reported month: 2026 against
+    // 2025 at the same point in the season, e.g. "Aug 251 vs 766".
+    const latest = panel.latestMonthIndex >= 0 ? panel.pairs[panel.latestMonthIndex] : null;
+    const hasCallout = !!(latest && latest.y2026 != null);
+    const calloutLabel = hasCallout
+      ? (latest.y2025 != null
+          ? `${latest.month} ${latest.y2026.toLocaleString()} vs ${latest.y2025.toLocaleString()}`
+          : `${latest.month} ${latest.y2026.toLocaleString()}`)
+      : "";
+
+    // The y title ("Sightings") only sits over the first panel — repeating it
+    // on all four would say the same word four times — but every panel still
+    // gets its own tick labels, since every panel has its own scale. Compact
+    // panels have no room to spare for another chrome row above the axis, so
+    // there it shares the title's own line (top right, where "own scale"
+    // sits in the wider layout) instead of adding height.
+    const isFirst = idx === 0;
+    const yAxisTitleH = isFirst && !compact ? 12 : 0;
+    const maxVal = d3.max(panel.pairs, d => Math.max(d.y2025 || 0, d.y2026 || 0)) || 1;
+    const tickFontSize = compact ? 8 : 8.5;
+    const niceMax = d3.scaleLinear().domain([0, maxVal]).nice().domain()[1];
+    const yTickVals = compact ? [0, niceMax] : [0, niceMax / 2, niceMax];
+    const tickLabelW = Math.max(...yTickVals.map(v => formatCount(v).length)) * tickFontSize * 0.6;
+
     const M = {
-      top: titleH + (compact ? 2 : 12),
+      top: titleH + (compact ? 2 : 12) + yAxisTitleH,
       bottom: (compact ? 14 : 20) + footerH,
-      left: 4,
+      left: Math.ceil(tickLabelW) + 6,
       right: 4,
     };
     const plotW = cellW - M.left - M.right;
@@ -239,6 +341,19 @@ export function mountSummer(container, data) {
         .attr("text-anchor", "end")
         .style("font-family", T.sans).attr("font-size", 9).attr("fill", T.ink2)
         .text("own scale");
+    }
+
+    if (isFirst && compact) {
+      g.append("text")
+        .attr("x", cellW - 2).attr("y", titleSize)
+        .attr("text-anchor", "end")
+        .style("font-family", T.sans).attr("font-size", 9).attr("fill", T.ink2)
+        .text("Sightings");
+    } else if (isFirst) {
+      g.append("text")
+        .attr("x", 2).attr("y", plotTop - yAxisTitleH + 9)
+        .style("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+        .text("Sightings");
     }
 
     // Hairline frame — the panel itself has no background.
@@ -256,10 +371,23 @@ export function mountSummer(container, data) {
       .range([0, monthX.bandwidth()])
       .padding(0.12);
 
-    const maxVal = d3.max(panel.pairs, d => Math.max(d.y2025 || 0, d.y2026 || 0)) || 1;
-    // 30% headroom: the callout lives in the top band of the panel, clear
-    // of even the tallest bar.
-    const y = d3.scaleLinear().domain([0, maxVal * 1.3]).range([plotBottom, plotTop]);
+    // Headroom for the callout is reserved in absolute pixels, not as a
+    // fixed fraction of plotH — a fraction (e.g. 30%) gives a four-panel
+    // compact stack only 4-5px, not enough for an 10-11px line of text, so
+    // the callout ran straight through the bars under it. A pixel band
+    // guarantees the text always has room, however short the panel is.
+    const calloutBandPx = hasCallout ? Math.min(plotH * 0.55, compact ? 13 : Math.max(20, plotH * 0.3)) : 0;
+    const barTop = plotTop + calloutBandPx;
+    // Shares niceMax with the tick labels below (not the raw maxVal), so the
+    // top tick lands exactly at the top of the drawable band instead of
+    // extrapolating past it.
+    const y = d3.scaleLinear().domain([0, niceMax]).range([plotBottom, barTop]);
+
+    g.append("g").selectAll("text").data(yTickVals).join("text")
+      .attr("x", M.left - 4).attr("y", d => y(d) + 3)
+      .attr("text-anchor", "end")
+      .style("font-family", T.sans).attr("font-size", tickFontSize).attr("fill", T.ink2)
+      .text(d => formatCount(d));
 
     if (!compact) {
       panel.pairs.forEach(d => {
@@ -292,32 +420,27 @@ export function mountSummer(container, data) {
     }));
     allBars.push(...panelBars);
 
-    // The one callout per panel, at the latest reported month: 2026 against
-    // 2025 at the same point in the season, e.g. "Aug 251 vs 766".
-    const latest = panel.latestMonthIndex >= 0 ? panel.pairs[panel.latestMonthIndex] : null;
     const callout = g.append("g").attr("opacity", 0);
-    if (latest && latest.y2026 != null) {
+    if (hasCallout) {
       const bx = monthX(latest.month) + seriesX("y2026") + seriesX.bandwidth() / 2;
       const topY = y(latest.y2026);
-      const label = latest.y2025 != null
-        ? `${latest.month} ${latest.y2026.toLocaleString()} vs ${latest.y2025.toLocaleString()}`
-        : `${latest.month} ${latest.y2026.toLocaleString()}`;
-      // The text sits in the headroom at the panel's top right; the leader
-      // runs from the bar top up to it, so it never crosses a neighbour.
-      const textY = plotTop + 11;
+      // The text sits in the reserved headroom band at the panel's top
+      // right; the leader runs from the bar top up to it, so it never
+      // crosses a neighbour.
+      const textY = plotTop + calloutBandPx - 2;
       callout.append("line")
         .attr("x1", bx).attr("y1", topY).attr("x2", bx).attr("y2", textY + 4)
         .attr("stroke", T.ink).attr("stroke-width", 1);
-      callout.append("circle").attr("cx", bx).attr("cy", topY).attr("r", 3).attr("fill", T.ink);
+      callout.append("circle").attr("cx", bx).attr("cy", topY).attr("r", compact ? 2 : 3).attr("fill", T.ink);
       callout.append("text")
         .attr("x", M.left + plotW - 4)
         .attr("y", textY)
         .attr("text-anchor", "end")
         .style("font-family", T.serif).style("font-style", "italic")
-        .attr("font-size", compact ? 10 : 11).attr("fill", T.ink)
+        .attr("font-size", compact ? 9 : 11).attr("fill", T.ink)
         .style("paint-order", "stroke")
-        .attr("stroke", T.paper).attr("stroke-width", 3).attr("stroke-linejoin", "round")
-        .text(label);
+        .attr("stroke", T.paper).attr("stroke-width", compact ? 2 : 3).attr("stroke-linejoin", "round")
+        .text(calloutLabel);
     }
     allCallouts.push(callout);
 

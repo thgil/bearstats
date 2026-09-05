@@ -145,12 +145,31 @@ export function revealFraction(t, i, n, growEnd = 0.92) {
 
 export function mountMast(container, data) {
   container.innerHTML = "";
-  const { years: rows, rho, n } = mastStrip(data);
+  const { years: rows } = mastStrip(data);
   if (!rows.length) return { play() {}, setProgress() {}, stop() {} };
 
   const T = TOKENS();
   const { width: W, height: H } = container.getBoundingClientRect();
-  const M = { top: 8, right: 10, bottom: 22, left: 10 };
+  const M = { top: 8, right: 10, bottom: 22, left: 30 };
+
+  /** Greedy word-wrap that never truncates — used to keep the subtitle and
+   * the closing note inside the canvas at any width instead of running off
+   * the right edge and getting clipped. */
+  function wrapToLines(text, maxWidth, fontSize) {
+    const charW = fontSize * 0.56;
+    const maxChars = Math.max(8, Math.floor(maxWidth / charW));
+    if (text.length <= maxChars) return [text];
+    const words = text.split(" ");
+    const lines = [];
+    let line = "";
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (candidate.length > maxChars && line) { lines.push(line); line = word; }
+      else line = candidate;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
 
   const svg = d3.select(container).append("svg")
     .attr("viewBox", `0 0 ${W} ${H}`)
@@ -160,23 +179,78 @@ export function mountMast(container, data) {
   const plotW = W - M.left - M.right;
   const x = d3.scaleBand().domain(rows.map(d => d.fy)).range([M.left, M.left + plotW]).padding(0.14);
 
-  const noteH = 16;
+  // ---- top label: what the tile row is, plus a 3-swatch ramp legend --------
+  const colorScale = d3.scaleLinear()
+    .domain([0, 1, 2, 3, 4, 5])
+    .range(T.mast)
+    .clamp(true);
+
+  // Below ~420px the full sentence runs off the canvas; the shorter form
+  // keeps the 0-5 scale and the prefectures it covers, dropping only the
+  // "no nuts / full crop" gloss that the legend swatches already carry.
+  const subtitleText = W < 420
+    ? "Beech index, 0-5, five Tohoku prefectures"
+    : "Beech index, 0 = no nuts, 5 = full crop, five Tohoku prefectures";
+  const topLabel = svg.append("g");
+  topLabel.append("text")
+    .attr("x", M.left).attr("y", M.top + 9)
+    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(subtitleText);
+  const legendY = M.top + 24;
+  const legendStops = [0, 2.5, 5];
+  const legendSwatch = 9;
+  legendStops.forEach((v, i) => {
+    const lx = M.left + i * 46;
+    topLabel.append("rect")
+      .attr("x", lx).attr("y", legendY - legendSwatch + 2).attr("width", legendSwatch).attr("height", legendSwatch)
+      .attr("fill", colorScale(v)).attr("stroke", T.rule);
+    topLabel.append("text")
+      .attr("x", lx + legendSwatch + 3).attr("y", legendY)
+      .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text(v);
+  });
+
+  // The note is two sentences; each wraps independently to however many
+  // lines the canvas actually needs, rather than a fixed two-line budget
+  // that runs the text off the right edge on a narrow panel.
+  const noteFontSize = 11;
+  const noteMaxW = W - M.left - 4;
+  const noteLine1 = wrapToLines("Every October above 2,235 followed a poor crop (index under 2).", noteMaxW, noteFontSize);
+  const noteLine2 = wrapToLines("The index does not set the size: 2023 and 2025 had the same index.", noteMaxW, noteFontSize);
+  const noteLines = [...noteLine1, ...noteLine2];
+  const noteLineH = 13;
+  const noteH = noteLines.length * noteLineH + 2;
   const tickH = 16;
-  const tileTop = M.top;
+  const xAxisTitleH = 13;
+  const yAxisTitleH = 13;
+  const topLabelH = 24 + 14; // subtitle line + legend row
+  const tileTop = M.top + topLabelH;
   const tileH = Math.max(30, Math.min(58, H * 0.16));
   const catH = 12;
   const gap = 8;
-  const barsTop = tileTop + tileH + catH + gap;
-  const barsBottom = H - M.bottom - tickH - noteH;
+  const barsTop = tileTop + tileH + catH + gap + yAxisTitleH;
+  const barsBottom = H - M.bottom - tickH - xAxisTitleH - noteH;
   const barsH = Math.max(20, barsBottom - barsTop);
 
   const maxOct = d3.max(rows, d => d.octSightings || 0) || 1;
   const y = d3.scaleLinear().domain([0, maxOct]).range([0, barsH]);
 
-  const colorScale = d3.scaleLinear()
-    .domain([0, 1, 2, 3, 4, 5])
-    .range(T.mast)
-    .clamp(true);
+  // ---- y-axis: horizontal title above, hairline + k-formatted ticks --------
+  svg.append("text")
+    .attr("x", M.left).attr("y", barsTop - 2)
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("October sightings, all Japan");
+
+  const yTicks = [0, 5000, 10000, 15000].filter(v => v <= maxOct + 1500);
+  svg.append("g").selectAll("text").data(yTicks).join("text")
+    .attr("x", M.left - 4).attr("y", d => barsTop + barsH - y(d) + 3)
+    .attr("text-anchor", "end")
+    .attr("font-family", T.sans).attr("font-size", 9.5).attr("fill", T.ink2)
+    .text(d => (d === 0 ? "0" : `${d / 1000}k`));
+  svg.append("line")
+    .attr("x1", M.left).attr("x2", M.left)
+    .attr("y1", barsTop).attr("y2", barsTop + barsH)
+    .attr("stroke", T.rule);
 
   // ---- top row: index tiles -------------------------------------------------
   // At narrow widths (e.g. 340px / 14 tiles) a tile is too small for both an
@@ -239,34 +313,48 @@ export function mountMast(container, data) {
     .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
     .text(d => `'${String(d.fy).slice(2)}`);
 
-  // ---- one callout: the FY2025 bar --------------------------------------------
-  const recordRow = barRows.find(d => d.fy === RECORD_FY);
-  const callout = svg.append("g").attr("opacity", 0);
-  if (recordRow) {
-    const cx = x(recordRow.fy) + x.bandwidth() / 2;
-    const topY = baseline - y(recordRow.octSightings);
-    callout.append("line")
+  svg.append("text")
+    .attr("x", M.left + plotW / 2).attr("y", baseline + tickH + xAxisTitleH - 3)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("Fiscal year");
+
+  // ---- callouts: the two record-setting years, both at the same index ---------
+  // makeCallout draws a leader + dot + label above a given bar; used for both
+  // the FY2025 record and the FY2023 callout that makes the amplitude point.
+  function makeCallout(row, text, lift) {
+    const g = svg.append("g").attr("opacity", 0);
+    if (!row) return g;
+    const cx = x(row.fy) + x.bandwidth() / 2;
+    const topY = baseline - y(row.octSightings);
+    g.append("line")
       .attr("x1", cx).attr("x2", cx)
-      .attr("y1", Math.max(barsTop, topY - 22)).attr("y2", topY - 4)
+      .attr("y1", Math.max(barsTop, topY - lift)).attr("y2", topY - 4)
       .attr("stroke", T.ink).attr("stroke-width", 1);
-    callout.append("circle")
+    g.append("circle")
       .attr("cx", cx).attr("cy", topY - 4).attr("r", 2)
       .attr("fill", T.ink);
-    callout.append("text")
-      .attr("x", cx).attr("y", Math.max(barsTop, topY - 26))
-      .attr("text-anchor", cx > M.left + plotW * 0.75 ? "end" : "middle")
-      .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 12)
+    g.append("text")
+      .attr("x", cx).attr("y", Math.max(barsTop, topY - lift - 4))
+      .attr("text-anchor", cx > M.left + plotW * 0.75 ? "end" : cx < M.left + plotW * 0.25 ? "start" : "middle")
+      .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 11.5)
       .attr("fill", T.ink)
-      .text(recordRow.octSightings.toLocaleString());
+      .text(text);
+    return g;
   }
 
-  // ---- note: rho ---------------------------------------------------------------
+  const recordRow = barRows.find(d => d.fy === RECORD_FY);
+  const priorRow = barRows.find(d => d.fy === 2023);
+  const callout = makeCallout(recordRow, recordRow ? recordRow.octSightings.toLocaleString() : "", 22);
+  const callout2 = makeCallout(priorRow, priorRow ? `${priorRow.octSightings.toLocaleString()} at index ${priorRow.meanIndex.toFixed(2)}` : "", 18);
+
+  // ---- note: the amplitude point, not the correlation coefficient --------------
   const note = svg.append("g").attr("opacity", 0);
-  note.append("text")
-    .attr("x", M.left).attr("y", H - 4)
-    .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 11)
+  note.selectAll("text").data(noteLines).join("text")
+    .attr("x", M.left).attr("y", (d, i) => H - noteH + noteLineH + i * noteLineH)
+    .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", noteFontSize)
     .attr("fill", T.ink2)
-    .text(rho != null ? `rho = ${rho.toFixed(2)}, n = ${n}` : "");
+    .text(d => d);
 
   function play() {
     tile.interrupt().transition().delay((_, i) => i * 40).duration(1)
@@ -275,6 +363,7 @@ export function mountMast(container, data) {
       .attr("y", d => baseline - y(d.octSightings))
       .attr("height", d => y(d.octSightings));
     callout.interrupt().transition().delay(rows.length * 40 + 300).duration(300).attr("opacity", 1);
+    callout2.interrupt().transition().delay(rows.length * 40 + 300).duration(300).attr("opacity", 1);
     note.interrupt().transition().delay(rows.length * 40 + 400).duration(300).attr("opacity", 1);
   }
 
@@ -284,11 +373,12 @@ export function mountMast(container, data) {
       .attr("y", (d, i) => baseline - revealFraction(t, i, barRows.length) * y(d.octSightings))
       .attr("height", (d, i) => revealFraction(t, i, barRows.length) * y(d.octSightings));
     callout.interrupt().attr("opacity", t >= 0.92 ? 1 : 0);
+    callout2.interrupt().attr("opacity", t >= 0.92 ? 1 : 0);
     note.interrupt().attr("opacity", t >= 0.92 ? 1 : 0);
   }
 
   function stop() {
-    tile.interrupt(); bars.interrupt(); callout.interrupt(); note.interrupt();
+    tile.interrupt(); bars.interrupt(); callout.interrupt(); callout2.interrupt(); note.interrupt();
   }
 
   return { play, setProgress, stop };

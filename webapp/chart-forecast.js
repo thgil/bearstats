@@ -168,6 +168,8 @@ export function mountForecast(container, data) {
   // row height as before.
   const isWide = W >= 640;
   const M = { top: 8, right: 12, bottom: 8, left: 76 };
+  const subtitleH = 14;
+  const legendH = 14;
   const headerH = 16; // "July 2023 / 2025 / 2026" column headers, above every layout
   const tileGap = 10;
   const maxBigW = 110;
@@ -177,8 +179,29 @@ export function mountForecast(container, data) {
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%").style("height", "100%");
 
+  // ---- subtitle: what one tile is, and the survey window --------------------
+  svg.append("text")
+    .attr("x", 2).attr("y", M.top + 9)
+    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text("July flowering survey, index 0 to 5, by prefecture");
+
+  // ---- tiny legend for the tile ramp -----------------------------------------
+  const legendY = M.top + subtitleH + 11;
+  const legendStops = [0, 2.5, 5];
+  const legendSwatch = 8;
+  legendStops.forEach((v, i) => {
+    const lx = 2 + i * 42;
+    svg.append("rect")
+      .attr("x", lx).attr("y", legendY - legendSwatch + 2).attr("width", legendSwatch).attr("height", legendSwatch)
+      .attr("fill", colorScale(v)).attr("stroke", T.rule);
+    svg.append("text")
+      .attr("x", lx + legendSwatch + 3).attr("y", legendY)
+      .attr("font-family", T.sans).attr("font-size", 9.5).attr("fill", T.ink2)
+      .text(v);
+  });
+
   const meansH = 18, surveysH = surveys.length * 14 + 6, footerH = 34;
-  const gridTop = M.top + headerH;
+  const gridTop = M.top + subtitleH + legendH + headerH;
   const rowsAreaH = isWide
     ? H - gridTop - M.bottom
     : H - gridTop - M.bottom - meansH - surveysH - footerH;
@@ -209,11 +232,17 @@ export function mountForecast(container, data) {
   // would overlap its neighbour. Below the threshold every column instead
   // gets just its year, with a single shared "July" label to their left —
   // still says what the columns are, without three overlapping copies of it.
+  // Narrower still (two adjacent small columns under ~34px each), even the
+  // bare four-digit year would collide with its neighbour, so it drops to a
+  // smaller font and a two-digit year.
   const headerFull = smallW >= 60;
+  const veryTight = !headerFull && smallW < 34;
+  const headerFontSize = headerFull ? 12 : veryTight ? 9.5 : 12;
+  const yearLabel = fy => (veryTight ? `’${String(fy).slice(2)}` : String(fy));
   const tileSpecs = [
-    { key: "f2023", w: smallW, label: headerFull ? "July 2023" : "2023" },
-    { key: "f2025", w: smallW, label: headerFull ? "July 2025" : "2025" },
-    { key: "f2026", w: bigW, label: headerFull ? "July 2026" : "2026" },
+    { key: "f2023", w: smallW, label: headerFull ? "July 2023" : yearLabel(2023) },
+    { key: "f2025", w: smallW, label: headerFull ? "July 2025" : yearLabel(2025) },
+    { key: "f2026", w: bigW, label: headerFull ? "July 2026" : yearLabel(2026) },
   ];
   const colCenters = (() => {
     let cx = 0;
@@ -223,15 +252,15 @@ export function mountForecast(container, data) {
   // ---- column headers -----------------------------------------------------------
   if (!headerFull) {
     svg.append("text")
-      .attr("x", rowsLeft - 8).attr("y", M.top + headerH - 5)
+      .attr("x", rowsLeft - 8).attr("y", gridTop - 5)
       .attr("text-anchor", "end")
       .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
       .text("July");
   }
   svg.append("g").selectAll("text").data(tileSpecs).join("text")
-    .attr("x", (d, i) => rowsLeft + colCenters[i]).attr("y", M.top + headerH - 5)
+    .attr("x", (d, i) => rowsLeft + colCenters[i]).attr("y", gridTop - 5)
     .attr("text-anchor", "middle")
-    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .attr("font-family", T.sans).attr("font-size", headerFontSize).attr("fill", T.ink2)
     .text(d => d.label);
 
   const groups = svg.append("g").selectAll("g").data(byPref).join("g")

@@ -139,6 +139,7 @@ export function mountAlternate(container, data) {
   const T = TOKENS();
   const { width: W, height: H } = container.getBoundingClientRect();
   const M = { top: 6, right: 10, bottom: 8, left: ROW_LABEL_W };
+  const useDots = W < 500;
 
   // A sixth row (Akita 2002-2025, 24 tiles) only when there is room for it
   // without squeezing the five main rows below a legible height.
@@ -155,7 +156,39 @@ export function mountAlternate(container, data) {
   const summaryLineH = 14;
   const summaryH = 6 + summaryLines.length * summaryLineH;
 
-  const plotH = H - M.top - M.bottom - summaryH;
+  // Legend: dark/pale swatches for the crop tiles, then the arrow/dot that
+  // marks a good year followed by a poor one. Items pack left to right and
+  // wrap onto as many lines as the panel's actual width needs — a fixed
+  // line count ran the widest item off the edge of a 340px panel.
+  const legendItems = [
+    { fill: T.mast0, label: "dark = poor crop (凶作 or 大凶作)" },
+    { fill: T.mast5, label: "pale = good crop (並作 or 豊作)" },
+    { fill: T.harm, dot: true, label: "arrow/dot = good year followed by poor" },
+  ];
+  const legendFontSize = 10;
+  const legendLineH = 13;
+  const legendMaxW = W - M.left - M.right;
+  function legendItemW(item) { return 12 + item.label.length * legendFontSize * 0.56 + 14; }
+  function legendLineCount(items, maxWidth) {
+    let cx = 0, lines = 1;
+    items.forEach(item => {
+      const w = legendItemW(item);
+      if (cx + w > maxWidth && cx > 0) { cx = 0; lines++; }
+      cx += w;
+    });
+    return lines;
+  }
+  const legendLines = legendLineCount(legendItems, legendMaxW);
+  const legendH = legendLines * legendLineH + 6;
+  // Year labels, one per column, above the five main rows.
+  const yearLabelH = 13;
+  // Below the Akita row: its own year ticks, then its own swatch legend.
+  const akitaTickH = 13;
+  const akitaLegendH = 13;
+  const akitaFooterH = showSixth ? akitaTickH + akitaLegendH + 4 : 0;
+
+  const gridTop = M.top + legendH + yearLabelH;
+  const plotH = H - gridTop - M.bottom - summaryH - akitaFooterH;
   const rowH = plotH / nRows;
   const tileGap = 2;
 
@@ -169,12 +202,44 @@ export function mountAlternate(container, data) {
   const tileW = x.bandwidth();
   const tileH = Math.max(10, rowH - tileGap * 2);
 
+  // ---- legend: swatches wrapped to fit, words inside the plot --------------
+  {
+    let cx = M.left, cy = M.top + legendLineH - 2;
+    legendItems.forEach(item => {
+      const w = legendItemW(item);
+      if (cx + w > M.left + legendMaxW && cx > M.left) { cx = M.left; cy += legendLineH; }
+      const sw = 8;
+      if (item.dot) {
+        svg.append("circle")
+          .attr("cx", cx + sw / 2).attr("cy", cy - legendFontSize * 0.32).attr("r", 2)
+          .attr("fill", item.fill);
+      } else {
+        svg.append("rect")
+          .attr("x", cx).attr("y", cy - legendFontSize - 1).attr("width", sw).attr("height", sw)
+          .attr("fill", item.fill).attr("stroke", T.rule);
+      }
+      cx += sw + 4;
+      svg.append("text")
+        .attr("x", cx).attr("y", cy)
+        .attr("font-family", T.sans).attr("font-size", legendFontSize).attr("fill", T.ink2)
+        .text(item.label);
+      cx += item.label.length * legendFontSize * 0.56 + 14;
+    });
+  }
+
+  // ---- year labels: one per column, above the five main rows ---------------
+  const yearStep = useDots ? 2 : 1;
+  svg.append("g").selectAll("text").data(years.filter((_, i) => i % yearStep === 0)).join("text")
+    .attr("x", d => x(d) + tileW / 2).attr("y", gridTop - 4)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 9.5).attr("fill", T.ink2)
+    .text(d => d);
+
   const allTiles = [];
   const allArrows = [];
-  const useDots = W < 500;
 
   rows.forEach((row, ri) => {
-    const g = svg.append("g").attr("transform", `translate(0,${M.top + ri * rowH})`);
+    const g = svg.append("g").attr("transform", `translate(0,${gridTop + ri * rowH})`);
     g.append("text")
       .attr("x", M.left - 8).attr("y", rowH / 2)
       .attr("text-anchor", "end").attr("dominant-baseline", "middle")
@@ -222,7 +287,8 @@ export function mountAlternate(container, data) {
   let sixthTiles = [];
   if (showSixth) {
     const ri = 5;
-    const g = svg.append("g").attr("transform", `translate(0,${M.top + ri * rowH})`);
+    const rowTop = gridTop + ri * rowH;
+    const g = svg.append("g").attr("transform", `translate(0,${rowTop})`);
     g.append("text")
       .attr("x", M.left - 8).attr("y", rowH / 2)
       .attr("text-anchor", "end").attr("dominant-baseline", "middle")
@@ -244,6 +310,41 @@ export function mountAlternate(container, data) {
       }
       return rect;
     });
+
+    // Its own year ticks, 2002...2025, thinned to whatever the tile width
+    // actually allows.
+    const tick6Step = x6.bandwidth() < 12 ? 4 : x6.bandwidth() < 20 ? 2 : 1;
+    const tickY = rowH + akitaTickH - 3;
+    svg.append("g").selectAll("text")
+      .data(akitaFiveSite.filter((_, i) => i % tick6Step === 0))
+      .join("text")
+      .attr("x", d => x6(d.year) + x6.bandwidth() / 2).attr("y", rowTop + tickY)
+      .attr("text-anchor", "middle")
+      .attr("font-family", T.sans).attr("font-size", 9).attr("fill", T.ink2)
+      .text(d => d.year);
+
+    // Its own ramp legend, since the Akita row uses a different (0-5 site
+    // count) scale from the five-prefecture category tiles above it.
+    const legendY = rowTop + tickY + akitaLegendH + 1;
+    let cx = M.left;
+    const sw = 8;
+    svg.append("rect")
+      .attr("x", cx).attr("y", legendY - 9).attr("width", sw).attr("height", sw)
+      .attr("fill", T.mast0).attr("stroke", T.rule);
+    cx += sw + 4;
+    svg.append("text")
+      .attr("x", cx).attr("y", legendY)
+      .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text("Akita five-site score: dark 0");
+    cx += "Akita five-site score: dark 0".length * 10 * 0.56 + 8;
+    svg.append("rect")
+      .attr("x", cx).attr("y", legendY - 9).attr("width", sw).attr("height", sw)
+      .attr("fill", T.mast5).attr("stroke", T.rule);
+    cx += sw + 4;
+    svg.append("text")
+      .attr("x", cx).attr("y", legendY)
+      .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
+      .text("… pale 5");
   }
 
   const summary = svg.append("g").attr("opacity", 0);

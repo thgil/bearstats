@@ -58,6 +58,11 @@ const TOKENS = () => ({
   mono: cssVar("--font-mono", "JetBrains Mono, ui-monospace, monospace"),
 });
 
+/** X-axis tick label: "5k" rather than "5,000", so the axis stays compact. */
+function formatK(v) {
+  return v === 0 ? "0" : `${Math.round(v / 1000)}k`;
+}
+
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -80,7 +85,10 @@ export function mountPopulation(container, data) {
   const T = TOKENS();
   const { width: W, height: H } = container.getBoundingClientRect();
   const narrow = W < NARROW_BREAKPOINT;
-  const M = { top: 10, right: 56, bottom: 20, left: 78 };
+  const subtitleH = 14;
+  const xAxisGap = 4, tickH = 12, xAxisTitleH = 13;
+  const axisH = xAxisGap + tickH + 2 + xAxisTitleH;
+  const M = { top: 10 + subtitleH, right: 56, bottom: 8 + axisH, left: 78 };
 
   let cap = Math.min(narrow ? MAX_ROWS_NARROW : MAX_ROWS_WIDE, all.length);
   let captionH = cap < all.length ? 16 : 0;
@@ -91,14 +99,37 @@ export function mountPopulation(container, data) {
   const rows = all.slice(0, cap);
   const omitted = all.length - rows.length;
   const rowH = (H - M.top - M.bottom - captionH) / rows.length;
+  const rowsBottom = M.top + rows.length * rowH;
 
   const svg = d3.select(container).append("svg")
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%").style("height", "100%");
 
+  // ---- subtitle: what one mark is, and the window ----------------------------
+  svg.append("text")
+    .attr("x", 2).attr("y", 10 + 9)
+    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text("Earliest published estimate to latest, survey year in brackets");
+
   const plotW = W - M.left - M.right;
   const x = d3.scaleLinear().domain([0, d3.max(rows, d => Math.max(d.from, d.to))]).nice().range([0, plotW]);
+
+  // ---- x-axis: hairline + k-formatted ticks + title, below every row --------
+  svg.append("line")
+    .attr("x1", M.left).attr("x2", M.left + plotW)
+    .attr("y1", rowsBottom).attr("y2", rowsBottom)
+    .attr("stroke", T.rule);
+  svg.append("g").selectAll("text").data(x.ticks(narrow ? 3 : 5)).join("text")
+    .attr("x", d => M.left + x(d)).attr("y", rowsBottom + xAxisGap + tickH - 2)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 9.5).attr("fill", T.ink2)
+    .text(d => formatK(d));
+  svg.append("text")
+    .attr("x", M.left + plotW / 2).attr("y", rowsBottom + xAxisGap + tickH + xAxisTitleH)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 10.5).attr("fill", T.ink2)
+    .text("Estimated bears");
 
   const groups = svg.append("g").selectAll("g").data(rows).join("g")
     .attr("transform", (d, i) => `translate(${M.left},${M.top + i * rowH + rowH / 2})`);
