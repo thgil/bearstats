@@ -122,6 +122,7 @@ h1 .answer { font-size: clamp(1.15rem, 2.2vw, 1.4rem); }
   max-width: var(--max-width);
   width: 100%;
 }
+.num-window { margin: 0 0 0.6rem; }
 .hero-numbers {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

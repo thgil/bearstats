@@ -295,7 +295,8 @@ export function mountPaceChart(container, timeline) {
           .attr("stroke", color).attr("stroke-width", 2);
       });
       gLabels.append("text")
-        .attr("x", x(cmpIdx) + 10).attr("y", y(y24.values[cmpIdx]) - 10)
+        .attr("x", x(cmpIdx) - 10).attr("y", y(y24.values[cmpIdx]) - 8)
+        .attr("text-anchor", "end")
         .attr("fill", BENCH).attr("font-size", 12).attr("font-weight", 700)
         .style("font-variant-numeric", "tabular-nums")
         .text(y24.values[cmpIdx].toLocaleString());
