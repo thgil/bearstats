@@ -247,11 +247,107 @@ def build_sample4_series(points: list[dict]) -> dict:
     }
 
 
+def _month_is_complete(as_of: date | None, month: int) -> bool:
+    """A FY2026 month counts as fully reported when the source's as_of date is
+    on or after the month's last calendar day."""
+    if as_of is None:
+        return False
+    year = 2026 if month >= 4 else 2027
+    return as_of >= date(year, month, calendar.monthrange(year, month)[1])
+
+
+def _moe_fy2026_published_months(moe_df: pd.DataFrame) -> set[int]:
+    """Months the ministry's FY2026 table already has a value for in at least one
+    prefecture row (the 計 row prints 0 for unpublished months, so it is no use)."""
+    if moe_df.empty:
+        return set()
+    sub = moe_df[(moe_df["fiscal_year"] == 2026) & (moe_df["prefecture"] != "計")]
+    return {m for m in FISCAL_MONTHS if sub[f"{m}月"].notna().any()}
+
+
+def build_prefectures_fy2026(moe_df: pd.DataFrame, pref_df: pd.DataFrame) -> tuple[list[dict], dict]:
+    """The wider prefectural compilation (research/recent/prefectures_fy2026.csv,
+    one row per prefecture per fiscal month, FY2026 only) and a coverage-weighted
+    national preliminary built from it.
+
+    `prefectures`: one record per prefecture in the CSV, with its twelve FY2026
+    values (null where the source printed nothing or the month is past as_of) and
+    the ministry's FY2025 row for the same prefecture.
+
+    `national_preliminary`: keyed by fiscal month (as a string), for every month
+    the ministry's own FY2026 table has not yet published. Each entry sums, over
+    the comparable prefectures whose as_of is on or after that month's end, the
+    FY2026 count and the ministry's FY2025 count for the same month; `ratio` is
+    FY2026/FY2025 and `coverage_share_fy2025` is those prefectures' share of the
+    ministry's FY2025 national total for that month (sum of the prefecture rows,
+    計 excluded). Not-comparable prefectures (Iwate's method change, Gifu's
+    sightings-only cumulative) and incomplete months (e.g. Fukushima's July,
+    published through 15 July) are left out.
+    """
+    if pref_df.empty:
+        return [], {}
+    prefectures: list[dict] = []
+    per_pref: dict[str, dict] = {}
+    for key, g in pref_df.groupby("pref", sort=False):
+        first = g.iloc[0]
+        by_month = {int(r.month): _num(r.count) for r in g.itertuples()}
+        as_of_s = _str(first["as_of"])
+        as_of = date.fromisoformat(as_of_s) if as_of_s else None
+        pref_ja = str(first["pref_ja"])
+        rec = {
+            "pref": key,
+            "label": key.capitalize(),
+            "pref_ja": pref_ja,
+            "as_of": as_of_s,
+            "comparable": bool(first["comparable"]),
+            "source_url": _str(first["source_url"]),
+            "source_title": _str(first["source_title"]),
+            "format": _str(first["format"]),
+            "method_note": _str(first["method_note"]),
+            "fy2026": [by_month.get(m) for m in FISCAL_MONTHS],
+            "fy2025": _moe_fy_months(moe_df, pref_ja, 2025),
+        }
+        prefectures.append(rec)
+        per_pref[key] = {**rec, "as_of_date": as_of}
+
+    national_fy2025 = {m: None for m in FISCAL_MONTHS}
+    if not moe_df.empty:
+        sub = moe_df[(moe_df["fiscal_year"] == 2025) & (moe_df["prefecture"] != "計")]
+        national_fy2025 = {m: _num(sub[f"{m}月"].sum()) for m in FISCAL_MONTHS}
+
+    published = _moe_fy2026_published_months(moe_df)
+    preliminary: dict[str, dict] = {}
+    for m in FISCAL_MONTHS:
+        if m in published:
+            continue
+        i = FISCAL_MONTHS.index(m)
+        used = [p for p in per_pref.values()
+                if p["comparable"] and p["fy2026"][i] is not None and p["fy2025"][i] is not None
+                and _month_is_complete(p["as_of_date"], m)]
+        if not used:
+            continue
+        sum_2026 = sum(p["fy2026"][i] for p in used)
+        sum_2025 = sum(p["fy2025"][i] for p in used)
+        nat = national_fy2025[m]
+        preliminary[str(m)] = {
+            "prefectures": [p["pref"] for p in used],
+            "coverage_share_fy2025": round(sum_2025 / nat, 4) if nat else None,
+            "national_fy2025": nat,
+            "sum_2026": sum_2026,
+            "sum_2025": sum_2025,
+            "ratio": round(sum_2026 / sum_2025, 4) if sum_2025 else None,
+        }
+    return prefectures, preliminary
+
+
 def build_recent(moe_df: pd.DataFrame, akita_df: pd.DataFrame, iwate_df: pd.DataFrame,
-                 miyagi_df: pd.DataFrame, points: list[dict]) -> dict:
+                 miyagi_df: pd.DataFrame, points: list[dict],
+                 prefectures_df: pd.DataFrame | None = None) -> dict:
     """Prefecture-published counts that run ahead of the ministry's own table:
     Akita's クマダス point feed, and one-page monthly PDFs from Iwate and Miyagi,
-    plus a bundle of the four smaller ArcGIS-point prefectures. FY2025 always
+    plus a bundle of the four smaller ArcGIS-point prefectures, and (under
+    `prefectures` / `national_preliminary`) the wider one-row-per-month
+    compilation in research/recent/prefectures_fy2026.csv. FY2025 always
     comes from the ministry's own CSV (the point of the FY2025 numbers here is
     to show the prefectural source agrees with it); FY2026 always comes from
     the prefectural source, since the ministry hasn't published it yet.
@@ -276,7 +372,10 @@ def build_recent(moe_df: pd.DataFrame, akita_df: pd.DataFrame, iwate_df: pd.Data
         "iwate", "Iwate", "Iwate Prefecture ツキノワグマ出没状況", IWATE_LANDING_URL,
         False, IWATE_FY2026_NOTE, "岩手", moe_df, iwate_df, "count")
     sample4 = build_sample4_series(points)
-    return {"built_at": utc_now_iso(), "series": [akita, miyagi, iwate, sample4]}
+    prefectures, preliminary = build_prefectures_fy2026(
+        moe_df, prefectures_df if prefectures_df is not None else pd.DataFrame())
+    return {"built_at": utc_now_iso(), "series": [akita, miyagi, iwate, sample4],
+            "prefectures": prefectures, "national_preliminary": preliminary}
 
 
 AKITA_SITES = ["hachimori", "moriyoshizan", "tazawako", "higashinaruse", "chokai"]
@@ -541,6 +640,7 @@ def build_context() -> dict:
         _csv(RECENT_DIR / "iwate_monthly.csv"),
         _csv(RECENT_DIR / "miyagi_monthly.csv"),
         _points_recent(),
+        _csv(RECENT_DIR / "prefectures_fy2026.csv"),
     )
 
     tohoku = build_tohoku_office(
