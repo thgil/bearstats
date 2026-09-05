@@ -28,23 +28,23 @@ const dur = Number(params.get("dur")) || DEFAULT_DURATION[scene] || 10;
 
 const COPY = {
   replay: {
-    title: "One year of bear reports, a month at a time",
-    dek: "Toyama, Niigata, Gunma and Saitama, April 2025 to March 2026. 64 reports in April. 1,795 in October.",
+    title: "Bear reports in four prefectures, month by month",
+    dek: "Toyama, Niigata, Gunma and Saitama, April 2025 to March 2026. April 2025: 64 reports. October 2025: 1,795. Yellow marks are people injured.",
     dateline: "Prefectural open data · bearstats.pages.dev",
   },
   years: {
-    title: "Where Japan’s bears are",
-    dek: "Sightings reported in each prefecture, fiscal years 2022 to 2025. Akita and Iwate alone reported nearly half of FY2025’s 50,801.",
+    title: "Bear sightings by prefecture, fiscal 2022 to 2025",
+    dek: "National sightings rose from 11,136 in fiscal 2022 to 50,801 in fiscal 2025. Akita and Iwate reported 46% of the fiscal 2025 total.",
     dateline: "Ministry of the Environment · bearstats.pages.dev",
   },
   overtake: {
-    title: "This spring is running 67% ahead of the record year",
-    dek: "Sightings per month. April 1,787 against 800. May 4,581 against 2,528. June 6,260 against 4,227.",
+    title: "Sightings in 2026 are 67% above the record year",
+    dek: "Sightings per month, fiscal 2026 against fiscal 2025. April: 1,787 against 800. May: 4,581 against 2,528. June: 6,260 against 4,227.",
     dateline: "Ministry of the Environment, to 30 June 2026 · bearstats.pages.dev",
   },
   deaths: {
-    title: "Thirteen people killed by bears in one year",
-    dek: "Deaths by fiscal year since the ministry’s series began in 2008. The previous worst was six.",
+    title: "Bears killed 13 people in the year to March 2026",
+    dek: "People killed by bears, by fiscal year. The count began in 2008. The previous high was 6, in fiscal 2023.",
     dateline: "Ministry of the Environment · bearstats.pages.dev",
   },
 };
