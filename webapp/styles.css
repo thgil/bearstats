@@ -256,6 +256,11 @@ h1 {
   align-items: start;
 }
 .steps { display: flex; flex-direction: column; }
+/* The first step must not become active while the chapter head is still on
+   screen: with the trigger line at 60vh, the card needs to start at least
+   60vh below the scrolly's top, or the panel is not yet pinned and the chart
+   is cut off at the bottom of the viewport. Phones use their own rule. */
+@media (min-width: 800px) { .steps { padding-top: 40vh; } }
 .step {
   min-height: 80vh;
   padding: 25vh 0;
@@ -580,3 +585,8 @@ h1 {
   .hero { padding-left: 0.75rem; padding-right: 0.75rem; }
   .chapter, .methods { padding-left: 0.75rem; padding-right: 0.75rem; }
 }
+
+/* The map carries two captions, one per mode. */
+.g[data-g="map"] .g-caption-points { display: none; }
+.g[data-g="map"].is-points .g-caption-points { display: block; }
+.g[data-g="map"].is-points .g-caption-choro { display: none; }
