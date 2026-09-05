@@ -12,7 +12,7 @@ Everything on the page exists to answer that. Anything that does not is cut.
 |---|---|---|---|
 | 1 | Fiscal 2025 (Apr 2025 to Mar 2026) was the worst year on record: 50,801 sightings, 238 injured, 13 killed. | MoE monthly sightings FY2022-26; MoE injuries/deaths FY2008-26. | Nothing. Proven. |
 | 2 | The surge was concentrated in autumn 2025 and in Tohoku (Akita + Iwate = 46%). | MoE prefecture totals; MoE monthly national series. | Prefecture x month table, if MoE publishes one, to show *where* October happened. |
-| 3 | Fiscal 2026 is running ahead: Apr-Jun sightings +67% on the same months of FY2025. | MoE monthly. | Nothing. Proven. |
+| 3 | Fiscal 2026 is running ahead: Apr-Jun sightings +67% on the same months of FY2025. | MoE monthly. | Nothing. Proven. Extended 2026-09-05: Akita, Miyagi and the four point-data prefectures show July and August 2026 below 2025 (Akita 904/251 vs 1,055/766). Iwate not comparable. |
 | 4 | Spring does not predict autumn (FY2024 was ahead of FY2025 in June and finished at 40%). | MoE monthly, 4 years. | Longer series if any exists (MoE archive, prefectural series back to 2009) so the claim rests on more than four years. |
 | 5 | Autumn surges follow failed beech/oak mast crops (2023, 2025). | Press reports only. | **Mast survey data**: Tohoku Regional Forest Office and prefectural beech (ブナ) fruiting surveys, by year and prefecture, ideally an index (凶作/不作/並作/豊作). |
 | 6 | Mast failure is linked to weather (a hot, dry summer the year before; heavy flowering the year before that). | Nothing. | **JMA station data**: monthly temperature and rainfall for Akita, Morioka, Niigata, Toyama; summer means by year. Test against the mast index. |

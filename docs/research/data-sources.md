@@ -368,3 +368,17 @@ These feed `webapp/data/points-recent.json` (11,885 geocoded points at last buil
 5. Read the Miyagi capture bar chart visually to pair 28 years of mast category with captures (3.7).
 6. Try institutional or author-hosted copies of Oka 2004, the one blocked paper that covers Tohoku (5.4).
 7. Recover and record the source URLs for the fetched-but-uncatalogued files in 2.4, 2.5 and 5.5 before any of them is cited.
+
+
+## Prefectural sources that run ahead of the ministry (added 2026-09-05)
+
+The ministry's national table lags month end by about six weeks (edition of 6 August 2026 covers to 30 June). Three prefectures publish sooner, and one of them publishes every report with coordinates.
+
+| Source | URL | As of | Granularity | Notes |
+|---|---|---|---|---|
+| Akita Prefecture, クマダス (ツキノワグマ等情報マップシステム) open data, CC BY 4.0 | https://ckan.pref.akita.lg.jp/dataset/050008_shizenhogoka_003 (CSV/JSON/XML/RDF) | records to 2026-08-31; CKAN updated 2026-09-03; "monthly" | every report: id, type (目撃/痕跡/人身被害), municipality, address, datetime, species, sex, group, count, description, lat, lon | 24,603 rows from October 2023; 23,205 black-bear rows. Reconciles with the ministry: FY2025 13,592 = 13,592; Apr-Jun 2026 2,113 vs 2,107. About 1,240 old rows carry Excel serial dates. Verified-fetched. |
+| Iwate Prefecture, ツキノワグマ出没状況 (monthly table, six fiscal years) | https://www.pref.iwate.jp/kurashikankyou/shizen/yasei/1049881/1056087.html (PDF link changes by date, e.g. 20260819_shutubotu.pdf) | 2026-08-21 | prefecture x month | FY2026 switched to the Bears app; the prefecture says FY2026 differs in nature from earlier years, so not comparable. Injuries PDF to 2026-08-29 (12 people). Verified-fetched. |
+| Miyagi Prefecture, 令和8年度クマ目撃等情報 (市町村別・月別集計) | https://www.pref.miyagi.jp/soshiki/sizenhogo/r8kumamokugeki.html (xlsx + two PDFs, dated) | 2026-09-02 | municipality x month | FY2026 Apr 141, May 318, Jun 347, Jul 222, Aug 132. Verified-fetched. |
+| Toyama, Niigata, Gunma, Saitama ArcGIS feeds | already in the pipeline (points-recent.json) | 2026-09-04 | point | Jul 2026 363 vs 420; Aug 134 vs 320. |
+
+Aggregators seen but not used: kumamap.com (claims 128,695 incidents across 47 prefectures; scrapes prefectural systems and news; no documented licence or method), kuma-watch.jp (news plus municipal notices, internal data only), FASTBEAR (Aisometry press release). None is primary.
