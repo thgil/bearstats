@@ -34,4 +34,5 @@ Everything on the page exists to answer that. Anything that does not is cut.
 - The page has been reviewed at 360, 390 and 430 px wide and at 660 and 844 px tall (phone with and without browser toolbars) and at 1280 and 1920 wide, with screenshots of every scroll step, before any deploy.
 - No text overlaps any other text or any chart at those sizes. Body text contrast is at least 7:1.
 - Charts are never shown empty. If an animation has not played, the finished state is shown.
+- Every chart passes the stranger test on its own, with the caption covered: it says inside the SVG what one mark is, what each axis measures and in what unit (tick labels and a title), and what each colour means (a legend whenever there is more than one). Callouts carry a number and a subject. The reviewer writes one sentence per chart answering "could a stranger tell what x, y and colour mean?" before deploying.
 - The page is updated within a day of the Ministry of the Environment publishing new monthly figures, by running the pipeline.
