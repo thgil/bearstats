@@ -5,7 +5,7 @@
   --paper: #f6f1e7;
   --paper-2: #efe8d8;
   --ink: #2b2620;
-  --ink-2: #5a5148;
+  --ink-2: #4d453d;  /* 8.1:1 on paper; #5a5148 measured 6.9:1 */
   --rule: #d8cdb8;
   --sight: #4a6741;
   --sight-2: #7f9a6c;
