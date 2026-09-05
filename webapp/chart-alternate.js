@@ -92,6 +92,7 @@ const TOKENS = () => ({
   mast0: cssVar("--mast-0", "#2b2620"),
   mast5: cssVar("--mast-5", "#efe6d2"),
   sight: cssVar("--sight", "#4a6741"),
+  harm: cssVar("--harm", "#b5482a"),
   serif: cssVar("--font-serif", "Newsreader, Georgia, serif"),
   sans: cssVar("--font-sans", "Public Sans, system-ui, sans-serif"),
   mono: cssVar("--font-mono", "JetBrains Mono, ui-monospace, monospace"),
@@ -100,6 +101,32 @@ const TOKENS = () => ({
 /** i's reveal step (year-by-year) at progress t: tiles appear left to right, row by row. */
 export function revealIndex(t, total, growEnd = 0.92) {
   return Math.floor((t / growEnd) * total);
+}
+
+/**
+ * Greedy word-wrap into at most `maxLines` lines that fit maxWidth px at the
+ * given font size — never cuts a word and never appends an ellipsis. If the
+ * text still doesn't fit within maxLines, the last line is left to run long
+ * rather than silently dropping words.
+ */
+export function wrapToLines(text, maxWidth, fontSize, maxLines = 2) {
+  const charW = fontSize * 0.56;
+  const maxChars = Math.max(6, Math.floor(maxWidth / charW));
+  if (text.length <= maxChars) return [text];
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (candidate.length > maxChars && line && lines.length < maxLines - 1) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
 }
 
 const ROW_LABEL_W = 74;
@@ -117,7 +144,17 @@ export function mountAlternate(container, data) {
   // without squeezing the five main rows below a legible height.
   const showSixth = akitaFiveSite.length > 0 && H >= 380;
   const nRows = showSixth ? 6 : 5;
-  const summaryH = 20;
+
+  // Short enough ("Good autumn, then poor: 22 of 23") to fit on one line at
+  // almost any panel width; wrapping onto a second line is a safety net for
+  // the narrowest containers, never an ellipsis.
+  const summaryFull = `Good autumn, then poor: ${goodToPoor} of ${goodTotal}`;
+  const summaryFontSize = 11.5;
+  const summaryMaxW = W - M.left - M.right;
+  const summaryLines = wrapToLines(summaryFull, summaryMaxW, summaryFontSize);
+  const summaryLineH = 14;
+  const summaryH = 6 + summaryLines.length * summaryLineH;
+
   const plotH = H - M.top - M.bottom - summaryH;
   const rowH = plotH / nRows;
   const tileGap = 2;
@@ -134,6 +171,7 @@ export function mountAlternate(container, data) {
 
   const allTiles = [];
   const allArrows = [];
+  const useDots = W < 500;
 
   rows.forEach((row, ri) => {
     const g = svg.append("g").attr("transform", `translate(0,${M.top + ri * rowH})`);
@@ -155,15 +193,26 @@ export function mountAlternate(container, data) {
       allTiles.push(rect);
 
       if (yr.good && yi < row.years.length - 1 && !row.years[yi + 1].good) {
-        const arrow = g.append("text")
-          .attr("x", x(yr.fy) + tileW + (x.step() - tileW) / 2)
-          .attr("y", rowH / 2)
-          .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
-          .attr("font-size", Math.min(13, tileH * 0.7))
-          .attr("fill", T.ink)
-          .attr("opacity", 0)
-          .attr("data-order", idx)
-          .text("→");
+        // At narrow widths the gap between tiles is a few px at most — an
+        // arrow glyph doesn't fit and renders as a broken mark straddling
+        // the tile edges. Below 500px a small rust dot centred in the same
+        // gap carries the same "here" signal without needing room for a
+        // legible character.
+        const gapCx = x(yr.fy) + tileW + (x.step() - tileW) / 2;
+        const arrow = useDots
+          ? g.append("circle")
+              .attr("cx", gapCx).attr("cy", rowH / 2).attr("r", 1.5)
+              .attr("fill", T.harm)
+              .attr("opacity", 0)
+              .attr("data-order", idx)
+          : g.append("text")
+              .attr("x", gapCx).attr("y", rowH / 2)
+              .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+              .attr("font-size", Math.min(13, tileH * 0.7))
+              .attr("fill", T.ink)
+              .attr("opacity", 0)
+              .attr("data-order", idx)
+              .text("→");
         allArrows.push(arrow);
       }
     });
@@ -197,19 +246,15 @@ export function mountAlternate(container, data) {
     });
   }
 
-  const summaryFull = `A good autumn was followed by a poor one in ${goodToPoor} of ${goodTotal} prefecture-years.`;
-  const summaryMaxW = W - M.left - M.right;
-  const summaryText = (() => {
-    const maxChars = Math.max(10, Math.floor(summaryMaxW / (11.5 * 0.56)));
-    return summaryFull.length <= maxChars ? summaryFull : summaryFull.slice(0, maxChars - 1).trimEnd() + "…";
-  })();
-
   const summary = svg.append("g").attr("opacity", 0);
-  summary.append("text")
-    .attr("x", M.left).attr("y", H - 6)
-    .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 11.5)
-    .attr("fill", T.ink)
-    .text(summaryText);
+  const summaryBaseY = H - 6 - (summaryLines.length - 1) * summaryLineH;
+  summaryLines.forEach((line, i) => {
+    summary.append("text")
+      .attr("x", M.left).attr("y", summaryBaseY + i * summaryLineH)
+      .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", summaryFontSize)
+      .attr("fill", T.ink)
+      .text(line);
+  });
 
   const totalCells = rows.length * years.length + sixthTiles.length;
 

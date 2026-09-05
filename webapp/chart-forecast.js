@@ -107,23 +107,48 @@ const TOKENS = () => ({
 });
 
 /**
- * Cut plain text to roughly fit maxWidth px at the given font size, so a
- * long survey line or footer sentence never runs past the chart's frame at
- * 340px width. The per-character estimate is generous (mixed Latin/Japanese
- * text) so it trims a little early rather than clipping.
+ * Short, never-truncated display line for one of the four other-source
+ * surveys. Each source's raw value string has its own shape (Niigata names
+ * a points count and a region tally, Toyama lists three species, Akita
+ * counts sites), so each gets its own compact phrasing rather than a
+ * generic "name: value" that risks running long enough to need an ellipsis.
  */
-function truncateToWidth(text, maxWidth, fontSize) {
-  const charW = fontSize * 0.62;
-  const maxChars = Math.max(6, Math.floor(maxWidth / charW));
-  if (text.length <= maxChars) return text;
-  return text.slice(0, maxChars - 1).trimEnd() + "…";
+function formatSurveyLine(s) {
+  const raw = String(s.value ?? "");
+  if (/^Niigata/.test(s.name)) {
+    const pts = /(\d+)\s*points/.exec(raw)?.[1] ?? "?";
+    const region = /(\d+)\s*of\s*(\d+)\s*regions/.exec(raw);
+    const cat = /^(\S+)/.exec(raw)?.[1] ?? raw;
+    const regionPhrase = region && region[1] === region[2]
+      ? `all ${region[2]} regions`
+      : region ? `${region[1]} of ${region[2]} regions` : "";
+    return `Niigata, ${pts} points: ${cat}${regionPhrase ? ` in ${regionPhrase}` : ""}`;
+  }
+  if (/^Toyama/.test(s.name)) {
+    return `Toyama: ${raw.split(/,\s*/).join(" · ")}`;
+  }
+  if (/^Akita/.test(s.name)) {
+    const m = /○\s*at\s*(\d+)\s*of\s*(\d+)/.exec(raw);
+    return `Akita five sites: ○ at ${m ? `${m[1]} of ${m[2]}` : raw}`;
+  }
+  if (/^Fukushima/.test(s.name)) {
+    return `Fukushima flowering: ${raw}`;
+  }
+  return `${s.name}: ${raw}`;
 }
 
-function luminance(hex) {
-  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || "");
-  if (!m) return 1;
-  const [r, g, b] = m.slice(1).map(h => parseInt(h, 16) / 255);
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+/**
+ * Relative luminance of a CSS colour. Accepts anything d3.color understands
+ * — in particular "rgb(r, g, b)", which is what d3.scaleLinear's colour
+ * interpolation actually returns (not the "#rrggbb" hex it started from), so
+ * a naive hex-only regex here silently fails on every interpolated tile and
+ * always falls back to dark ink text, even over the darkest tiles.
+ */
+function luminance(color) {
+  const c = typeof d3 !== "undefined" && d3.color ? d3.color(color) : null;
+  if (!c) return 1;
+  const { r, g, b } = c.rgb();
+  return 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255);
 }
 
 export function mountForecast(container, data) {
@@ -134,26 +159,83 @@ export function mountForecast(container, data) {
   const T = TOKENS();
   const { width: W, height: H } = container.getBoundingClientRect();
   const colorScale = d3.scaleLinear().domain([0, 1, 2, 3, 4, 5]).range(T.mast).clamp(true);
-  const textFor = fill => (luminance(fill) < 0.5 ? T.paper : T.ink);
+  const textFor = fill => (luminance(fill) < 0.4 ? T.paper : T.ink);
 
+  // Wide panels put the text block beside the tile grid instead of below it
+  // — stacking everything in one narrow left-hand column left the right
+  // half of a desktop panel empty. Below the breakpoint the layout is
+  // unchanged: tiles on top, text stacked underneath, tiles sized off the
+  // row height as before.
+  const isWide = W >= 640;
   const M = { top: 8, right: 12, bottom: 8, left: 76 };
-  const meansH = 18, surveysH = surveys.length * 14 + 6, footerH = 34;
-  const rowsAreaH = H - M.top - M.bottom - meansH - surveysH - footerH;
-  const rowH = rowsAreaH / byPref.length;
+  const headerH = 16; // "July 2023 / 2025 / 2026" column headers, above every layout
+  const tileGap = 10;
+  const maxBigW = 110;
 
   const svg = d3.select(container).append("svg")
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%").style("height", "100%");
 
-  const smallW = Math.min(36, rowH * 0.7);
-  const bigW = smallW * 1.5;
-  const tileGap = 10;
-  const rowW = smallW * 2 + tileGap * 2 + bigW;
+  const meansH = 18, surveysH = surveys.length * 14 + 6, footerH = 34;
+  const gridTop = M.top + headerH;
+  const rowsAreaH = isWide
+    ? H - gridTop - M.bottom
+    : H - gridTop - M.bottom - meansH - surveysH - footerH;
+  const rowH = rowsAreaH / byPref.length;
+
   const rowsLeft = M.left;
+  let smallW, bigW;
+  if (isWide) {
+    // Tile columns may grow up to maxBigW for the 2026 tile, but never past
+    // ~60% of the panel width, so the tiles and the text block read as one
+    // composition rather than a strip with empty space beside it.
+    const textColW = Math.max(230, W * 0.34);
+    const budget = Math.max(90, Math.min(W * 0.6 - M.left, W - M.left - M.right - textColW));
+    smallW = Math.max(18, (budget - 2 * tileGap) / 3.5);
+    bigW = smallW * 1.5;
+    if (bigW > maxBigW) { bigW = maxBigW; smallW = bigW / 1.5; }
+  } else {
+    smallW = Math.min(36, rowH * 0.7);
+    bigW = smallW * 1.5;
+  }
+  const rowW = smallW * 2 + tileGap * 2 + bigW;
+  // Wide: text block sits to the right of the tile grid. Narrow: it stacks
+  // below (rowsLeft), as before.
+  const textLeft = isWide ? rowsLeft + rowW + 40 : rowsLeft;
+
+  // "July 2023" at 12px needs ~59px; below that a narrow tile column (as on
+  // phones, where even the biggest of the three columns can be under that)
+  // would overlap its neighbour. Below the threshold every column instead
+  // gets just its year, with a single shared "July" label to their left —
+  // still says what the columns are, without three overlapping copies of it.
+  const headerFull = smallW >= 60;
+  const tileSpecs = [
+    { key: "f2023", w: smallW, label: headerFull ? "July 2023" : "2023" },
+    { key: "f2025", w: smallW, label: headerFull ? "July 2025" : "2025" },
+    { key: "f2026", w: bigW, label: headerFull ? "July 2026" : "2026" },
+  ];
+  const colCenters = (() => {
+    let cx = 0;
+    return tileSpecs.map(spec => { const c = cx + spec.w / 2; cx += spec.w + tileGap; return c; });
+  })();
+
+  // ---- column headers -----------------------------------------------------------
+  if (!headerFull) {
+    svg.append("text")
+      .attr("x", rowsLeft - 8).attr("y", M.top + headerH - 5)
+      .attr("text-anchor", "end")
+      .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+      .text("July");
+  }
+  svg.append("g").selectAll("text").data(tileSpecs).join("text")
+    .attr("x", (d, i) => rowsLeft + colCenters[i]).attr("y", M.top + headerH - 5)
+    .attr("text-anchor", "middle")
+    .attr("font-family", T.sans).attr("font-size", 12).attr("fill", T.ink2)
+    .text(d => d.label);
 
   const groups = svg.append("g").selectAll("g").data(byPref).join("g")
-    .attr("transform", (d, i) => `translate(${rowsLeft},${M.top + i * rowH})`);
+    .attr("transform", (d, i) => `translate(${rowsLeft},${gridTop + i * rowH})`);
 
   groups.append("text")
     .attr("x", -8).attr("y", rowH / 2)
@@ -161,12 +243,6 @@ export function mountForecast(container, data) {
     .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 13)
     .attr("fill", T.ink)
     .text(d => d.label);
-
-  const tileSpecs = [
-    { key: "f2023", w: smallW, label: "'23" },
-    { key: "f2025", w: smallW, label: "'25" },
-    { key: "f2026", w: bigW, label: "'26" },
-  ];
 
   const allTiles = [];
   groups.each(function (d) {
@@ -195,36 +271,39 @@ export function mountForecast(container, data) {
   });
 
   // ---- means line -------------------------------------------------------------
-  const meansY = M.top + rowsAreaH + 12;
+  const meansY = isWide ? gridTop + 12 : gridTop + rowsAreaH + 12;
   const meansText = svg.append("text")
-    .attr("x", rowsLeft).attr("y", meansY)
+    .attr("x", textLeft).attr("y", meansY)
     .attr("font-family", T.mono).attr("font-size", 11.5)
     .attr("fill", T.ink)
     .attr("opacity", 0)
     .text(`July mean ${fmt(means[2023])} · ${fmt(means[2025])} · ${fmt(means[2026])}`);
 
   // ---- other surveys ------------------------------------------------------------
-  const textMaxW = W - rowsLeft - M.right;
+  // Fixed, hand-shortened phrasing per source (see formatSurveyLine) so none
+  // of these ever needs an ellipsis, at any panel width.
   const surveyGroup = svg.append("g").attr("opacity", 0);
   surveys.forEach((s, i) => {
     surveyGroup.append("text")
-      .attr("x", rowsLeft).attr("y", meansY + 18 + i * 14)
+      .attr("x", textLeft).attr("y", meansY + 18 + i * 14)
       .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
-      .text(truncateToWidth(`${s.name}: ${s.value}`, textMaxW, 10));
+      .text(formatSurveyLine(s));
   });
 
   // ---- footer -------------------------------------------------------------------
+  // Two short lines instead of one long sentence, so the 大凶作/凶作 track
+  // record never needs truncating either.
   const footer = svg.append("g").attr("opacity", 0);
   footer.append("text")
-    .attr("x", rowsLeft).attr("y", H - 19)
+    .attr("x", textLeft).attr("y", H - 19)
     .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 10.5)
     .attr("fill", T.ink)
-    .text(truncateToWidth(`In ${record.goodNeverWorst.split(" of ")[1]} prefecture-years a July forecast of 並作 or better has never ended in 大凶作.`, textMaxW, 10.5));
+    .text(`July 並作 or better, then 大凶作: ${record.goodNeverWorst}`);
   footer.append("text")
-    .attr("x", rowsLeft).attr("y", H - 4)
+    .attr("x", textLeft).attr("y", H - 4)
     .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 10.5)
     .attr("fill", T.ink)
-    .text(`It slipped to 凶作 ${record.goodToPoor} times.`);
+    .text(`then 凶作: ${record.goodToPoor}`);
 
   function fmt(v) { return v == null ? "-" : v.toFixed(2); }
 

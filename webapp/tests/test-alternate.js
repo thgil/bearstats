@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { alternatePairs, akitaSiteSeries } from "../chart-alternate.js";
+import { alternatePairs, akitaSiteSeries, wrapToLines } from "../chart-alternate.js";
 
 const context = JSON.parse(
   readFileSync(new URL("../data/context.json", import.meta.url))
@@ -33,4 +33,24 @@ test("akitaSiteSeries: excludes the forecast row and covers 2002-2025", () => {
   assert.ok(rows.every(r => r.year <= 2025));
   assert.equal(rows[0].year, 2002);
   assert.equal(rows.at(-1).year, 2025);
+});
+
+test("wrapToLines: fits on one line when there's room, never truncates", () => {
+  const lines = wrapToLines("Good autumn, then poor: 22 of 23", 400, 11.5);
+  assert.equal(lines.length, 1);
+  assert.equal(lines[0], "Good autumn, then poor: 22 of 23");
+});
+
+test("wrapToLines: wraps onto a second line instead of adding an ellipsis", () => {
+  const text = "Good autumn, then poor: 22 of 23";
+  const lines = wrapToLines(text, 60, 11.5);
+  assert.ok(lines.length <= 2);
+  assert.ok(lines.every(l => !l.includes("…")));
+  assert.equal(lines.join(" "), text);
+});
+
+test("wrapToLines: never drops words even when it can't fit two lines", () => {
+  const text = "Good autumn, then poor: 22 of 23";
+  const lines = wrapToLines(text, 1, 11.5);
+  assert.equal(lines.join(" "), text);
 });

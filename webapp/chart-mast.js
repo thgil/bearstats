@@ -113,12 +113,24 @@ const TOKENS = () => ({
   mono: cssVar("--font-mono", "JetBrains Mono, ui-monospace, monospace"),
 });
 
-/** Relative luminance of a hex colour, used to choose white-on-dark text. */
-function luminance(hex) {
-  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || "");
-  if (!m) return 1;
-  const [r, g, b] = m.slice(1).map(h => parseInt(h, 16) / 255);
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+/**
+ * Relative luminance of a CSS colour, used to choose paper-on-dark vs
+ * ink-on-pale text. Accepts anything d3.color understands — in particular
+ * "rgb(r, g, b)", which is what d3.scaleLinear's colour interpolation
+ * actually returns (not the "#rrggbb" hex the colour started from), so a
+ * naive hex-only regex here silently fails on every interpolated tile and
+ * always falls back to dark ink text, even over the darkest tiles.
+ */
+function luminance(color) {
+  const c = typeof d3 !== "undefined" && d3.color ? d3.color(color) : null;
+  if (!c) return 1;
+  const { r, g, b } = c.rgb();
+  return 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255);
+}
+
+/** Paper text over dark tiles, ink over pale ones — luminance < 0.4 is dark. */
+function textOn(fill, dark, light) {
+  return luminance(fill) < 0.4 ? dark : light;
 }
 
 /** i's reveal fraction at progress t, left to right, one slot per year. */
@@ -190,7 +202,7 @@ export function mountMast(container, data) {
     .attr("x", bw / 2).attr("y", tileH / 2 - (showCategory ? 4 : 0))
     .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
     .attr("font-family", T.mono).attr("font-size", numFontSize).attr("font-variant-numeric", "tabular-nums")
-    .attr("fill", d => (luminance(colorScale(d.meanIndex)) < 0.5 ? T.paper : T.ink))
+    .attr("fill", d => textOn(colorScale(d.meanIndex), T.paper, T.ink))
     .text(d => d.meanIndex.toFixed(decimals));
 
   if (showCategory) {
@@ -198,7 +210,7 @@ export function mountMast(container, data) {
       .attr("x", bw / 2).attr("y", tileH - 6)
       .attr("text-anchor", "middle")
       .attr("font-family", T.sans).attr("font-size", 9)
-      .attr("fill", d => (luminance(colorScale(d.meanIndex)) < 0.5 ? T.paper : T.ink2))
+      .attr("fill", d => textOn(colorScale(d.meanIndex), T.paper, T.ink2))
       .attr("opacity", 0.85)
       .text(d => d.category);
   }

@@ -52,8 +52,12 @@ const TOKENS = () => ({
   mono: cssVar("--font-mono", "JetBrains Mono, ui-monospace, monospace"),
 });
 
-const NOTE = "rho = +0.45, n = 16: no support for hot summers causing failures";
-const CAPTION = "Akita, prior-summer (Jun-Aug) mean temperature vs the same year's beech score, 2010-2025 (Forest Office cross-check)";
+// The in-chart note carries only the statistic; the explanation ("no
+// support for hot summers causing failures") and the full methods sentence
+// both already live in the page's own <p class="g-caption"> next to this
+// panel, so repeating a trimmed, truncated copy of either inside the SVG
+// only doubled the text without ever managing to say all of it.
+const NOTE = "rho = +0.45, n = 16";
 
 export function mountWeather(container, data) {
   container.innerHTML = "";
@@ -69,7 +73,7 @@ export function mountWeather(container, data) {
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%").style("height", "100%");
 
-  const noteH = 30;
+  const noteH = 18; // one line now that the explanation lives in the page caption
   const plotW = W - M.left - M.right;
   const plotH = H - M.top - M.bottom - noteH;
 
@@ -104,53 +108,66 @@ export function mountWeather(container, data) {
     .attr("opacity", 0);
 
   // The point of this chart is that the years cluster with no pattern, so
-  // several fall close together in both axes (e.g. '19, '21, '23). A greedy
-  // vertical nudge keeps every year label readable without pulling any of
-  // them away from its own point by more than a few rows, clamped so a
-  // nudge never lands on the axis ticks above or below the frame.
+  // several fall within a few px of each other in both axes at once (e.g.
+  // FY2014/'19/'21/'23 are all within 0.1°C and 0.3 index of each other) —
+  // close enough that nudging a label up or down alone still leaves it
+  // overlapping a neighbour at the same x. Each label instead tries slots in
+  // a widening ring around its own point (12 angles at each of five radii),
+  // in point order, taking the first that doesn't overlap anything already
+  // placed; the growing radius means even a four-point knot can spread out
+  // into the surrounding empty space rather than only ever trying to fit
+  // beside itself.
   const labelMinY = M.top + 8, labelMaxY = M.top + plotH - 6;
-  const placed = [];
-  const labelPos = points.map(d => {
-    const lx = x(d.temp) + 6;
-    const base = y(d.index) - 6;
-    let ly = Math.min(labelMaxY, Math.max(labelMinY, base));
-    let attempt = 0;
-    while (placed.some(p => Math.abs(p.x - lx) < 26 && Math.abs(p.y - ly) < 12) && attempt < 12) {
-      attempt++;
-      const dir = attempt % 2 === 0 ? 1 : -1;
-      const candidate = base + dir * Math.ceil(attempt / 2) * 12;
-      ly = Math.min(labelMaxY, Math.max(labelMinY, candidate));
+  const labelPlotLeft = M.left + 2, labelPlotRight = M.left + plotW - 2;
+  const labelW = 3 * 10 * 0.62, labelH = 11; // "'XX" at 10px mono, generous estimate
+  const boxesOverlap = (a, b) => !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top);
+
+  function candidatesFor(px, py) {
+    const angles = [0, 45, -45, 90, -90, 135, -135, 180, 22, -22, 158, -158];
+    const radii = [10, 16, 24, 34, 46];
+    const cands = [];
+    for (const r of radii) {
+      for (const a of angles) {
+        const rad = (a * Math.PI) / 180;
+        const dx = Math.sin(rad) * r, dy = -Math.cos(rad) * r;
+        const lx = Math.min(labelPlotRight, Math.max(labelPlotLeft, px + dx));
+        const ly = Math.min(labelMaxY, Math.max(labelMinY, py + dy));
+        const anchor = dx > 2 ? "start" : dx < -2 ? "end" : "middle";
+        const left = anchor === "start" ? lx : anchor === "end" ? lx - labelW : lx - labelW / 2;
+        cands.push({ x: lx, y: ly, anchor, left, right: left + labelW, top: ly - labelH, bottom: ly + 3 });
+      }
     }
-    placed.push({ x: lx, y: ly });
-    return { x: lx, y: ly };
+    return cands;
+  }
+
+  const placedBoxes = [];
+  const order = points.map((_, i) => i).sort((a, b) => x(points[a].temp) - x(points[b].temp));
+  const labelPos = new Array(points.length);
+  order.forEach(i => {
+    const d = points[i];
+    const cands = candidatesFor(x(d.temp), y(d.index));
+    const chosen = cands.find(c => !placedBoxes.some(b => boxesOverlap(c, b))) || cands[0];
+    placedBoxes.push(chosen);
+    labelPos[i] = chosen;
   });
 
   const labels = svg.append("g").selectAll("text").data(points).join("text")
     .attr("x", (d, i) => labelPos[i].x).attr("y", (d, i) => labelPos[i].y)
+    .attr("text-anchor", (d, i) => labelPos[i].anchor)
     .attr("font-family", T.mono).attr("font-size", 10)
     .attr("fill", T.ink2)
     .attr("opacity", 0)
     .text(d => `'${String(d.fy).slice(2)}`);
 
-  // Trimmed to the plot width so neither line runs past the frame at 340px;
-  // the full wording still reaches the reader through the step's own prose.
-  const textMaxW = W - M.left - 4;
-  const truncateToWidth = (text, fontSize) => {
-    const maxChars = Math.max(6, Math.floor(textMaxW / (fontSize * 0.6)));
-    return text.length <= maxChars ? text : text.slice(0, maxChars - 1).trimEnd() + "…";
-  };
-
+  // In-chart note: just the statistic. The explanation and the full methods
+  // sentence live in the page's own caption next to this panel (never
+  // truncated here, because there's nothing left to truncate).
   const note = svg.append("g").attr("opacity", 0);
   note.append("text")
-    .attr("x", M.left).attr("y", H - 18)
+    .attr("x", M.left).attr("y", H - 4)
     .attr("font-family", T.serif).attr("font-style", "italic").attr("font-size", 12)
     .attr("fill", T.ink)
-    .text(truncateToWidth(NOTE, 12));
-  note.append("text")
-    .attr("x", M.left).attr("y", H - 4)
-    .attr("font-family", T.sans).attr("font-size", 9.5)
-    .attr("fill", T.ink2)
-    .text(truncateToWidth(CAPTION, 9.5));
+    .text(NOTE);
 
   function play() {
     dots.interrupt().transition().delay((_, i) => i * 60).duration(1).attr("opacity", 1);

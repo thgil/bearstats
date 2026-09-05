@@ -14,7 +14,9 @@ export function licenceSeries(ctx) {
     .map(r => ({
       year: r.year,
       total: r.total,
-      gun: (r.gun1 ?? 0) + (r.gun2 ?? 0),
+      // First-class gun licences only (第1種銃猟), the series the copy quotes:
+      // 493,700 in 1975 to 84,400 in 2021. gun2 (air rifles) is ~2,000.
+      gun: r.gun1 ?? 0,
       trap: r.trap ?? null,
       net: r.net ?? null,
     }))
@@ -48,6 +50,16 @@ export function pathLength(path) {
   return path && typeof path.getTotalLength === "function" ? path.getTotalLength() : 0;
 }
 
+/** Y-axis tick label: "500k" rather than "500,000", so it fits a margin sized to it. */
+export function formatK(v) {
+  return v === 0 ? "0" : `${Math.round(v / 1000)}k`;
+}
+
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function mountLicences(container, data) {
   container.innerHTML = "";
   const rows = licenceSeries(data);
@@ -56,7 +68,18 @@ export function mountLicences(container, data) {
   const T = TOKENS();
   const colors = { ink: T.ink, sight: T.sight, rule: T.ink2 }; // "total" line drawn slightly darker than a pure rule so it stays legible
   const { width: W, height: H } = container.getBoundingClientRect();
-  const M = { top: 16, right: 86, bottom: 26, left: 46 };
+
+  // "500,000" against a 46px margin runs past x=0 and gets clipped by the
+  // container's overflow:hidden — the margin was sized for nothing in
+  // particular. Two fixes: format ticks as "500k" (much narrower), and size
+  // the margin to whatever the widest formatted tick actually needs, using
+  // the same (nice()'d) domain the final y-scale below will use.
+  const maxY = d3.max(rows, d => Math.max(d.total, d.gun, d.trap || 0));
+  const yDomain = d3.scaleLinear().domain([0, maxY]).nice().domain();
+  const previewTicks = d3.scaleLinear().domain(yDomain).ticks(4);
+  const tickCharW = 10 * 0.62; // 10px sans-serif digits/letters, generous estimate
+  const widestTickW = Math.max(...previewTicks.map(v => formatK(v).length)) * tickCharW;
+  const M = { top: 16, right: 86, bottom: 26, left: Math.ceil(widestTickW) + 16 };
 
   const svg = d3.select(container).append("svg")
     .attr("viewBox", `0 0 ${W} ${H}`)
@@ -67,8 +90,7 @@ export function mountLicences(container, data) {
   const plotH = H - M.top - M.bottom - 16; // 16px reserved for the closing note
 
   const x = d3.scaleLinear().domain(d3.extent(rows, d => d.year)).range([M.left, M.left + plotW]);
-  const maxY = d3.max(rows, d => Math.max(d.total, d.gun, d.trap || 0));
-  const y = d3.scaleLinear().domain([0, maxY]).nice().range([M.top + plotH, M.top]);
+  const y = d3.scaleLinear().domain(yDomain).range([M.top + plotH, M.top]);
 
   // Hairline frame + y ticks.
   svg.append("rect")
@@ -78,7 +100,7 @@ export function mountLicences(container, data) {
     .attr("x", M.left - 6).attr("y", d => y(d) + 3)
     .attr("text-anchor", "end")
     .attr("font-family", T.sans).attr("font-size", 10).attr("fill", T.ink2)
-    .text(d => d3.format(",")(d));
+    .text(d => formatK(d));
 
   // Candidate ticks (every decade, plus the first and last published year)
   // thinned to whatever the plot is actually wide enough to hold: keep a
@@ -153,6 +175,19 @@ export function mountLicences(container, data) {
   });
 
   function play() {
+    // "Played once, on scroll" (chapter 4 has no director driving
+    // setProgress) means nothing else guarantees this ever finishes before
+    // it's looked at — a quick screenshot or a fast scroll can land mid-draw
+    // and never see the rest. Reduced motion jumps straight to the end
+    // state instead of racing a ~1.6s staggered reveal against whatever
+    // happens to look at the chart next.
+    if (prefersReducedMotion()) {
+      paths.forEach(({ path }) => path.interrupt().attr("stroke-dashoffset", 0));
+      startLabel.interrupt().attr("opacity", 1);
+      endLabels.forEach(g => g && g.interrupt().attr("opacity", 1));
+      note.interrupt().attr("opacity", 1);
+      return;
+    }
     paths.forEach(({ path }, i) => {
       path.interrupt().transition().delay(i * 120).duration(900).ease(d3.easeCubicOut)
         .attr("stroke-dashoffset", 0);

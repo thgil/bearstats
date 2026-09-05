@@ -58,6 +58,11 @@ const TOKENS = () => ({
   mono: cssVar("--font-mono", "JetBrains Mono, ui-monospace, monospace"),
 });
 
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 const MAX_ROWS_WIDE = 16;
 const MAX_ROWS_NARROW = 8;
 const NARROW_BREAKPOINT = 380;
@@ -159,6 +164,24 @@ export function mountPopulation(container, data) {
     .text(omitted > 0 ? `${omitted} more prefecture${omitted === 1 ? "" : "s"} not shown at this size.` : "");
 
   function play() {
+    // "Played once, on scroll" (chapter 4 has no director driving
+    // setProgress) means nothing else guarantees this ever finishes before
+    // it's looked at — a quick screenshot or a fast scroll can land mid-reveal
+    // and never see the far ("to") end of any row. Reduced motion jumps
+    // straight to the end state instead of racing a per-row stagger that can
+    // take over a second to finish for 16 rows.
+    if (prefersReducedMotion()) {
+      lines.interrupt().attr("x2", d => x(d.to));
+      dotsFrom.interrupt().attr("opacity", 1);
+      labelsFrom.interrupt().attr("opacity", 1);
+      dotsTo.interrupt().attr("cx", d => x(d.to)).attr("opacity", 1);
+      labelsTo.interrupt()
+        .attr("x", d => x(d.to))
+        .attr("text-anchor", d => anchorFor(x(d.to), `${d.to.toLocaleString()} (${d.toYear})`))
+        .attr("opacity", 1);
+      caption.interrupt().attr("opacity", 1);
+      return;
+    }
     lines.interrupt().transition().delay((_, i) => i * 55).duration(500).ease(d3.easeCubicOut)
       .attr("x2", d => x(d.to));
     dotsFrom.interrupt().transition().delay((_, i) => i * 55).duration(1).attr("opacity", 1);
